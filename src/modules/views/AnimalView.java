@@ -163,7 +163,8 @@ public class AnimalView extends VBox {
         actionColumn.setCellFactory(param -> new TableCell<>() {
             private final Button editButton = new Button("✏️");
             private final Button deleteButton = new Button("❌");
-            private final HBox pane = new HBox(5, editButton, deleteButton);
+            private final Button attachmentsButton = new Button("Anexos");
+            private final HBox pane = new HBox(5, editButton, deleteButton, attachmentsButton);
 
             {
                 editButton.setOnAction(event -> {
