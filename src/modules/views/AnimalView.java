@@ -15,9 +15,8 @@ import config.Database;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.UUID;
 
-public class AnimalListView extends VBox {
+public class AnimalView extends VBox {
 
     private TableView<Animal> tableView;
     private ObservableList<Animal> animalList;
@@ -27,7 +26,7 @@ public class AnimalListView extends VBox {
     private final BorderPane mainLayout;
 
     // Construtor modificado para receber o mainLayout
-    public AnimalListView(BorderPane mainLayout) {
+    public AnimalView(BorderPane mainLayout) {
         this.mainLayout = mainLayout;
 
         try {
@@ -46,8 +45,15 @@ public class AnimalListView extends VBox {
             this.mainLayout.setCenter(new AnimalForm(this.mainLayout));
         });
 
+        // Botão "Menu" para voltar ao MainMenuView
+        Button menuButton = new Button("Menu");
+        menuButton.setOnAction(e -> {
+            MenuView mainMenu = new MenuView(this.mainLayout, null); // Passando o mainLayout
+            this.mainLayout.setCenter(mainMenu);  // Atualizando o layout com o menu principal
+        });
+
         // HBox para agrupar os botões
-        HBox buttonBox = new HBox(10, addButton);
+        HBox buttonBox = new HBox(10, addButton, menuButton);
         buttonBox.setPadding(new Insets(10, 10, 10, 10));
 
         // ... (código das colunas e CellFactory) ...
@@ -163,7 +169,7 @@ public class AnimalListView extends VBox {
                 editButton.setOnAction(event -> {
                     Animal animal = getTableView().getItems().get(getIndex());
                     if (animal != null) {
-                        AnimalListView.this.mainLayout.setCenter(new AnimalForm(AnimalListView.this.mainLayout, animal));
+                        AnimalView.this.mainLayout.setCenter(new AnimalForm(AnimalView.this.mainLayout, animal));
                     } else {
                         Alert alert = new Alert(Alert.AlertType.WARNING);
                         alert.setTitle("Nenhum animal selecionado");

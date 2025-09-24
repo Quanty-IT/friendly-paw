@@ -11,10 +11,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import modules.controllers.MedicineBrandController;
-import modules.models.MedicineBrand;
+import modules.controllers.MedicineController;
+import modules.models.Medicine;
 import config.Database;
-
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -22,20 +21,20 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
-public class MedicineBrandView extends VBox {
+public class MedicineView extends VBox {
 
-    private TableView<MedicineBrand> table;
-    private ObservableList<MedicineBrand> brandsList;
+    private TableView<Medicine> table;
+    private ObservableList<Medicine> medicinesList;
     private Connection conn;
-    private MedicineBrandController controller;
-    private BorderPane mainLayout;
+    private MedicineController controller;
+    private BorderPane mainLayout; // A referência para o layout principal
 
-    public MedicineBrandView(BorderPane mainLayout) {
-        this.mainLayout = mainLayout;  // Passando o mainLayout para dentro da view
+    public MedicineView(BorderPane mainLayout) {
+        this.mainLayout = mainLayout; // Passa o mainLayout no construtor
 
         try {
             this.conn = Database.getConnection();
-            this.controller = new MedicineBrandController(conn);
+            this.controller = new MedicineController(conn);
         } catch (SQLException e) {
             e.printStackTrace();
             new Alert(Alert.AlertType.ERROR, "Erro ao conectar com o banco de dados.").showAndWait();
@@ -49,21 +48,48 @@ public class MedicineBrandView extends VBox {
 
     private void initializeComponents() {
         table = new TableView<>();
-        brandsList = FXCollections.observableArrayList();
-        table.setItems(brandsList);
+        medicinesList = FXCollections.observableArrayList();
+        table.setItems(medicinesList);
 
-        TableColumn<MedicineBrand, Integer> idColumn = new TableColumn<>("ID");
+        TableColumn<Medicine, Integer> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         idColumn.setPrefWidth(50);
 
-        TableColumn<MedicineBrand, String> nameColumn = new TableColumn<>("Nome");
+        TableColumn<Medicine, String> nameColumn = new TableColumn<>("Nome");
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         nameColumn.setPrefWidth(200);
 
-        TableColumn<MedicineBrand, LocalDateTime> createdAtColumn = new TableColumn<>("Data Criação");
+        TableColumn<Medicine, String> brandColumn = new TableColumn<>("Marca");
+        brandColumn.setCellValueFactory(new PropertyValueFactory<>("brandName"));
+        brandColumn.setPrefWidth(150);
+
+        TableColumn<Medicine, Integer> quantityColumn = new TableColumn<>("Quantidade");
+        quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        quantityColumn.setPrefWidth(100);
+
+        TableColumn<Medicine, String> descriptionColumn = new TableColumn<>("Descrição");
+        descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
+        descriptionColumn.setPrefWidth(200);
+
+        TableColumn<Medicine, Boolean> activeColumn = new TableColumn<>("Ativo");
+        activeColumn.setCellValueFactory(new PropertyValueFactory<>("isActive"));
+        activeColumn.setPrefWidth(80);
+        activeColumn.setCellFactory(column -> new TableCell<Medicine, Boolean>() {
+            @Override
+            protected void updateItem(Boolean item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item ? "Sim" : "Não");
+                }
+            }
+        });
+
+        TableColumn<Medicine, LocalDateTime> createdAtColumn = new TableColumn<>("Data Criação");
         createdAtColumn.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
-        createdAtColumn.setPrefWidth(150);
-        createdAtColumn.setCellFactory(column -> new TableCell<MedicineBrand, LocalDateTime>() {
+        createdAtColumn.setPrefWidth(130);
+        createdAtColumn.setCellFactory(column -> new TableCell<Medicine, LocalDateTime>() {
             private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
             @Override
@@ -77,7 +103,7 @@ public class MedicineBrandView extends VBox {
             }
         });
 
-        table.getColumns().addAll(idColumn, nameColumn, createdAtColumn);
+        table.getColumns().addAll(idColumn, nameColumn, brandColumn, quantityColumn, descriptionColumn, activeColumn, createdAtColumn);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
@@ -86,8 +112,8 @@ public class MedicineBrandView extends VBox {
         Button addButton = new Button("Cadastrar");
         addButton.setOnAction(e -> openAddForm());
 
-        Button medicinesButton = new Button("Medicamentos");
-        medicinesButton.setOnAction(e -> openMedicineView());
+        Button brandsButton = new Button("Marcas");
+        brandsButton.setOnAction(e -> openBrandView());
 
         Button menuButton = new Button("Menu");
         menuButton.setOnAction(e -> returnToMainMenu());
@@ -104,7 +130,7 @@ public class MedicineBrandView extends VBox {
 
         // HBox para a primeira linha de botões (Cadastrar, Medicamentos, Menu)
         HBox topButtonBox = new HBox(10);
-        topButtonBox.getChildren().addAll(addButton, medicinesButton, menuButton);
+        topButtonBox.getChildren().addAll(addButton, brandsButton, menuButton);
         topButtonBox.setPadding(new Insets(10, 0, 10, 0));
 
         // HBox para a segunda linha de botões (Atualizar, Editar, Excluir)
@@ -116,7 +142,7 @@ public class MedicineBrandView extends VBox {
         this.setPadding(new Insets(20));
         this.setSpacing(10);
         this.getChildren().addAll(
-                new Label("Marcas de Medicamentos"),
+                new Label("Medicamentos"),
                 topButtonBox,  // Primeira linha de botões
                 bottomButtonBox,  // Segunda linha de botões
                 table
@@ -127,21 +153,21 @@ public class MedicineBrandView extends VBox {
 
     private void loadData() {
         try {
-            brandsList.clear();
-            brandsList.addAll(controller.listAll());
+            medicinesList.clear();
+            medicinesList.addAll(controller.listAll());
         } catch (SQLException e) {
             e.printStackTrace();
-            new Alert(Alert.AlertType.ERROR, "Erro ao carregar marcas: " + e.getMessage()).showAndWait();
+            new Alert(Alert.AlertType.ERROR, "Erro ao carregar medicamentos: " + e.getMessage()).showAndWait();
         }
     }
 
     private void openAddForm() {
         Stage formStage = new Stage();
-        formStage.setTitle("Adicionar Marca de Remédio");
+        formStage.setTitle("Adicionar Medicamento");
         formStage.initModality(Modality.APPLICATION_MODAL);
 
-        MedicineBrandForm form = new MedicineBrandForm();
-        Scene scene = new Scene(form, 400, 200);
+        MedicineForm form = new MedicineForm();
+        Scene scene = new Scene(form, 450, 400);
 
         formStage.setScene(scene);
         formStage.setResizable(false);
@@ -152,62 +178,59 @@ public class MedicineBrandView extends VBox {
     }
 
     private void editSelected() {
-        MedicineBrand selected = table.getSelectionModel().getSelectedItem();
+        Medicine selected = table.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            new Alert(Alert.AlertType.WARNING, "Selecione uma marca para editar.").showAndWait();
+            new Alert(Alert.AlertType.WARNING, "Selecione um medicamento para editar.").showAndWait();
             return;
         }
 
-        TextInputDialog dialog = new TextInputDialog(selected.getName());
-        dialog.setTitle("Editar Marca");
-        dialog.setHeaderText("Editar nome da marca:");
-        dialog.setContentText("Nome:");
+        Stage formStage = new Stage();
+        formStage.setTitle("Editar Medicamento");
+        formStage.initModality(Modality.APPLICATION_MODAL);
 
-        Optional<String> result = dialog.showAndWait();
-        if (result.isPresent() && !result.get().trim().isEmpty()) {
-            try {
-                controller.update(selected.getId(), result.get().trim());
-                new Alert(Alert.AlertType.INFORMATION, "Marca editada com sucesso!").showAndWait();
-                loadData();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                new Alert(Alert.AlertType.ERROR, "Erro ao editar marca: " + e.getMessage()).showAndWait();
-            }
-        }
+        MedicineForm form = new MedicineForm(selected);
+        Scene scene = new Scene(form, 450, 400);
+
+        formStage.setScene(scene);
+        formStage.setResizable(false);
+
+        formStage.setOnHidden(e -> loadData());
+
+        formStage.showAndWait();
     }
 
     private void deleteSelected() {
-        MedicineBrand selected = table.getSelectionModel().getSelectedItem();
+        Medicine selected = table.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            new Alert(Alert.AlertType.WARNING, "Selecione uma marca para excluir.").showAndWait();
+            new Alert(Alert.AlertType.WARNING, "Selecione um medicamento para excluir.").showAndWait();
             return;
         }
 
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmAlert.setTitle("Confirmar Exclusão");
-        confirmAlert.setHeaderText("Excluir marca?");
-        confirmAlert.setContentText("Deseja realmente excluir a marca '" + selected.getName() + "'?");
+        confirmAlert.setHeaderText("Excluir medicamento?");
+        confirmAlert.setContentText("Deseja realmente excluir o medicamento '" + selected.getName() + "'?");
 
         Optional<ButtonType> result = confirmAlert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 controller.delete(selected.getId());
-                new Alert(Alert.AlertType.INFORMATION, "Marca excluída com sucesso!").showAndWait();
+                new Alert(Alert.AlertType.INFORMATION, "Medicamento excluído com sucesso!").showAndWait();
                 loadData();
             } catch (SQLException e) {
                 e.printStackTrace();
-                new Alert(Alert.AlertType.ERROR, "Erro ao excluir marca: " + e.getMessage()).showAndWait();
+                new Alert(Alert.AlertType.ERROR, "Erro ao excluir medicamento: " + e.getMessage()).showAndWait();
             }
         }
+    }
+
+    private void openBrandView() {
+        MedicineBrandView brandView = new MedicineBrandView(mainLayout);  // Passando mainLayout
+        mainLayout.setCenter(brandView);  // Atualizando o layout com a view de marcas de medicamentos
     }
 
     private void returnToMainMenu() {
         MenuView mainMenu = new MenuView(mainLayout, null);  // Passando mainLayout
         mainLayout.setCenter(mainMenu);  // Atualizando o layout com o menu principal
-    }
-
-    private void openMedicineView() {
-        MedicineView medicineView = new MedicineView(mainLayout);  // Passando mainLayout
-        mainLayout.setCenter(medicineView);  // Atualizando o layout com a view de medicamentos
     }
 }
