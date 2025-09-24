@@ -5,6 +5,7 @@ import javafx.stage.Stage;
 import modules.views.AnimalListView;
 import modules.views.LoginForm;
 import modules.models.User;
+import modules.views.MedicineView;
 
 public class MainApp extends Application {
 
@@ -21,7 +22,9 @@ public class MainApp extends Application {
         LoginForm login = new LoginForm((User u) -> {
             // Após o login, o conteúdo do mainLayout muda para a lista de animais
             AnimalListView animalView = new AnimalListView(this.mainLayout);
-            this.mainLayout.setCenter(animalView);
+            MedicineView mdV = new MedicineView();
+
+            this.mainLayout.setCenter(mdV);
             stage.sizeToScene();
         });
         this.mainLayout.setCenter(login);
