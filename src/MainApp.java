@@ -2,10 +2,9 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import modules.views.AnimalListView;
 import modules.views.LoginForm;
+import modules.views.MenuView;
 import modules.models.User;
-import modules.views.MedicineView;
 
 public class MainApp extends Application {
 
@@ -20,13 +19,12 @@ public class MainApp extends Application {
 
         // O conteúdo inicial do mainLayout será a tela de login
         LoginForm login = new LoginForm((User u) -> {
-            // Após o login, o conteúdo do mainLayout muda para a lista de animais
-            AnimalListView animalView = new AnimalListView(this.mainLayout);
-            MedicineView mdV = new MedicineView();
-
-            this.mainLayout.setCenter(mdV);
+            // Após o login, o conteúdo do mainLayout muda para o menu principal
+            MenuView mainMenu = new MenuView(this.mainLayout, stage);
+            this.mainLayout.setCenter(mainMenu);
             stage.sizeToScene();
         });
+
         this.mainLayout.setCenter(login);
 
         // A cena da aplicação agora é o mainLayout, que gerencia todas as views

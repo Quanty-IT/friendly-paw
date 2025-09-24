@@ -6,6 +6,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -26,8 +27,11 @@ public class MedicineView extends VBox {
     private ObservableList<Medicine> medicinesList;
     private Connection conn;
     private MedicineController controller;
+    private BorderPane mainLayout; // A referência para o layout principal
 
-    public MedicineView() {
+    public MedicineView(BorderPane mainLayout) {
+        this.mainLayout = mainLayout; // Passa o mainLayout no construtor
+
         try {
             this.conn = Database.getConnection();
             this.controller = new MedicineController(conn);
@@ -104,8 +108,19 @@ public class MedicineView extends VBox {
     }
 
     private void setupLayout() {
-        Button addButton = new Button("Adicionar Medicamento");
+        // Botões na primeira linha
+        Button addButton = new Button("Cadastrar");
         addButton.setOnAction(e -> openAddForm());
+
+        Button brandsButton = new Button("Marcas");
+        brandsButton.setOnAction(e -> openBrandView());
+
+        Button menuButton = new Button("Menu");
+        menuButton.setOnAction(e -> returnToMainMenu());
+
+        // Botões na segunda linha
+        Button refreshButton = new Button("Atualizar");
+        refreshButton.setOnAction(e -> loadData());
 
         Button editButton = new Button("Editar");
         editButton.setOnAction(e -> editSelected());
@@ -113,22 +128,27 @@ public class MedicineView extends VBox {
         Button deleteButton = new Button("Excluir");
         deleteButton.setOnAction(e -> deleteSelected());
 
-        Button refreshButton = new Button("Atualizar");
-        refreshButton.setOnAction(e -> loadData());
+        // HBox para a primeira linha de botões (Cadastrar, Medicamentos, Menu)
+        HBox topButtonBox = new HBox(10);
+        topButtonBox.getChildren().addAll(addButton, brandsButton, menuButton);
+        topButtonBox.setPadding(new Insets(10, 0, 10, 0));
 
-        HBox buttonBox = new HBox(10);
-        buttonBox.getChildren().addAll(addButton, editButton, deleteButton, refreshButton);
-        buttonBox.setPadding(new Insets(10, 0, 10, 0));
+        // HBox para a segunda linha de botões (Atualizar, Editar, Excluir)
+        HBox bottomButtonBox = new HBox(10);
+        bottomButtonBox.getChildren().addAll(refreshButton, editButton, deleteButton);
+        bottomButtonBox.setPadding(new Insets(10, 0, 10, 0));
 
+        // Organiza os botões e a tabela dentro da VBox
         this.setPadding(new Insets(20));
         this.setSpacing(10);
         this.getChildren().addAll(
                 new Label("Medicamentos"),
-                buttonBox,
+                topButtonBox,  // Primeira linha de botões
+                bottomButtonBox,  // Segunda linha de botões
                 table
         );
 
-        this.setPrefSize(800, 500);
+        this.setPrefSize(500, 400);
     }
 
     private void loadData() {
@@ -202,5 +222,15 @@ public class MedicineView extends VBox {
                 new Alert(Alert.AlertType.ERROR, "Erro ao excluir medicamento: " + e.getMessage()).showAndWait();
             }
         }
+    }
+
+    private void openBrandView() {
+        MedicineBrandView brandView = new MedicineBrandView(mainLayout);  // Passando mainLayout
+        mainLayout.setCenter(brandView);  // Atualizando o layout com a view de marcas de medicamentos
+    }
+
+    private void returnToMainMenu() {
+        MenuView mainMenu = new MenuView(mainLayout, null);  // Passando mainLayout
+        mainLayout.setCenter(mainMenu);  // Atualizando o layout com o menu principal
     }
 }

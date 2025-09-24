@@ -13,7 +13,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 public class AnimalForm extends GridPane {
 
@@ -90,7 +89,7 @@ public class AnimalForm extends GridPane {
         saveButton.setOnAction(e -> saveAnimal());
 
         Button backButton = new Button("Voltar");
-        backButton.setOnAction(e -> mainLayout.setCenter(new AnimalListView(mainLayout)));
+        backButton.setOnAction(e -> mainLayout.setCenter(new AnimalView(mainLayout)));
 
         HBox buttonBox = new HBox(10, saveButton, backButton);
 
@@ -188,7 +187,7 @@ public class AnimalForm extends GridPane {
                 System.out.println("Animal atualizado com sucesso!");
             }
             // Navega de volta para a lista após salvar
-            mainLayout.setCenter(new AnimalListView(mainLayout));
+            mainLayout.setCenter(new AnimalView(mainLayout));
         } catch (SQLException e) {
             e.printStackTrace();
         }
