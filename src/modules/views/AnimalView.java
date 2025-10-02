@@ -22,10 +22,10 @@ public class AnimalView extends VBox {
     private ObservableList<Animal> animalList;
     private Connection conn;
 
-    // Adicionado: referência ao layout principal
-    private final BorderPane mainLayout;
+     // Adicionado: referência ao layout principal
+     private final BorderPane mainLayout;
 
-    // Construtor modificado para receber o mainLayout
+     // Construtor modificado para receber o mainLayout
     public AnimalView(BorderPane mainLayout) {
         this.mainLayout = mainLayout;
 
@@ -41,19 +41,18 @@ public class AnimalView extends VBox {
         // Botão para Cadastrar um novo animal
         Button addButton = new Button("Cadastrar");
         addButton.setOnAction(e -> {
-            // Navega para o formulário de cadastro, passando o mainLayout
+              // Navega para o formulário de cadastro, passando o mainLayout
             this.mainLayout.setCenter(new AnimalForm(this.mainLayout));
         });
 
-        // Botão "Menu" para voltar ao MainMenuView
-        Button menuButton = new Button("Menu");
-        menuButton.setOnAction(e -> {
-            MenuView mainMenu = new MenuView(this.mainLayout, null); // Passando o mainLayout
-            this.mainLayout.setCenter(mainMenu);  // Atualizando o layout com o menu principal
+        // Botão "Voltar" para voltar à tela anterior
+        Button backButton = new Button("Voltar");
+        backButton.setOnAction(e -> {
+            this.mainLayout.setCenter(new MenuView(this.mainLayout, null));
         });
 
         // HBox para agrupar os botões
-        HBox buttonBox = new HBox(10, addButton, menuButton);
+        HBox buttonBox = new HBox(10, addButton, backButton);
         buttonBox.setPadding(new Insets(10, 10, 10, 10));
 
         // ... (código das colunas e CellFactory) ...
@@ -76,96 +75,32 @@ public class AnimalView extends VBox {
 
         TableColumn<Animal, String> speciesColumn = new TableColumn<>("Espécie");
         speciesColumn.setCellValueFactory(new PropertyValueFactory<>("species"));
-        speciesColumn.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(convertSpeciesToPt(item));
-                }
-            }
-        });
 
         TableColumn<Animal, String> breedColumn = new TableColumn<>("Raça");
         breedColumn.setCellValueFactory(new PropertyValueFactory<>("breed"));
-        breedColumn.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(convertBreedToPt(item));
-                }
-            }
-        });
 
         TableColumn<Animal, String> sizeColumn = new TableColumn<>("Porte");
         sizeColumn.setCellValueFactory(new PropertyValueFactory<>("size"));
-        sizeColumn.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(convertSizeToPt(item));
-                }
-            }
-        });
 
         TableColumn<Animal, Boolean> castratedColumn = new TableColumn<>("Castrado");
         castratedColumn.setCellValueFactory(new PropertyValueFactory<>("castrated"));
-        castratedColumn.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(Boolean item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item ? "Sim" : "Não");
-                }
-            }
-        });
 
         TableColumn<Animal, String> fivColumn = new TableColumn<>("Fiv");
         fivColumn.setCellValueFactory(new PropertyValueFactory<>("fiv"));
-        fivColumn.setCellFactory(col -> new TableCell<>(){
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(convertYesNoNotTestedToPt(item));
-                }
-            }
-        });
 
         TableColumn<Animal, String> felvColumn = new TableColumn<>("Felv");
         felvColumn.setCellValueFactory(new PropertyValueFactory<>("felv"));
-        felvColumn.setCellFactory(col -> new TableCell<>(){
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(convertYesNoNotTestedToPt(item));
-                }
-            }
-        });
 
         // Coluna de Ações com CellFactory personalizado
         TableColumn<Animal, Void> actionColumn = new TableColumn<>("Ações");
         actionColumn.setCellFactory(param -> new TableCell<>() {
             private final Button editButton = new Button("✏️");
             private final Button deleteButton = new Button("❌");
-            private final HBox pane = new HBox(5, editButton, deleteButton);
+            private final Button attachmentsButton = new Button("Anexos");
+            private final HBox pane = new HBox(5, editButton, deleteButton, attachmentsButton);
 
             {
+                // Ação de Editar
                 editButton.setOnAction(event -> {
                     Animal animal = getTableView().getItems().get(getIndex());
                     if (animal != null) {
@@ -179,6 +114,7 @@ public class AnimalView extends VBox {
                     }
                 });
 
+                // Ação de Deletar
                 deleteButton.setOnAction(event -> {
                     Animal animal = getTableView().getItems().get(getIndex());
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Tem certeza que deseja deletar este animal?", ButtonType.YES, ButtonType.NO);
@@ -195,7 +131,22 @@ public class AnimalView extends VBox {
                         }
                     });
                 });
+
+                // Ação de Anexos
+                attachmentsButton.setOnAction(event -> {
+                    Animal animal = getTableView().getItems().get(getIndex());
+                    if (animal != null) {
+                        AnimalView.this.mainLayout.setCenter(new AttachmentView(AnimalView.this.mainLayout, animal.getId()));
+                    } else {
+                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                        alert.setTitle("Nenhum animal selecionado");
+                        alert.setHeaderText(null);
+                        alert.setContentText("Por favor, selecione um animal para ver os anexos.");
+                        alert.showAndWait();
+                    }
+                });
             }
+
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);

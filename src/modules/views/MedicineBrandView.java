@@ -89,8 +89,11 @@ public class MedicineBrandView extends VBox {
         Button medicinesButton = new Button("Medicamentos");
         medicinesButton.setOnAction(e -> openMedicineView());
 
-        Button menuButton = new Button("Menu");
-        menuButton.setOnAction(e -> returnToMainMenu());
+        // Botão "Voltar" para voltar à tela anterior
+        Button backButton = new Button("Voltar");
+        backButton.setOnAction(e -> {
+            this.mainLayout.setCenter(new MedicineView(this.mainLayout));
+        });
 
         // Botões na segunda linha
         Button refreshButton = new Button("Atualizar");
@@ -104,7 +107,7 @@ public class MedicineBrandView extends VBox {
 
         // HBox para a primeira linha de botões (Cadastrar, Medicamentos, Menu)
         HBox topButtonBox = new HBox(10);
-        topButtonBox.getChildren().addAll(addButton, medicinesButton, menuButton);
+        topButtonBox.getChildren().addAll(addButton, medicinesButton, backButton);
         topButtonBox.setPadding(new Insets(10, 0, 10, 0));
 
         // HBox para a segunda linha de botões (Atualizar, Editar, Excluir)

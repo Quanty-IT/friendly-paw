@@ -12,3 +12,6 @@ Thumbs.db
 
 # Environments
 *.env
+
+# Temp folder for compiled classes
+temp/
