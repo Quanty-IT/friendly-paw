@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-public class AttachmentListView extends VBox {
+public class AttachmentView extends VBox {
 
     private TableView<Attachment> tableView;
     private ObservableList<Attachment> attachmentList;
@@ -27,7 +27,7 @@ public class AttachmentListView extends VBox {
     private final BorderPane mainLayout;
     private final UUID animalId;
 
-    public AttachmentListView(BorderPane mainLayout, UUID animalId) {
+    public AttachmentView(BorderPane mainLayout, UUID animalId) {
         this.mainLayout = mainLayout;
         this.animalId = animalId;
 
@@ -45,7 +45,13 @@ public class AttachmentListView extends VBox {
             this.mainLayout.setCenter(new AttachmentForm(this.mainLayout, this.animalId));
         });
 
-        HBox buttonBox = new HBox(10, addButton);
+        // Botão "Voltar" para voltar à tela anterior
+        Button backButton = new Button("Voltar");
+        backButton.setOnAction(e -> {
+            this.mainLayout.setCenter(new AnimalView(this.mainLayout));
+        });
+
+        HBox buttonBox = new HBox(10, addButton, backButton);
         buttonBox.setPadding(new Insets(10, 10, 10, 10));
 
         TableColumn<Attachment, String> urlColumn = new TableColumn<>("URL");
