@@ -1,0 +1,265 @@
+.main-bg {
+    -fx-background-color: linear-gradient(to bottom, #F5E6D3, #E8D4B8);
+}
+
+.title {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #5C3317;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 3, 0, 0, 2);
+    -fx-padding: 0 0 10 0;
+}
+
+.top-btn {
+    -fx-background-color: linear-gradient(to bottom, #8B5A2B, #6B3A18);
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 10 20 10 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0, 0, 3);
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+}
+
+.top-btn:hover {
+    -fx-background-color: linear-gradient(to bottom, #A0672F, #7D4520);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 8, 0, 0, 4);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.top-btn:pressed {
+    -fx-background-color: linear-gradient(to bottom, #6B3A18, #5C3317);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 3, 0, 0, 1);
+}
+
+.custom-table {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.custom-table .viewport {
+    -fx-background-color: transparent;
+}
+
+.custom-table .table-view {
+    -fx-background-color: transparent;
+}
+
+.custom-table .column-header-background {
+    -fx-background-color: linear-gradient(to bottom, #8B5A2B, #7D4520);
+    -fx-background-radius: 8 8 0 0;
+}
+
+.custom-table .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 12 10 12 10;
+}
+
+.custom-table .column-header .label {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-text-fill: #FFFFFF;
+    -fx-alignment: center-left;
+}
+
+.custom-table .column-header:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+.custom-table .table-row-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E0D0BA;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 8 0 8 0;
+    -fx-text-fill: #4A2C10;
+}
+
+.custom-table .table-row-cell:odd {
+    -fx-background-color: #FAF5EE;
+}
+
+.custom-table .table-row-cell:selected {
+    -fx-background-color: #D4B896;
+    -fx-text-fill: #3D2410;
+}
+
+.custom-table .table-row-cell:hover {
+    -fx-background-color: #E8D4B8;
+    -fx-cursor: hand;
+}
+
+.custom-table .table-row-cell:selected:hover {
+    -fx-background-color: #C9AA85;
+}
+
+.custom-table .table-cell {
+    -fx-padding: 12 10 12 10;
+    -fx-text-fill: #4A2C10;
+    -fx-font-size: 13px;
+    -fx-border-color: transparent;
+}
+
+.custom-table .placeholder .label {
+    -fx-text-fill: #8B6F47;
+    -fx-font-size: 14px;
+    -fx-font-style: italic;
+}
+
+.custom-table .scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
+.custom-table .scroll-bar:vertical .track {
+    -fx-background-color: #E8D4B8;
+    -fx-background-radius: 5;
+}
+
+.custom-table .scroll-bar:vertical .thumb {
+    -fx-background-color: #8B5A2B;
+    -fx-background-radius: 5;
+}
+
+.custom-table .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #A0672F;
+}
+
+.icon-btn {
+    -fx-background-radius: 6;
+    -fx-font-size: 16px;
+    -fx-cursor: hand;
+    -fx-border-width: 0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 4, 0, 0, 2);
+}
+
+.icon-btn-edit {
+    -fx-background-color: linear-gradient(to bottom, #5A9F5E, #4A8A4E);
+    -fx-text-fill: white;
+}
+
+.icon-btn-edit:hover {
+    -fx-background-color: linear-gradient(to bottom, #6BB56F, #5A9F5E);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0, 0, 3);
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+
+.icon-btn-edit:pressed {
+    -fx-background-color: linear-gradient(to bottom, #4A8A4E, #3A7A3E);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 2, 0, 0, 1);
+}
+
+.icon-btn-delete {
+    -fx-background-color: linear-gradient(to bottom, #C44545, #A83838);
+    -fx-text-fill: white;
+}
+
+.icon-btn-delete:hover {
+    -fx-background-color: linear-gradient(to bottom, #D85555, #C44545);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0, 0, 3);
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+
+.icon-btn-delete:pressed {
+    -fx-background-color: linear-gradient(to bottom, #A83838, #982828);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 2, 0, 0, 1);
+}
+
+.icon-btn:focused,
+.top-btn:focused {
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+}
+
+/* Estilos para os formulários */
+.form-bg {
+    -fx-background-color: linear-gradient(to bottom, #F5E6D3, #E8D4B8);
+    -fx-background-radius: 10;
+}
+
+.form-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #5C3317;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 3, 0, 0, 2);
+}
+
+.form-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #5C3317;
+}
+
+.form-input {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 6;
+    -fx-border-color: #D4B896;
+    -fx-border-width: 2;
+    -fx-border-radius: 6;
+    -fx-padding: 10 15 10 15;
+    -fx-font-size: 13px;
+    -fx-text-fill: #4A2C10;
+}
+
+.form-input:focused {
+    -fx-border-color: #8B5A2B;
+    -fx-effect: dropshadow(gaussian, rgba(139,90,43,0.3), 6, 0, 0, 0);
+}
+
+.form-btn-save {
+    -fx-background-color: linear-gradient(to bottom, #5A9F5E, #4A8A4E);
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 12 25 12 25;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0, 0, 3);
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+}
+
+.form-btn-save:hover {
+    -fx-background-color: linear-gradient(to bottom, #6BB56F, #5A9F5E);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 8, 0, 0, 4);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.form-btn-save:pressed {
+    -fx-background-color: linear-gradient(to bottom, #4A8A4E, #3A7A3E);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 3, 0, 0, 1);
+}
+
+.form-btn-cancel {
+    -fx-background-color: linear-gradient(to bottom, #9E9E9E, #757575);
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 12 25 12 25;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0, 0, 3);
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+}
+
+.form-btn-cancel:hover {
+    -fx-background-color: linear-gradient(to bottom, #BDBDBD, #9E9E9E);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 8, 0, 0, 4);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.form-btn-cancel:pressed {
+    -fx-background-color: linear-gradient(to bottom, #757575, #616161);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 3, 0, 0, 1);
+}
+
+.form-btn-save:focused,
+.form-btn-cancel:focused {
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+}
