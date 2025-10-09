@@ -10,6 +10,7 @@
     -fx-padding: 0 0 10 0;
 }
 
+
 .top-btn {
     -fx-background-color: linear-gradient(to bottom, #8B5A2B, #6B3A18);
     -fx-text-fill: #FFFFFF;
@@ -21,6 +22,11 @@
     -fx-cursor: hand;
     -fx-border-color: transparent;
 }
+
+.top-btn .label {
+    -fx-text-fill: #FFFFFF;
+}
+
 
 .top-btn:hover {
     -fx-background-color: linear-gradient(to bottom, #A0672F, #7D4520);

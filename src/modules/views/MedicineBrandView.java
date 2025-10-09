@@ -60,7 +60,7 @@ public class MedicineBrandView extends VBox {
         editColumn.setMaxWidth(100);
         editColumn.setStyle("-fx-alignment: CENTER;");
         editColumn.setCellFactory(param -> new TableCell<>() {
-            private final Button editBtn = createIconButton("✎", "edit");
+            private final Button editBtn = createIconButton("E", "edit");
 
             {
                 editBtn.setOnAction(e -> {
@@ -88,7 +88,7 @@ public class MedicineBrandView extends VBox {
         deleteColumn.setMaxWidth(100);
         deleteColumn.setStyle("-fx-alignment: CENTER;");
         deleteColumn.setCellFactory(param -> new TableCell<>() {
-            private final Button delBtn = createIconButton("✖", "delete");
+            private final Button delBtn = createIconButton("x", "delete");
 
             {
                 delBtn.setOnAction(e -> {
@@ -136,9 +136,34 @@ public class MedicineBrandView extends VBox {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Button addButton = new Button("+ Cadastrar");
-        Button productsButton = new Button("Medicamentos");
-        Button menuButton = new Button("Menu");
+        ImageView paw1 = new ImageView(new Image(getClass().getResourceAsStream("/assets/patas.png")));
+        ImageView paw2 = new ImageView(new Image(getClass().getResourceAsStream("/assets/patas.png")));
+        ImageView paw3 = new ImageView(new Image(getClass().getResourceAsStream("/assets/patas.png")));
+
+        paw1.setPreserveRatio(true);
+        paw2.setPreserveRatio(true);
+        paw3.setPreserveRatio(true);
+
+        Label addLabel = new Label("Cadastrar");
+        HBox addContent = new HBox(6, addLabel, paw1);
+        addContent.setAlignment(Pos.CENTER);
+        Button addButton = new Button();
+        addButton.setGraphic(addContent);
+        addButton.getStyleClass().add("top-btn");
+
+        Label productsLabel = new Label("Medicamentos");
+        HBox productsContent = new HBox(6, productsLabel, paw2);
+        productsContent.setAlignment(Pos.CENTER);
+        Button productsButton = new Button();
+        productsButton.setGraphic(productsContent);
+        productsButton.getStyleClass().add("top-btn");
+
+        Label menuLabel = new Label("Menu");
+        HBox menuContent = new HBox(6, menuLabel, paw3);
+        menuContent.setAlignment(Pos.CENTER);
+        Button menuButton = new Button();
+        menuButton.setGraphic(menuContent);
+        menuButton.getStyleClass().add("top-btn");
 
         addButton.getStyleClass().add("top-btn");
         productsButton.getStyleClass().add("top-btn");
