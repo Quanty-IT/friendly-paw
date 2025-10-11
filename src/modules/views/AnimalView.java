@@ -97,7 +97,8 @@ public class AnimalView extends VBox {
             private final Button editButton = new Button("✏️");
             private final Button deleteButton = new Button("❌");
             private final Button attachmentsButton = new Button("Anexos");
-            private final HBox pane = new HBox(5, editButton, deleteButton, attachmentsButton);
+            private final Button applyMedicineButton = new Button("💊");
+            private final HBox pane = new HBox(5, editButton, deleteButton, attachmentsButton, applyMedicineButton);
 
             {
                 // Ação de Editar
@@ -145,7 +146,16 @@ public class AnimalView extends VBox {
                         alert.showAndWait();
                     }
                 });
+                // Ação para o botão de aplicar medicamento
+                applyMedicineButton.setOnAction(event -> {
+                    Animal animal = getTableView().getItems().get(getIndex());
+                    if (animal != null) {
+                        // Navega para o novo formulário, passando o layout e o animal selecionado
+                        AnimalView.this.mainLayout.setCenter(new MedicineApplicationForm(AnimalView.this.mainLayout, animal));
+                    }
+                });
             }
+
 
             @Override
             protected void updateItem(Void item, boolean empty) {
