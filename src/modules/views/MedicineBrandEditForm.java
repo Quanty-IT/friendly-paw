@@ -3,48 +3,43 @@ package modules.views;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import modules.controllers.MedicineBrandController;
-import config.Database;
+import modules.models.MedicineBrand;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
-public class MedicineBrandForm extends VBox {
+public class MedicineBrandEditForm extends VBox {
 
     private TextField nameField;
-    private Connection conn;
+    private MedicineBrand brand;
+    private MedicineBrandController controller;
 
-    public MedicineBrandForm() {
+    public MedicineBrandEditForm(MedicineBrand brand, MedicineBrandController controller) {
+        this.brand = brand;
+        this.controller = controller;
+
         this.setSpacing(20);
         this.setPadding(new Insets(30, 40, 30, 40));
         this.setAlignment(Pos.CENTER);
         this.getStyleClass().add("form-bg");
 
-        Label titleLabel = new Label("Cadastrar nova marca");
+        Label titleLabel = new Label("Editar marca");
         titleLabel.getStyleClass().add("form-title");
 
         Label nameLabel = new Label("Nome da marca:");
         nameLabel.getStyleClass().add("form-label");
 
-        nameField = new TextField();
-        nameField.setPromptText("Digite o nome da marca");
+        nameField = new TextField(brand.getName());
         nameField.setPrefWidth(350);
         nameField.getStyleClass().add("form-input");
 
-        try {
-            conn = Database.getConnection();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        Button saveButton = new Button("Salvar");
+        Button saveButton = new Button("Salvar alterações");
         saveButton.getStyleClass().add("form-btn-save");
         saveButton.setPrefWidth(150);
-        saveButton.setOnAction(e -> saveBrand());
+        saveButton.setOnAction(e -> updateBrand());
 
         Button cancelButton = new Button("Cancelar");
         cancelButton.getStyleClass().add("form-btn-cancel");
@@ -61,26 +56,25 @@ public class MedicineBrandForm extends VBox {
         this.getChildren().addAll(titleLabel, formContent, buttonBox);
     }
 
-    private void saveBrand() {
+    private void updateBrand() {
         String name = nameField.getText().trim();
         if (name.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.WARNING, "Por favor, digite o nome da marca.");
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Por favor, digite um nome para a marca!");
             alert.setTitle("Campo obrigatório");
             alert.setHeaderText(null);
             alert.showAndWait();
             return;
         }
         try {
-            MedicineBrandController controller = new MedicineBrandController(conn);
-            controller.insert(name);
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Marca cadastrada com sucesso!");
+            controller.update(brand.getId(), name);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Marca editada com sucesso!");
             alert.setTitle("Sucesso");
             alert.setHeaderText(null);
             alert.showAndWait();
             closeWindow();
         } catch (SQLException e) {
             e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Erro ao salvar a marca: " + e.getMessage());
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Erro ao editar a marca: " + e.getMessage());
             alert.setTitle("Erro");
             alert.setHeaderText(null);
             alert.showAndWait();
