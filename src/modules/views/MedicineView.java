@@ -3,12 +3,13 @@ package modules.views;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import modules.controllers.MedicineController;
@@ -27,10 +28,10 @@ public class MedicineView extends VBox {
     private ObservableList<Medicine> medicinesList;
     private Connection conn;
     private MedicineController controller;
-    private BorderPane mainLayout; // A referência para o layout principal
+    private BorderPane mainLayout;
 
     public MedicineView(BorderPane mainLayout) {
-        this.mainLayout = mainLayout; // Passa o mainLayout no construtor
+        this.mainLayout = mainLayout;
 
         try {
             this.conn = Database.getConnection();
@@ -51,29 +52,29 @@ public class MedicineView extends VBox {
         medicinesList = FXCollections.observableArrayList();
         table.setItems(medicinesList);
 
-        TableColumn<Medicine, Integer> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        idColumn.setPrefWidth(50);
-
         TableColumn<Medicine, String> nameColumn = new TableColumn<>("Nome");
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        nameColumn.setPrefWidth(200);
+        nameColumn.setStyle("-fx-alignment: CENTER-LEFT; -fx-padding: 0 0 0 20;");
 
         TableColumn<Medicine, String> brandColumn = new TableColumn<>("Marca");
         brandColumn.setCellValueFactory(new PropertyValueFactory<>("brandName"));
         brandColumn.setPrefWidth(150);
+        brandColumn.setStyle("-fx-alignment: CENTER-LEFT;");
 
         TableColumn<Medicine, Integer> quantityColumn = new TableColumn<>("Quantidade");
         quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         quantityColumn.setPrefWidth(100);
+        quantityColumn.setStyle("-fx-alignment: CENTER;");
 
         TableColumn<Medicine, String> descriptionColumn = new TableColumn<>("Descrição");
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
         descriptionColumn.setPrefWidth(200);
+        descriptionColumn.setStyle("-fx-alignment: CENTER-LEFT;");
 
         TableColumn<Medicine, Boolean> activeColumn = new TableColumn<>("Ativo");
         activeColumn.setCellValueFactory(new PropertyValueFactory<>("isActive"));
         activeColumn.setPrefWidth(80);
+        activeColumn.setStyle("-fx-alignment: CENTER;");
         activeColumn.setCellFactory(column -> new TableCell<Medicine, Boolean>() {
             @Override
             protected void updateItem(Boolean item, boolean empty) {
@@ -89,6 +90,7 @@ public class MedicineView extends VBox {
         TableColumn<Medicine, LocalDateTime> createdAtColumn = new TableColumn<>("Data Criação");
         createdAtColumn.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
         createdAtColumn.setPrefWidth(130);
+        createdAtColumn.setStyle("-fx-alignment: CENTER;");
         createdAtColumn.setCellFactory(column -> new TableCell<Medicine, LocalDateTime>() {
             private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
@@ -103,55 +105,137 @@ public class MedicineView extends VBox {
             }
         });
 
-        table.getColumns().addAll(idColumn, nameColumn, brandColumn, quantityColumn, descriptionColumn, activeColumn, createdAtColumn);
+        TableColumn<Medicine, Void> editColumn = new TableColumn<>("Editar");
+        editColumn.setPrefWidth(100);
+        editColumn.setMinWidth(100);
+        editColumn.setMaxWidth(100);
+        editColumn.setStyle("-fx-alignment: CENTER;");
+        editColumn.setCellFactory(param -> new TableCell<>() {
+            private final Button editBtn = createIconButton("E", "edit");
+
+            {
+                editBtn.setOnAction(e -> {
+                    Medicine medicine = getTableView().getItems().get(getIndex());
+                    if (medicine != null) editSelected(medicine);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    HBox box = new HBox(editBtn);
+                    box.setAlignment(Pos.CENTER);
+                    setGraphic(box);
+                }
+            }
+        });
+
+        TableColumn<Medicine, Void> deleteColumn = new TableColumn<>("Excluir");
+        deleteColumn.setPrefWidth(100);
+        deleteColumn.setMinWidth(100);
+        deleteColumn.setMaxWidth(100);
+        deleteColumn.setStyle("-fx-alignment: CENTER;");
+        deleteColumn.setCellFactory(param -> new TableCell<>() {
+            private final Button delBtn = createIconButton("x", "delete");
+
+            {
+                delBtn.setOnAction(e -> {
+                    Medicine medicine = getTableView().getItems().get(getIndex());
+                    if (medicine != null) deleteSelected(medicine);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    HBox box = new HBox(delBtn);
+                    box.setAlignment(Pos.CENTER);
+                    setGraphic(box);
+                }
+            }
+        });
+
+        table.getColumns().addAll(nameColumn, brandColumn, quantityColumn, descriptionColumn, activeColumn, createdAtColumn, editColumn, deleteColumn);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.getStyleClass().add("custom-table");
+        table.setPlaceholder(new Label("Nenhum medicamento cadastrado"));
+    }
+
+    private Button createIconButton(String icon, String type) {
+        Button btn = new Button(icon);
+        btn.getStyleClass().addAll("icon-btn", "icon-btn-" + type);
+        btn.setPrefSize(35, 35);
+        btn.setMinSize(35, 35);
+        btn.setMaxSize(35, 35);
+        return btn;
     }
 
     private void setupLayout() {
-        // Botões na primeira linha
-        Button addButton = new Button("Cadastrar");
+        ImageView logo = new ImageView(new Image(getClass().getResourceAsStream("/assets/logo.png")));
+        logo.setFitWidth(140);
+        logo.setPreserveRatio(true);
+
+        Label title = new Label("Medicamentos");
+        title.getStyleClass().add("title");
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        ImageView paw1 = new ImageView(new Image(getClass().getResourceAsStream("/assets/patas.png")));
+        ImageView paw2 = new ImageView(new Image(getClass().getResourceAsStream("/assets/patas.png")));
+        ImageView paw3 = new ImageView(new Image(getClass().getResourceAsStream("/assets/patas.png")));
+
+        paw1.setPreserveRatio(true);
+        paw2.setPreserveRatio(true);
+        paw3.setPreserveRatio(true);
+
+        Label addLabel = new Label("Cadastrar");
+        HBox addContent = new HBox(6, addLabel, paw1);
+        addContent.setAlignment(Pos.CENTER);
+        Button addButton = new Button();
+        addButton.setGraphic(addContent);
+        addButton.getStyleClass().add("top-btn");
+
+        Label brandsLabel = new Label("Marcas");
+        HBox brandsContent = new HBox(6, brandsLabel, paw2);
+        brandsContent.setAlignment(Pos.CENTER);
+        Button brandsButton = new Button();
+        brandsButton.setGraphic(brandsContent);
+        brandsButton.getStyleClass().add("top-btn");
+
+        Label menuLabel = new Label("Menu");
+        HBox menuContent = new HBox(6, menuLabel, paw3);
+        menuContent.setAlignment(Pos.CENTER);
+        Button menuButton = new Button();
+        menuButton.setGraphic(menuContent);
+        menuButton.getStyleClass().add("top-btn");
+
         addButton.setOnAction(e -> openAddForm());
-
-        Button brandsButton = new Button("Marcas");
         brandsButton.setOnAction(e -> openBrandView());
+        menuButton.setOnAction(e -> returnToMainMenu());
 
-        // Botão "Voltar" para voltar à tela anterior
-        Button backButton = new Button("Voltar");
-        backButton.setOnAction(e -> {
-            this.mainLayout.setCenter(new MenuView(this.mainLayout, null));
-        });
+        HBox buttonBar = new HBox(15, addButton, brandsButton, menuButton);
+        buttonBar.setAlignment(Pos.CENTER_RIGHT);
 
-        // Botões na segunda linha
-        Button refreshButton = new Button("Atualizar");
-        refreshButton.setOnAction(e -> loadData());
+        HBox topBar = new HBox(15, logo, spacer, buttonBar);
+        topBar.setAlignment(Pos.CENTER_LEFT);
+        topBar.setPadding(new Insets(30, 40, 0, 40));
 
-        Button editButton = new Button("Editar");
-        editButton.setOnAction(e -> editSelected());
+        VBox content = new VBox(30, title, table);
+        content.setAlignment(Pos.CENTER);
+        content.setPadding(new Insets(40, 60, 40, 60));
+        VBox.setVgrow(table, Priority.ALWAYS);
 
-        Button deleteButton = new Button("Excluir");
-        deleteButton.setOnAction(e -> deleteSelected());
-
-        // HBox para a primeira linha de botões (Cadastrar, Medicamentos, Menu)
-        HBox topButtonBox = new HBox(10);
-        topButtonBox.getChildren().addAll(addButton, brandsButton, backButton);
-        topButtonBox.setPadding(new Insets(10, 0, 10, 0));
-
-        // HBox para a segunda linha de botões (Atualizar, Editar, Excluir)
-        HBox bottomButtonBox = new HBox(10);
-        bottomButtonBox.getChildren().addAll(refreshButton, editButton, deleteButton);
-        bottomButtonBox.setPadding(new Insets(10, 0, 10, 0));
-
-        // Organiza os botões e a tabela dentro da VBox
-        this.setPadding(new Insets(20));
-        this.setSpacing(10);
-        this.getChildren().addAll(
-                new Label("Medicamentos"),
-                topButtonBox,  // Primeira linha de botões
-                bottomButtonBox,  // Segunda linha de botões
-                table
-        );
-
-        this.setPrefSize(500, 400);
+        this.setAlignment(Pos.TOP_CENTER);
+        this.getChildren().addAll(topBar, content);
+        this.getStyleClass().add("main-bg");
+        this.getStylesheets().add(getClass().getResource("/styles/medicine.css").toExternalForm());
     }
 
     private void loadData() {
@@ -160,80 +244,67 @@ public class MedicineView extends VBox {
             medicinesList.addAll(controller.listAll());
         } catch (SQLException e) {
             e.printStackTrace();
-            new Alert(Alert.AlertType.ERROR, "Erro ao carregar medicamentos: " + e.getMessage()).showAndWait();
+            new Alert(Alert.AlertType.ERROR, "Erro ao buscar medicamentos: " + e.getMessage()).showAndWait();
         }
     }
 
     private void openAddForm() {
         Stage formStage = new Stage();
-        formStage.setTitle("Adicionar Medicamento");
+        formStage.setTitle("Adicionar medicamento");
         formStage.initModality(Modality.APPLICATION_MODAL);
 
         MedicineForm form = new MedicineForm();
-        Scene scene = new Scene(form, 450, 400);
-
+        Scene scene = new Scene(form, 500, 550);
+        scene.getStylesheets().add(getClass().getResource("/styles/medicine.css").toExternalForm());
         formStage.setScene(scene);
         formStage.setResizable(false);
-
         formStage.setOnHidden(e -> loadData());
-
         formStage.showAndWait();
     }
 
-    private void editSelected() {
-        Medicine selected = table.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            new Alert(Alert.AlertType.WARNING, "Selecione um medicamento para editar.").showAndWait();
-            return;
-        }
+    private void editSelected(Medicine selected) {
+        if (selected == null) return;
 
-        Stage formStage = new Stage();
-        formStage.setTitle("Editar Medicamento");
-        formStage.initModality(Modality.APPLICATION_MODAL);
+        // Stage editStage = new Stage();
+        // editStage.setTitle("Editar medicamento");
+        // editStage.initModality(Modality.APPLICATION_MODAL);
 
-        MedicineForm form = new MedicineForm(selected);
-        Scene scene = new Scene(form, 450, 400);
-
-        formStage.setScene(scene);
-        formStage.setResizable(false);
-
-        formStage.setOnHidden(e -> loadData());
-
-        formStage.showAndWait();
+        // MedicineEditForm form = new MedicineEditForm(selected, controller);
+        // Scene scene = new Scene(form, 500, 550);
+        // scene.getStylesheets().add(getClass().getResource("/styles/medicine.css").toExternalForm());
+        // editStage.setScene(scene);
+        // editStage.setResizable(false);
+        // editStage.setOnHidden(e -> loadData());
+        // editStage.showAndWait();
     }
 
-    private void deleteSelected() {
-        Medicine selected = table.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            new Alert(Alert.AlertType.WARNING, "Selecione um medicamento para excluir.").showAndWait();
-            return;
-        }
+    private void deleteSelected(Medicine selected) {
+        if (selected == null) return;
 
-        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmAlert.setTitle("Confirmar Exclusão");
-        confirmAlert.setHeaderText("Excluir medicamento?");
-        confirmAlert.setContentText("Deseja realmente excluir o medicamento '" + selected.getName() + "'?");
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                "Tem certeza que deseja excluir o medicamento '" + selected.getName() + "'?",
+                ButtonType.YES, ButtonType.NO);
+        confirm.setTitle("Confirmar exclusão");
+        confirm.setHeaderText(null);
 
-        Optional<ButtonType> result = confirmAlert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            try {
-                controller.delete(selected.getId());
-                new Alert(Alert.AlertType.INFORMATION, "Medicamento excluído com sucesso!").showAndWait();
-                loadData();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                new Alert(Alert.AlertType.ERROR, "Erro ao excluir medicamento: " + e.getMessage()).showAndWait();
+        confirm.showAndWait().ifPresent(type -> {
+            if (type == ButtonType.YES) {
+                try {
+                    controller.delete(selected.getId());
+                    loadData();
+                    new Alert(Alert.AlertType.INFORMATION, "Medicamento excluído com sucesso!").showAndWait();
+                } catch (SQLException e) {
+                    new Alert(Alert.AlertType.ERROR, "Erro ao excluir medicamento: " + e.getMessage()).showAndWait();
+                }
             }
-        }
+        });
     }
 
     private void openBrandView() {
-        MedicineBrandView brandView = new MedicineBrandView(mainLayout);  // Passando mainLayout
-        mainLayout.setCenter(brandView);  // Atualizando o layout com a view de marcas de medicamentos
+        mainLayout.setCenter(new MedicineBrandView(mainLayout));
     }
 
     private void returnToMainMenu() {
-        MenuView mainMenu = new MenuView(mainLayout, null);  // Passando mainLayout
-        mainLayout.setCenter(mainMenu);  // Atualizando o layout com o menu principal
+        mainLayout.setCenter(new MenuView(mainLayout, null));
     }
 }
