@@ -328,3 +328,37 @@
     -fx-background-color: linear-gradient(to bottom, #F5E6D3, #E8D4B8);
     -fx-background-radius: 10;
 }
+
+.icon-btn-edit {
+    -fx-background-color: linear-gradient(to bottom, #5A9F5E, #4A8A4E);
+    -fx-text-fill: white;
+}
+
+.icon-btn-edit:hover {
+    -fx-background-color: linear-gradient(to bottom, #6BB56F, #5A9F5E);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0, 0, 3);
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+
+.icon-btn-edit:pressed {
+    -fx-background-color: linear-gradient(to bottom, #4A8A4E, #3A7A3E);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 2, 0, 0, 1);
+}
+
+.icon-btn-delete {
+    -fx-background-color: linear-gradient(to bottom, #C44545, #A83838);
+    -fx-text-fill: white;
+}
+
+.icon-btn-delete:hover {
+    -fx-background-color: linear-gradient(to bottom, #D85555, #C44545);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0, 0, 3);
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+
+.icon-btn-delete:pressed {
+    -fx-background-color: linear-gradient(to bottom, #A83838, #982828);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 2, 0, 0, 1);
+}

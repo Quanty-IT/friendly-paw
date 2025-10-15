@@ -265,17 +265,17 @@ public class MedicineView extends VBox {
     private void editSelected(Medicine selected) {
         if (selected == null) return;
 
-        // Stage editStage = new Stage();
-        // editStage.setTitle("Editar medicamento");
-        // editStage.initModality(Modality.APPLICATION_MODAL);
+         Stage editStage = new Stage();
+         editStage.setTitle("Editar medicamento");
+         editStage.initModality(Modality.APPLICATION_MODAL);
 
-        // MedicineEditForm form = new MedicineEditForm(selected, controller);
-        // Scene scene = new Scene(form, 500, 550);
-        // scene.getStylesheets().add(getClass().getResource("/styles/medicine.css").toExternalForm());
-        // editStage.setScene(scene);
-        // editStage.setResizable(false);
-        // editStage.setOnHidden(e -> loadData());
-        // editStage.showAndWait();
+         MedicineEditForm form = new MedicineEditForm(selected, controller);
+         Scene scene = new Scene(form, 500, 550);
+         scene.getStylesheets().add(getClass().getResource("/styles/medicine.css").toExternalForm());
+         editStage.setScene(scene);
+         editStage.setResizable(false);
+         editStage.setOnHidden(e -> loadData());
+         editStage.showAndWait();
     }
 
     private void deleteSelected(Medicine selected) {

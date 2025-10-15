@@ -10,6 +10,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import modules.controllers.MedicineBrandController;
 import modules.controllers.MedicineController;
+import modules.models.Medicine;
 import modules.models.MedicineBrand;
 import config.Database;
 
@@ -17,23 +18,25 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
-public class MedicineForm extends VBox {
+public class MedicineEditForm extends VBox {
 
     private TextField nameField;
     private ComboBox<MedicineBrand> brandComboBox;
     private TextField quantityField;
     private TextArea descriptionField;
     private CheckBox isActiveCheckBox;
+    private Medicine medicine;
+    private MedicineController controller;
     private Connection conn;
 
-    public MedicineForm() {
+    public MedicineEditForm(Medicine medicine, MedicineController controller) {
+        this.medicine = medicine;
+        this.controller = controller;
+
         this.setSpacing(20);
         this.setPadding(new Insets(30, 40, 30, 40));
         this.setAlignment(Pos.CENTER);
         this.getStyleClass().add("form-bg");
-
-        Label titleLabel = new Label("Cadastrar novo medicamento");
-        titleLabel.getStyleClass().add("form-title");
 
         try {
             conn = Database.getConnection();
@@ -41,7 +44,13 @@ public class MedicineForm extends VBox {
             e.printStackTrace();
         }
 
+        Label titleLabel = new Label("Editar medicamento");
+        titleLabel.getStyleClass().add("form-title");
+
         setupComponents();
+        populateFields();
+
+        this.getChildren().add(0, titleLabel);
     }
 
     private void setupComponents() {
@@ -50,7 +59,6 @@ public class MedicineForm extends VBox {
         nameLabel.getStyleClass().add("form-label");
 
         nameField = new TextField();
-        nameField.setPromptText("Digite o nome do medicamento");
         nameField.setPrefWidth(400);
         nameField.getStyleClass().add("form-input");
 
@@ -62,7 +70,6 @@ public class MedicineForm extends VBox {
         brandLabel.getStyleClass().add("form-label");
 
         brandComboBox = new ComboBox<>();
-        brandComboBox.setPromptText("Selecione uma marca");
         brandComboBox.setPrefWidth(400);
         brandComboBox.getStyleClass().add("combo-box");
         loadBrands();
@@ -75,7 +82,6 @@ public class MedicineForm extends VBox {
         quantityLabel.getStyleClass().add("form-label");
 
         quantityField = new TextField();
-        quantityField.setPromptText("Digite a quantidade");
         quantityField.setPrefWidth(400);
         quantityField.getStyleClass().add("form-input");
 
@@ -87,7 +93,6 @@ public class MedicineForm extends VBox {
         descriptionLabel.getStyleClass().add("form-label");
 
         descriptionField = new TextArea();
-        descriptionField.setPromptText("Digite a descrição (opcional)");
         descriptionField.setPrefSize(400, 100);
         descriptionField.setWrapText(true);
         descriptionField.getStyleClass().add("text-area");
@@ -100,17 +105,16 @@ public class MedicineForm extends VBox {
         activeLabel.getStyleClass().add("form-label");
 
         isActiveCheckBox = new CheckBox("Sim");
-        isActiveCheckBox.setSelected(true);
         isActiveCheckBox.getStyleClass().add("check-box");
 
         HBox activeBox = new HBox(15, activeLabel, isActiveCheckBox);
         activeBox.setAlignment(Pos.CENTER_LEFT);
 
         // Botões
-        Button saveButton = new Button("Salvar");
+        Button saveButton = new Button("Salvar alterações");
         saveButton.getStyleClass().add("form-btn-save");
         saveButton.setPrefWidth(150);
-        saveButton.setOnAction(e -> saveMedicine());
+        saveButton.setOnAction(e -> updateMedicine());
 
         Button cancelButton = new Button("Cancelar");
         cancelButton.getStyleClass().add("form-btn-cancel");
@@ -124,11 +128,7 @@ public class MedicineForm extends VBox {
         formContent.setAlignment(Pos.CENTER_LEFT);
         formContent.setPadding(new Insets(10, 0, 10, 0));
 
-        Label titleLabel = new Label("Cadastrar novo medicamento");
-        titleLabel.getStyleClass().add("form-title");
-
-        this.getChildren().clear();
-        this.getChildren().addAll(titleLabel, formContent, buttonBox);
+        this.getChildren().addAll(formContent, buttonBox);
     }
 
     private void loadBrands() {
@@ -170,7 +170,24 @@ public class MedicineForm extends VBox {
         }
     }
 
-    private void saveMedicine() {
+    private void populateFields() {
+        if (medicine != null) {
+            nameField.setText(medicine.getName());
+            quantityField.setText(medicine.getQuantity() != null ? medicine.getQuantity().toString() : "");
+            descriptionField.setText(medicine.getDescription() != null ? medicine.getDescription() : "");
+            isActiveCheckBox.setSelected(medicine.getIsActive());
+
+            if (medicine.getBrandId() != null) {
+                brandComboBox.getItems().forEach(brand -> {
+                    if (brand.getId().equals(medicine.getBrandId())) {
+                        brandComboBox.setValue(brand);
+                    }
+                });
+            }
+        }
+    }
+
+    private void updateMedicine() {
         String name = nameField.getText().trim();
         if (name.isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.WARNING, "Por favor, digite o nome do medicamento.");
@@ -199,16 +216,15 @@ public class MedicineForm extends VBox {
         Boolean isActive = isActiveCheckBox.isSelected();
 
         try {
-            MedicineController controller = new MedicineController(conn);
-            controller.insert(name, brandId, quantity, description, isActive);
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Medicamento cadastrado com sucesso!");
+            controller.update(medicine.getId(), name, brandId, quantity, description, isActive);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Medicamento editado com sucesso!");
             alert.setTitle("Sucesso");
             alert.setHeaderText(null);
             alert.showAndWait();
             closeWindow();
         } catch (SQLException e) {
             e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Erro ao salvar o medicamento: " + e.getMessage());
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Erro ao editar o medicamento: " + e.getMessage());
             alert.setTitle("Erro");
             alert.setHeaderText(null);
             alert.showAndWait();
