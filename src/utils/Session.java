@@ -1,6 +1,6 @@
 package utils;
 
-import modules.models.User;
+import modules.User.models.User;
 
 public class Session {
     private static User currentUser;

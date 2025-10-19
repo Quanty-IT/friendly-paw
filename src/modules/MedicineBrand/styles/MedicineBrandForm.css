@@ -1,0 +1,91 @@
+.form-bg {
+  -fx-background-color: linear-gradient(to bottom, #f5e6d3, #e8d4b8);
+  -fx-background-radius: 10;
+}
+
+.form-title {
+  -fx-font-size: 24px;
+  -fx-font-weight: bold;
+  -fx-text-fill: #5c3317;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 3, 0, 0, 2);
+}
+
+.form-label {
+  -fx-font-size: 14px;
+  -fx-font-weight: bold;
+  -fx-text-fill: #5c3317;
+}
+
+.form-input {
+  -fx-background-color: #ffffff;
+  -fx-background-radius: 6;
+  -fx-border-color: #d4b896;
+  -fx-border-width: 2;
+  -fx-border-radius: 6;
+  -fx-padding: 10 15 10 15;
+  -fx-font-size: 13px;
+  -fx-text-fill: #4a2c10;
+}
+
+.form-input:focused {
+  -fx-border-color: #8b5a2b;
+  -fx-effect: dropshadow(gaussian, rgba(139, 90, 43, 0.3), 6, 0, 0, 0);
+}
+
+.form-btn-save {
+  -fx-background-color: linear-gradient(to bottom, #5a9f5e, #4a8a4e);
+  -fx-text-fill: #ffffff;
+  -fx-font-size: 14px;
+  -fx-font-weight: bold;
+  -fx-background-radius: 8;
+  -fx-padding: 12 25 12 25;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 6, 0, 0, 3);
+  -fx-cursor: hand;
+  -fx-border-color: transparent;
+}
+
+.form-btn-save:hover {
+  -fx-background-color: linear-gradient(to bottom, #6bb56f, #5a9f5e);
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 8, 0, 0, 4);
+  -fx-scale-x: 1.05;
+  -fx-scale-y: 1.05;
+}
+
+.form-btn-save:pressed {
+  -fx-background-color: linear-gradient(to bottom, #4a8a4e, #3a7a3e);
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0, 0, 1);
+}
+
+.form-btn-cancel {
+  -fx-background-color: linear-gradient(to bottom, #9e9e9e, #757575);
+  -fx-text-fill: #ffffff;
+  -fx-font-size: 14px;
+  -fx-font-weight: bold;
+  -fx-background-radius: 8;
+  -fx-padding: 12 25 12 25;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 6, 0, 0, 3);
+  -fx-cursor: hand;
+  -fx-border-color: transparent;
+}
+
+.form-btn-cancel:hover {
+  -fx-background-color: linear-gradient(to bottom, #bdbdbd, #9e9e9e);
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 8, 0, 0, 4);
+  -fx-scale-x: 1.05;
+  -fx-scale-y: 1.05;
+}
+
+.form-btn-cancel:pressed {
+  -fx-background-color: linear-gradient(to bottom, #757575, #616161);
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0, 0, 1);
+}
+
+.form-btn-save:focused,
+.form-btn-cancel:focused {
+  -fx-background-insets: 0;
+  -fx-border-color: transparent;
+}
+
+.label {
+  -fx-text-fill: #5c3317;
+}

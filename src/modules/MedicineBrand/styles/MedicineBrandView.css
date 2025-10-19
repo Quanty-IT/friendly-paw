@@ -1,0 +1,184 @@
+.main-bg {
+  -fx-background-color: linear-gradient(to bottom, #f5e6d3, #e8d4b8);
+}
+
+.title {
+  -fx-font-size: 32px;
+  -fx-font-weight: bold;
+  -fx-text-fill: #5c3317;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 3, 0, 0, 2);
+  -fx-padding: 0 0 10 0;
+}
+
+.top-btn {
+  -fx-background-color: linear-gradient(to bottom, #8b5a2b, #6b3a18);
+  -fx-text-fill: #ffffff;
+  -fx-font-size: 13px;
+  -fx-font-weight: bold;
+  -fx-background-radius: 8;
+  -fx-padding: 10 20 10 20;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 6, 0, 0, 3);
+  -fx-cursor: hand;
+  -fx-border-color: transparent;
+}
+
+.top-btn .label {
+  -fx-text-fill: #ffffff;
+}
+
+.top-btn:hover {
+  -fx-background-color: linear-gradient(to bottom, #a0672f, #7d4520);
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 8, 0, 0, 4);
+  -fx-scale-x: 1.05;
+  -fx-scale-y: 1.05;
+}
+
+.top-btn:pressed {
+  -fx-background-color: linear-gradient(to bottom, #6b3a18, #5c3317);
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0, 0, 1);
+}
+
+.custom-table {
+  -fx-background-color: transparent;
+  -fx-background-insets: 0;
+  -fx-padding: 0;
+}
+
+.custom-table .viewport {
+  -fx-background-color: transparent;
+}
+
+.custom-table .table-view {
+  -fx-background-color: transparent;
+}
+
+.custom-table .column-header-background {
+  -fx-background-color: linear-gradient(to bottom, #8b5a2b, #7d4520);
+  -fx-background-radius: 8 8 0 0;
+}
+
+.custom-table .column-header {
+  -fx-background-color: transparent;
+  -fx-border-color: transparent;
+  -fx-padding: 12 10 12 10;
+}
+
+.custom-table .column-header .label {
+  -fx-font-weight: bold;
+  -fx-font-size: 14px;
+  -fx-text-fill: #ffffff;
+  -fx-alignment: center-left;
+}
+
+.custom-table .column-header:hover {
+  -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+.custom-table .table-row-cell {
+  -fx-background-color: #ffffff;
+  -fx-border-color: #e0d0ba;
+  -fx-border-width: 0 0 1 0;
+  -fx-padding: 8 0 8 0;
+  -fx-text-fill: #4a2c10;
+}
+
+.custom-table .table-row-cell:odd {
+  -fx-background-color: #faf5ee;
+}
+
+.custom-table .table-row-cell:selected {
+  -fx-background-color: #d4b896;
+  -fx-text-fill: #3d2410;
+}
+
+.custom-table .table-row-cell:hover {
+  -fx-background-color: #e8d4b8;
+  -fx-cursor: hand;
+}
+
+.custom-table .table-row-cell:selected:hover {
+  -fx-background-color: #c9aa85;
+}
+
+.custom-table .table-cell {
+  -fx-padding: 12 10 12 10;
+  -fx-text-fill: #4a2c10;
+  -fx-font-size: 13px;
+  -fx-border-color: transparent;
+}
+
+.custom-table .placeholder .label {
+  -fx-text-fill: #8b6f47;
+  -fx-font-size: 14px;
+  -fx-font-style: italic;
+}
+
+.custom-table .scroll-bar:vertical {
+  -fx-background-color: transparent;
+}
+
+.custom-table .scroll-bar:vertical .track {
+  -fx-background-color: #e8d4b8;
+  -fx-background-radius: 5;
+}
+
+.custom-table .scroll-bar:vertical .thumb {
+  -fx-background-color: #8b5a2b;
+  -fx-background-radius: 5;
+}
+
+.custom-table .scroll-bar:vertical .thumb:hover {
+  -fx-background-color: #a0672f;
+}
+
+.icon-btn {
+  -fx-background-radius: 6;
+  -fx-font-size: 16px;
+  -fx-cursor: hand;
+  -fx-border-width: 0;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 4, 0, 0, 2);
+}
+
+.icon-btn-edit {
+  -fx-background-color: linear-gradient(to bottom, #5a9f5e, #4a8a4e);
+  -fx-text-fill: white;
+}
+
+.icon-btn-edit:hover {
+  -fx-background-color: linear-gradient(to bottom, #6bb56f, #5a9f5e);
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 6, 0, 0, 3);
+  -fx-scale-x: 1.1;
+  -fx-scale-y: 1.1;
+}
+
+.icon-btn-edit:pressed {
+  -fx-background-color: linear-gradient(to bottom, #4a8a4e, #3a7a3e);
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0, 0, 1);
+}
+
+.icon-btn-delete {
+  -fx-background-color: linear-gradient(to bottom, #c44545, #a83838);
+  -fx-text-fill: white;
+}
+
+.icon-btn-delete:hover {
+  -fx-background-color: linear-gradient(to bottom, #d85555, #c44545);
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 6, 0, 0, 3);
+  -fx-scale-x: 1.1;
+  -fx-scale-y: 1.1;
+}
+
+.icon-btn-delete:pressed {
+  -fx-background-color: linear-gradient(to bottom, #a83838, #982828);
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0, 0, 1);
+}
+
+.icon-btn:focused,
+.top-btn:focused {
+  -fx-background-insets: 0;
+  -fx-border-color: transparent;
+}
+
+.label {
+  -fx-text-fill: #5c3317;
+}

@@ -2,9 +2,9 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import modules.views.LoginForm;
-import modules.views.MenuView;
-import modules.models.User;
+import modules.User.views.UserAuthForm;
+import modules.Shared.views.MenuView;
+import modules.User.models.User;
 
 public class MainApp extends Application {
 
@@ -18,7 +18,7 @@ public class MainApp extends Application {
         this.mainLayout = new BorderPane();
 
         // O conteúdo inicial do mainLayout será a tela de login
-        LoginForm login = new LoginForm((User u) -> {
+        UserAuthForm login = new UserAuthForm((User u) -> {
             // Após o login, o conteúdo do mainLayout muda para o menu principal
             MenuView mainMenu = new MenuView(this.mainLayout, stage);
             this.mainLayout.setCenter(mainMenu);
