@@ -15,3 +15,6 @@ Thumbs.db
 
 # Temp folder for compiled classes
 temp/
+
+# Google Calendar credentials
+friendly-paw-calendar.json
