@@ -10,6 +10,12 @@ import java.sql.Timestamp;
 
 public class MedicineApplicationController {
 
+    /**
+     * Cria uma nova aplicação de medicamento no banco de dados.
+     * 
+     * @param application Objeto MedicineApplication com os dados da aplicação
+     * @throws SQLException Se ocorrer erro na operação do banco de dados
+     */
     public void create(MedicineApplication application) throws SQLException {
         String sql = """
             INSERT INTO public.medicine_applications
@@ -32,7 +38,7 @@ public class MedicineApplicationController {
                 pstmt.setNull(6, java.sql.Types.TIMESTAMP_WITH_TIMEZONE);
             }
 
-            pstmt.setString(7, application.getFrequency());
+            pstmt.setString(7, application.getFrequency().name());
 
             if (application.getEndsAt() != null) {
                 pstmt.setTimestamp(8, Timestamp.from(application.getEndsAt().toInstant()));
