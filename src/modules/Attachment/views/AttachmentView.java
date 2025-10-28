@@ -57,6 +57,26 @@ public class AttachmentView extends VBox {
 
         TableColumn<Attachment, String> urlColumn = new TableColumn<>("URL");
         urlColumn.setCellValueFactory(new PropertyValueFactory<>("url"));
+        urlColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(String url, boolean empty) {
+                super.updateItem(url, empty);
+                if (empty || url == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    Hyperlink link = new Hyperlink(url);
+                    link.setOnAction(event -> {
+                        try {
+                            java.awt.Desktop.getDesktop().browse(new java.net.URI(url));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    setGraphic(link);
+                }
+            }
+        });
 
         TableColumn<Attachment, String> descriptionColumn = new TableColumn<>("Descrição");
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));

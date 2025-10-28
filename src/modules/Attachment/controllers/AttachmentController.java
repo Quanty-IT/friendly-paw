@@ -2,6 +2,7 @@
 package modules.Attachment.controllers;
 
 import modules.Attachment.models.Attachment;
+import modules.Attachment.services.GoogleDriveOAuthService;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -31,6 +32,26 @@ public class AttachmentController {
     }
 
     public static void deleteAttachment(Connection conn, UUID attachmentId) throws SQLException {
+        // First, get the attachment to delete the file from Google Drive
+        String selectSql = "SELECT url FROM public.attachments WHERE id = ?";
+        
+        try (PreparedStatement selectPs = conn.prepareStatement(selectSql)) {
+            selectPs.setObject(1, attachmentId);
+            try (ResultSet rs = selectPs.executeQuery()) {
+                if (rs.next()) {
+                    String url = rs.getString("url");
+                    // Delete file from Google Drive
+                    if (url != null && url.contains("drive.google.com")) {
+                        String fileId = GoogleDriveOAuthService.extractFileIdFromUrl(url);
+                        if (fileId != null) {
+                            GoogleDriveOAuthService.deleteFile(fileId);
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Now delete from database
         try (PreparedStatement ps = conn.prepareStatement(DELETE_SQL)) {
             ps.setObject(1, attachmentId);
             ps.executeUpdate();

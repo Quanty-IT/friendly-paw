@@ -18,3 +18,6 @@ temp/
 
 # Google Calendar credentials
 friendly-paw-calendar.json
+
+# Google OAuth2 tokens (criado automaticamente)
+tokens/
