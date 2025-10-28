@@ -80,13 +80,12 @@ public class AttachmentForm extends GridPane {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Selecionar Arquivo");
         
-        // Add file filters for common file types
-        FileChooser.ExtensionFilter allFiles = new FileChooser.ExtensionFilter("Todos os Arquivos", "*.*");
-        FileChooser.ExtensionFilter images = new FileChooser.ExtensionFilter("Imagens", "*.png", "*.jpg", "*.jpeg", "*.gif");
-        FileChooser.ExtensionFilter documents = new FileChooser.ExtensionFilter("Documentos", "*.pdf", "*.doc", "*.docx");
-        FileChooser.ExtensionFilter videos = new FileChooser.ExtensionFilter("Vídeos", "*.mp4", "*.avi", "*.mov");
+        // Aceita apenas PNG, JPEG, JPG e PDF
+        FileChooser.ExtensionFilter images = new FileChooser.ExtensionFilter("Imagens", "*.png", "*.jpg", "*.jpeg");
+        FileChooser.ExtensionFilter pdf = new FileChooser.ExtensionFilter("PDF", "*.pdf");
+        FileChooser.ExtensionFilter allSupported = new FileChooser.ExtensionFilter("Todos Suportados", "*.png", "*.jpg", "*.jpeg", "*.pdf");
         
-        fileChooser.getExtensionFilters().addAll(images, documents, videos, allFiles);
+        fileChooser.getExtensionFilters().addAll(allSupported, images, pdf);
         
         selectedFile = fileChooser.showOpenDialog(null);
         
@@ -112,8 +111,8 @@ public class AttachmentForm extends GridPane {
         }
 
         try {
-            // Upload file to Google Drive (OAuth 2.0)
-            String fileUrl = GoogleDriveOAuthService.uploadFile(selectedFile);
+            // Upload file to Google Drive (OAuth 2.0) - organizado por animal
+            String fileUrl = GoogleDriveOAuthService.uploadFile(selectedFile, this.animalId);
             System.out.println("Arquivo enviado para Google Drive: " + fileUrl);
 
             Attachment a = new Attachment(
