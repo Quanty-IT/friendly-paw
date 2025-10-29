@@ -195,13 +195,13 @@ public class MedicineForm extends VBox {
         }
 
         MedicineBrand selectedBrand = brandComboBox.getValue();
-        Integer brandId = selectedBrand != null ? selectedBrand.getId() : null;
+        java.util.UUID brandUuid = selectedBrand != null ? selectedBrand.getUuid() : null;
         String description = descriptionField.getText().trim();
         Boolean isActive = isActiveCheckBox.isSelected();
 
         try {
             MedicineController controller = new MedicineController(conn);
-            controller.insert(name, brandId, quantity, description, isActive);
+            controller.insert(name, brandUuid, quantity, description, isActive);
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Medicamento cadastrado com sucesso!");
             alert.setTitle("Sucesso");
             alert.setHeaderText(null);

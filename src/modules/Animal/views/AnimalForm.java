@@ -169,7 +169,7 @@ public class AnimalForm extends GridPane {
         boolean castrated = castratedCheckBox.isSelected();
 
         Animal a = new Animal(
-                this.animalToEdit != null ? this.animalToEdit.getId() : null, // Se for edição, mantém o ID
+                this.animalToEdit != null ? this.animalToEdit.getUuid() : null, // Se for edição, mantém o ID
                 name, sex, species, breed, size, color, birthdate,
                 microchip, rga, castrated, fiv, felv, status, notes,
                 this.animalToEdit != null ? this.animalToEdit.getCreatedAt() : LocalDateTime.now(), // Mantém created_at

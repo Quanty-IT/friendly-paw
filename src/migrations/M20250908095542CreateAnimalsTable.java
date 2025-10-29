@@ -8,7 +8,7 @@ public class M20250908095542CreateAnimalsTable implements Migration {
 
     @Override
     public String name() {
-        return "20250908095542_createanimalstable";
+        return "20250908095542_create_animals_table";
     }
 
     @Override
@@ -20,11 +20,11 @@ public class M20250908095542CreateAnimalsTable implements Migration {
 
             st.execute("""
                 CREATE TABLE IF NOT EXISTS public.animals (
-                    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-                    name text NOT NULL,
-                    sex text NOT NULL CHECK (sex IN ('male','female')),
-                    species text NOT NULL CHECK (species IN ('dog','cat')),
-                    breed text NOT NULL CHECK (breed IN (
+                    uuid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                    name VARCHAR(255) NOT NULL,
+                    sex VARCHAR(10) NOT NULL CHECK (sex IN ('male','female')),
+                    species VARCHAR(10) NOT NULL CHECK (species IN ('dog','cat')),
+                    breed VARCHAR(100) NOT NULL CHECK (breed IN (
                         'mixed-breed',
                         'shih-tzu',
                         'yorkshire-terrier',
@@ -42,18 +42,18 @@ public class M20250908095542CreateAnimalsTable implements Migration {
                         'belgian-malinois',
                         'maltese'
                     )),
-                    size text NOT NULL CHECK (size IN ('small','medium','large')),
-                    color text NOT NULL CHECK (color IN ('black','white','gray','brown','golden','cream','tan','speckled')),
-                    birthdate date,
-                    microchip text,
-                    rga text,
-                    castrated boolean DEFAULT false,
-                    fiv text CHECK (fiv IN ('yes','no','not-tested')) ,
-                    felv text CHECK (felv IN ('yes','no','not-tested')),
-                    status text CHECK (status IN ('quarantine','sheltered','adopted','lost')),
-                    notes text,
-                    created_at timestamptz NOT NULL DEFAULT now(),
-                    updated_at timestamptz NOT NULL DEFAULT now()
+                    size VARCHAR(10) NOT NULL CHECK (size IN ('small','medium','large')),
+                    color VARCHAR(20) NOT NULL CHECK (color IN ('black','white','gray','brown','golden','cream','tan','speckled')),
+                    birthdate DATE,
+                    microchip VARCHAR(20),
+                    rga VARCHAR(20),
+                    castrated BOOLEAN DEFAULT false,
+                    fiv VARCHAR(10) CHECK (fiv IN ('yes','no','not-tested')) ,
+                    felv VARCHAR(10) CHECK (felv IN ('yes','no','not-tested')),
+                    status VARCHAR(20) CHECK (status IN ('quarantine','sheltered','adopted','lost')),
+                    notes TEXT,
+                    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
                 );
             """);
         }

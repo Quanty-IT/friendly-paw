@@ -14,37 +14,37 @@ public class AttachmentController {
 
     private static final String INSERT_SQL = """
         INSERT INTO public.attachments
-        (url, description, animal_id, created_at)
+        (file, description, animal_uuid, created_at)
         VALUES (?, ?, ?, now())
         """;
 
-    private static final String SELECT_BY_ANIMAL_SQL = "SELECT * FROM public.attachments WHERE animal_id = ?";
+    private static final String SELECT_BY_ANIMAL_SQL = "SELECT * FROM public.attachments WHERE animal_uuid = ?";
 
-    private static final String DELETE_SQL = "DELETE FROM public.attachments WHERE id = ?";
+    private static final String DELETE_SQL = "DELETE FROM public.attachments WHERE uuid = ?";
 
     public static void addAttachment(Connection conn, Attachment a) throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement(INSERT_SQL)) {
-            ps.setString(1, a.getUrl());
+            ps.setString(1, a.getFile());
             ps.setString(2, a.getDescription());
-            ps.setObject(3, a.getAnimalId());
+            ps.setObject(3, a.getAnimalUuid());
             ps.executeUpdate();
         }
     }
 
     public static void deleteAttachment(Connection conn, UUID attachmentId) throws SQLException {
         // First, get the attachment to delete the file from Google Drive
-        String selectSql = "SELECT url FROM public.attachments WHERE id = ?";
+        String selectSql = "SELECT file FROM public.attachments WHERE uuid = ?";
         
         try (PreparedStatement selectPs = conn.prepareStatement(selectSql)) {
             selectPs.setObject(1, attachmentId);
             try (ResultSet rs = selectPs.executeQuery()) {
                 if (rs.next()) {
-                    String url = rs.getString("url");
+                    String url = rs.getString("file");
                     // Delete file from Google Drive
                     if (url != null && url.contains("drive.google.com")) {
-                        String fileId = GoogleDriveOAuthService.extractFileIdFromUrl(url);
-                        if (fileId != null) {
-                            GoogleDriveOAuthService.deleteFile(fileId);
+                        String fileUuid = GoogleDriveOAuthService.extractFileIdFromUrl(url);
+                        if (fileUuid != null) {
+                            GoogleDriveOAuthService.deleteFile(fileUuid);
                         }
                     }
                 }
@@ -64,14 +64,14 @@ public class AttachmentController {
             ps.setObject(1, animalId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    UUID id = (UUID) rs.getObject("id");
-                    String url = rs.getString("url");
+                    UUID uuid = (UUID) rs.getObject("uuid");
+                    String file = rs.getString("file");
                     String description = rs.getString("description");
                     Timestamp cat = rs.getTimestamp("created_at");
 
                     Attachment a = new Attachment(
-                            id,
-                            url,
+                            uuid,
+                            file,
                             description,
                             animalId,
                             cat != null ? cat.toLocalDateTime() : LocalDateTime.now()

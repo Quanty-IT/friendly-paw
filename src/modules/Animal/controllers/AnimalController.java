@@ -21,10 +21,10 @@ public class AnimalController {
     private static final String UPDATE_SQL = """
         UPDATE public.animals
         SET name = ?, sex = ?, species = ?, breed = ?, size = ?, color = ?, birthdate = ?, microchip = ?, rga = ?, castrated = ?, fiv = ?, felv = ?, status = ?, notes = ?, updated_at = now()
-        WHERE id = ?
+        WHERE uuid = ?
         """;
 
-    private static final String DELETE_SQL = "DELETE FROM public.animals WHERE id = ?";
+    private static final String DELETE_SQL = "DELETE FROM public.animals WHERE uuid = ?";
 
     public static void addAnimal(Connection conn, Animal a) throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement(INSERT_SQL)) {
@@ -70,7 +70,7 @@ public class AnimalController {
             ps.setString(12, a.getFelv());
             ps.setString(13, a.getStatus());
             ps.setString(14, a.getNotes());
-            ps.setObject(15, a.getId());
+            ps.setObject(15, a.getUuid());
             ps.executeUpdate();
         }
     }
@@ -86,7 +86,7 @@ public class AnimalController {
         List<Animal> animals = new ArrayList<>();
         try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(SELECT_SQL)) {
             while (rs.next()) {
-                UUID id = (UUID) rs.getObject("id");
+                UUID uuid = (UUID) rs.getObject("uuid");
                 String name = rs.getString("name");
                 String sex = rs.getString("sex");
                 String species = rs.getString("species");
@@ -105,7 +105,7 @@ public class AnimalController {
                 Timestamp uat = rs.getTimestamp("updated_at");
 
                 Animal a = new Animal(
-                        id,
+                        uuid,
                         name,
                         sex,
                         species,

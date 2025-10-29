@@ -5,31 +5,31 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class Attachment {
-    private UUID id;
-    private String url;
+    private UUID uuid;
+    private String file;
     private String description;
-    private UUID animalId;
+    private UUID animalUuid;
     private LocalDateTime createdAt;
 
-    public Attachment(UUID id, String url, String description, UUID animalId, LocalDateTime createdAt) {
-        this.id = id;
-        this.url = url;
+    public Attachment(UUID uuid, String file, String description, UUID animalUuid, LocalDateTime createdAt) {
+        this.uuid = uuid;
+        this.file = file;
         this.description = description;
-        this.animalId = animalId;
+        this.animalUuid = animalUuid;
         this.createdAt = createdAt;
     }
 
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
+    public UUID getUuid() { return uuid; }
+    public void setUuid(UUID uuid) { this.uuid = uuid; }
 
-    public String getUrl() { return url; }
-    public void setUrl(String url) { this.url = url; }
+    public String getFile() { return file; }
+    public void setFile(String file) { this.file = file; }
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
-    public UUID getAnimalId() { return animalId; }
-    public void setAnimalId(UUID animalId) { this.animalId = animalId; }
+    public UUID getAnimalUuid() { return animalUuid; }
+    public void setAnimalUuid(UUID animalUuid) { this.animalUuid = animalUuid; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

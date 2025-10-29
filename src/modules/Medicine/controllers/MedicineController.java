@@ -5,6 +5,7 @@ import modules.Medicine.models.Medicine;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class MedicineController {
 
@@ -14,8 +15,8 @@ public class MedicineController {
         this.conn = conn;
     }
 
-    public void insert(String name, Integer brandId, Integer quantity, String description, Boolean isActive) throws SQLException {
-        String sql = "INSERT INTO public.medicines (name, brand_id, quantity, description, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, now(), now())";
+    public void insert(String name, UUID brandId, Integer quantity, String description, Boolean isActive) throws SQLException {
+        String sql = "INSERT INTO public.medicines (name, brand_uuid, quantity, description, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, now(), now())";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, name);
             ps.setObject(2, brandId);
@@ -29,56 +30,56 @@ public class MedicineController {
     public List<Medicine> listAll() throws SQLException {
         List<Medicine> medicines = new ArrayList<>();
         String sql = """
-                SELECT m.id, m.name, m.brand_id, mb.name as brand_name, m.quantity, 
+                SELECT m.uuid, m.name, m.brand_uuid, mb.name as brand_name, m.quantity, 
                        m.description, m.is_active, m.created_at, m.updated_at
                 FROM public.medicines m
-                LEFT JOIN public.medicine_brands mb ON m.brand_id = mb.id
+                LEFT JOIN public.medicine_brands mb ON m.brand_uuid = mb.uuid
                 ORDER BY m.created_at DESC
                 """;
         try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                medicines.add(new Medicine(rs.getInt("id"), rs.getString("name"), (Integer) rs.getObject("brand_id"), rs.getString("brand_name"), (Integer) rs.getObject("quantity"), rs.getString("description"), rs.getBoolean("is_active"), rs.getTimestamp("created_at").toLocalDateTime(), rs.getTimestamp("updated_at").toLocalDateTime()));
+                medicines.add(new Medicine((UUID) rs.getObject("uuid"), rs.getString("name"), (UUID) rs.getObject("brand_uuid"), rs.getString("brand_name"), (Integer) rs.getObject("quantity"), rs.getString("description"), rs.getBoolean("is_active"), rs.getTimestamp("created_at").toLocalDateTime(), rs.getTimestamp("updated_at").toLocalDateTime()));
             }
         }
         return medicines;
     }
 
-    public Medicine findById(int id) throws SQLException {
+    public Medicine findByUuid(UUID uuid) throws SQLException {
         String sql = """
-                SELECT m.id, m.name, m.brand_id, mb.name as brand_name, m.quantity, 
+                SELECT m.uuid, m.name, m.brand_uuid, mb.name as brand_name, m.quantity, 
                        m.description, m.is_active, m.created_at, m.updated_at
                 FROM public.medicines m
-                LEFT JOIN public.medicine_brands mb ON m.brand_id = mb.id
-                WHERE m.id = ?
+                LEFT JOIN public.medicine_brands mb ON m.brand_uuid = mb.uuid
+                WHERE m.uuid = ?
                 """;
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, id);
+            stmt.setObject(1, uuid);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return new Medicine(rs.getInt("id"), rs.getString("name"), (Integer) rs.getObject("brand_id"), rs.getString("brand_name"), (Integer) rs.getObject("quantity"), rs.getString("description"), rs.getBoolean("is_active"), rs.getTimestamp("created_at").toLocalDateTime(), rs.getTimestamp("updated_at").toLocalDateTime());
+                    return new Medicine((UUID) rs.getObject("uuid"), rs.getString("name"), (UUID) rs.getObject("brand_uuid"), rs.getString("brand_name"), (Integer) rs.getObject("quantity"), rs.getString("description"), rs.getBoolean("is_active"), rs.getTimestamp("created_at").toLocalDateTime(), rs.getTimestamp("updated_at").toLocalDateTime());
                 }
             }
         }
         return null;
     }
 
-    public void update(int id, String name, Integer brandId, Integer quantity, String description, Boolean isActive) throws SQLException {
-        String sql = "UPDATE public.medicines SET name = ?, brand_id = ?, quantity = ?, description = ?, is_active = ?, updated_at = now() WHERE id = ?";
+    public void update(UUID uuid, String name, UUID brandId, Integer quantity, String description, Boolean isActive) throws SQLException {
+        String sql = "UPDATE public.medicines SET name = ?, brand_uuid = ?, quantity = ?, description = ?, is_active = ?, updated_at = now() WHERE uuid = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, name);
             ps.setObject(2, brandId);
             ps.setObject(3, quantity);
             ps.setString(4, description);
             ps.setBoolean(5, isActive);
-            ps.setInt(6, id);
+            ps.setObject(6, uuid);
             ps.executeUpdate();
         }
     }
 
-    public void delete(int id) throws SQLException {
-        String sql = "DELETE FROM public.medicines WHERE id = ?";
+    public void delete(UUID uuid) throws SQLException {
+        String sql = "DELETE FROM public.medicines WHERE uuid = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
+            ps.setObject(1, uuid);
             ps.executeUpdate();
         }
     }

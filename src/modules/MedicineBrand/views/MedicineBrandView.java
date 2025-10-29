@@ -245,7 +245,7 @@ public class MedicineBrandView extends VBox {
         confirm.showAndWait().ifPresent(type -> {
             if (type == ButtonType.YES) {
                 try {
-                    controller.delete(selected.getId());
+                    controller.delete(selected.getUuid());
                     loadData();
                     new Alert(Alert.AlertType.INFORMATION, "Marca excluída com sucesso!").showAndWait();
                 } catch (SQLException e) {

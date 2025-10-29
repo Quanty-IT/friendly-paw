@@ -1,12 +1,13 @@
 package modules.Medicine.models;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public class Medicine {
 
-    private Integer id;
+    private UUID uuid;
     private String name;
-    private Integer brandId;
+    private UUID brandUuid;
     private String brandName;
     private Integer quantity;
     private String description;
@@ -14,10 +15,10 @@ public class Medicine {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Medicine(Integer id, String name, Integer brandId, String brandName, Integer quantity, String description, Boolean isActive, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
+    public Medicine(UUID uuid, String name, UUID brandUuid, String brandName, Integer quantity, String description, Boolean isActive, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.uuid = uuid;
         this.name = name;
-        this.brandId = brandId;
+        this.brandUuid = brandUuid;
         this.brandName = brandName;
         this.quantity = quantity;
         this.description = description;
@@ -26,12 +27,12 @@ public class Medicine {
         this.updatedAt = updatedAt;
     }
 
-    public Integer getId() {
-        return id;
+    public UUID getUuid() {
+        return uuid;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public String getName() {
@@ -42,12 +43,12 @@ public class Medicine {
         this.name = name;
     }
 
-    public Integer getBrandId() {
-        return brandId;
+    public UUID getBrandUuid() {
+        return brandUuid;
     }
 
-    public void setBrandId(Integer brandId) {
-        this.brandId = brandId;
+    public void setBrandUuid(UUID brandUuid) {
+        this.brandUuid = brandUuid;
     }
 
     public String getBrandName() {

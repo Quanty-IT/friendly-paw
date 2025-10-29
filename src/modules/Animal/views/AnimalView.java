@@ -125,7 +125,7 @@ public class AnimalView extends VBox {
                     alert.showAndWait().ifPresent(response -> {
                         if (response == ButtonType.YES) {
                             try {
-                                AnimalController.deleteAnimal(conn, animal.getId());
+                                AnimalController.deleteAnimal(conn, animal.getUuid());
                                 getTableView().getItems().remove(animal);
                                 System.out.println("Animal deletado com sucesso!");
                             } catch (SQLException e) {
@@ -140,7 +140,7 @@ public class AnimalView extends VBox {
                 attachmentsButton.setOnAction(event -> {
                     Animal animal = getTableView().getItems().get(getIndex());
                     if (animal != null) {
-                        AnimalView.this.mainLayout.setCenter(new AttachmentView(AnimalView.this.mainLayout, animal.getId()));
+                        AnimalView.this.mainLayout.setCenter(new AttachmentView(AnimalView.this.mainLayout, animal.getUuid()));
                     } else {
                         Alert alert = new Alert(Alert.AlertType.WARNING);
                         alert.setTitle("Nenhum animal selecionado");

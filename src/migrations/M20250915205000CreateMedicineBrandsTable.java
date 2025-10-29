@@ -4,24 +4,20 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class M20250915210000CreateMedicines implements Migration {
+public class M20250915205000CreateMedicineBrandsTable implements Migration {
 
     @Override
     public String name() {
-        return "20250915210000_create_medicines";
+        return "20250915205000_create_medicine_brands";
     }
 
     @Override
     public void up(Connection conn) throws SQLException {
         try (Statement st = conn.createStatement()) {
             st.execute("""
-                CREATE TABLE medicines (
-                    id SERIAL PRIMARY KEY,
+                CREATE TABLE IF NOT EXISTS public.medicine_brands (
+                    uuid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                     name VARCHAR(255) NOT NULL,
-                    brand_id INTEGER REFERENCES medicine_brands(id) ON DELETE CASCADE,
-                    quantity INTEGER DEFAULT 0,
-                    description TEXT,
-                    is_active BOOLEAN DEFAULT TRUE,
                     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
                 );
@@ -32,7 +28,7 @@ public class M20250915210000CreateMedicines implements Migration {
     @Override
     public void down(Connection conn) throws SQLException {
         try (Statement st = conn.createStatement()) {
-            st.execute("DROP TABLE IF EXISTS medicines;");
+            st.execute("DROP TABLE IF EXISTS public.medicine_brands;");
         }
     }
 }

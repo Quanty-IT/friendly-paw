@@ -5,6 +5,7 @@ import modules.MedicineBrand.models.MedicineBrand;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class MedicineBrandController {
 
@@ -29,7 +30,7 @@ public class MedicineBrandController {
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 brands.add(new MedicineBrand(
-                        rs.getInt("id"),
+                        (UUID) rs.getObject("uuid"),
                         rs.getString("name"),
                         rs.getTimestamp("created_at").toLocalDateTime(),
                         rs.getTimestamp("updated_at").toLocalDateTime()
@@ -39,14 +40,14 @@ public class MedicineBrandController {
         return brands;
     }
 
-    public MedicineBrand findById(int id) throws SQLException {
-        String sql = "SELECT id, name, created_at, updated_at FROM public.medicine_brands WHERE id = ?";
+    public MedicineBrand findByUuid(UUID uuid) throws SQLException {
+        String sql = "SELECT uuid, name, created_at, updated_at FROM public.medicine_brands WHERE uuid = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, id);
+            stmt.setObject(1, uuid);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return new MedicineBrand(
-                            rs.getInt("id"),
+                            (UUID) rs.getObject("uuid"),
                             rs.getString("name"),
                             rs.getTimestamp("created_at").toLocalDateTime(),
                             rs.getTimestamp("updated_at").toLocalDateTime()
@@ -57,19 +58,19 @@ public class MedicineBrandController {
         return null;
     }
 
-    public void update(int id, String name) throws SQLException {
-        String sql = "UPDATE public.medicine_brands SET name = ?, updated_at = now() WHERE id = ?";
+    public void update(UUID uuid, String name) throws SQLException {
+        String sql = "UPDATE public.medicine_brands SET name = ?, updated_at = now() WHERE uuid = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, name);
-            ps.setInt(2, id);
+            ps.setObject(2, uuid);
             ps.executeUpdate();
         }
     }
 
-    public void delete(int id) throws SQLException {
-        String sql = "DELETE FROM public.medicine_brands WHERE id = ?";
+    public void delete(UUID uuid) throws SQLException {
+        String sql = "DELETE FROM public.medicine_brands WHERE uuid = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
+            ps.setObject(1, uuid);
             ps.executeUpdate();
         }
     }

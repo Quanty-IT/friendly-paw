@@ -97,7 +97,7 @@ public class MedicineApplication {
     }
 
     private UUID applicationUuid;
-    private Integer medicineId;
+    private UUID medicineUuid;
     private UUID userUuid;
     private UUID animalUuid;
     private ZonedDateTime appliedAt;
@@ -118,12 +118,12 @@ public class MedicineApplication {
         this.applicationUuid = applicationUuid;
     }
 
-    public Integer getMedicineId() {
-        return medicineId;
+    public UUID getMedicineUuid() {
+        return medicineUuid;
     }
 
-    public void setMedicineId(Integer medicineId) {
-        this.medicineId = medicineId;
+    public void setMedicineUuid(UUID medicineUuid) {
+        this.medicineUuid = medicineUuid;
     }
 
     public UUID getUserUuid() {

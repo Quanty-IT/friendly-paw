@@ -194,9 +194,9 @@ public class MedicineApplicationForm extends VBox {
                 }
 
                 MedicineApplication newApp = new MedicineApplication();
-                newApp.setAnimalUuid(selectedAnimal.getId());
-                newApp.setMedicineId(selectedMedicine.getId());
-                newApp.setUserUuid(currentUser.getId());
+                newApp.setAnimalUuid(selectedAnimal.getUuid());
+                newApp.setMedicineUuid(selectedMedicine.getUuid());
+                newApp.setUserUuid(currentUser.getUuid());
 
                 LocalDate localDate = appliedDatePicker.getValue();
                 newApp.setAppliedAt(ZonedDateTime.of(localDate, LocalTime.now(), ZoneId.systemDefault()));
@@ -219,7 +219,7 @@ public class MedicineApplicationForm extends VBox {
                             newApp.getNextApplicationAt() : 
                             newApp.getAppliedAt();
                             
-                        String eventId = modules.MedicineApplication.services.GoogleCalendarService.createMedicineApplicationEvent(
+                        String eventUuid = modules.MedicineApplication.services.GoogleCalendarService.createMedicineApplicationEvent(
                             selectedAnimal.getName(),
                             selectedMedicine.getName(),
                             newApp.getQuantity().toString(),

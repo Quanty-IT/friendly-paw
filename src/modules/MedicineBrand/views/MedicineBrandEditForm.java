@@ -67,7 +67,7 @@ public class MedicineBrandEditForm extends VBox {
             return;
         }
         try {
-            controller.update(brand.getId(), name);
+            controller.update(brand.getUuid(), name);
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Marca editada com sucesso!");
             alert.setTitle("Sucesso");
             alert.setHeaderText(null);

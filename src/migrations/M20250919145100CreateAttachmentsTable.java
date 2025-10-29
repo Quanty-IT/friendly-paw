@@ -8,7 +8,7 @@ public class M20250919145100CreateAttachmentsTable implements Migration {
 
     @Override
     public String name() {
-        return "20250919145100_createattachmentstable";
+        return "20250919145100_create_attachments_table";
     }
 
     @Override
@@ -16,14 +16,14 @@ public class M20250919145100CreateAttachmentsTable implements Migration {
         try (Statement st = conn.createStatement()) {
             st.execute("""
                 CREATE TABLE IF NOT EXISTS public.attachments (
-                    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-                    url text NOT NULL,
-                    description text,
-                    animal_id uuid NOT NULL,
-                    created_at timestamptz NOT NULL DEFAULT now(),
+                    uuid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                    file VARCHAR(255) NOT NULL,
+                    description TEXT,
+                    animal_uuid UUID NOT NULL,
+                    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     CONSTRAINT fk_animal
-                        FOREIGN KEY(animal_id) 
-	                    REFERENCES animals(id)
+                        FOREIGN KEY(animal_uuid) 
+	                    REFERENCES public.animals(uuid)
                 );
             """);
         }

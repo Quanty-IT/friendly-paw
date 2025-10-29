@@ -38,7 +38,7 @@ public class GoogleDriveOAuthService {
     );
     
     private static Drive driveService;
-    private static String friendlyPawFolderId = null;
+    private static String friendlyPawFolderUuid = null;
     private static Credential credential;
     private static HttpServer localServer;
     
@@ -143,24 +143,24 @@ public class GoogleDriveOAuthService {
      * Busca ou cria a pasta "friendly-paw" no Google Drive.
      */
     private static String getOrCreateFriendlyPawFolder() throws IOException, GeneralSecurityException {
-        if (friendlyPawFolderId != null) return friendlyPawFolderId;
+        if (friendlyPawFolderUuid != null) return friendlyPawFolderUuid;
         
         Drive service = getDriveServiceInstance();
         String query = "name='" + FOLDER_NAME + "' and mimeType='application/vnd.google-apps.folder' and trashed=false";
         FileList result = service.files().list().setQ(query).setPageSize(1).execute();
         
         if (result.getFiles() != null && !result.getFiles().isEmpty()) {
-            friendlyPawFolderId = result.getFiles().get(0).getId();
+            friendlyPawFolderUuid = result.getFiles().get(0).getId();
         } else {
             com.google.api.services.drive.model.File folder = service.files().create(
                 new com.google.api.services.drive.model.File().setName(FOLDER_NAME)
                     .setMimeType("application/vnd.google-apps.folder"))
                 .setFields("id").execute();
-            friendlyPawFolderId = folder.getId();
+            friendlyPawFolderUuid = folder.getId();
             service.permissions().create(folder.getId(), 
                 new Permission().setType("anyone").setRole("reader")).execute();
         }
-        return friendlyPawFolderId;
+        return friendlyPawFolderUuid;
     }
 
     /**
@@ -205,14 +205,14 @@ public class GoogleDriveOAuthService {
         }
         
         Drive service = getDriveServiceInstance();
-        String animalFolderId = getOrCreateAnimalFolder(animalId);
+        String animalFolderUuid = getOrCreateAnimalFolder(animalId);
         
         String fileName = UUID.randomUUID().toString() + "_" + file.getName();
         
         com.google.api.services.drive.model.File uploadedFile = service.files().create(
             new com.google.api.services.drive.model.File()
                 .setName(fileName)
-                .setParents(Arrays.asList(animalFolderId)),
+                .setParents(Arrays.asList(animalFolderUuid)),
             new FileContent(mimeType, file))
             .setFields("id,webViewLink").execute();
         
@@ -225,9 +225,9 @@ public class GoogleDriveOAuthService {
     /**
      * Deleta um arquivo do Google Drive.
      */
-    public static boolean deleteFile(String fileId) {
+    public static boolean deleteFile(String fileUuid) {
         try {
-            getDriveServiceInstance().files().delete(fileId).execute();
+            getDriveServiceInstance().files().delete(fileUuid).execute();
             return true;
         } catch (Exception e) {
             System.err.println("Erro ao deletar: " + e.getMessage());

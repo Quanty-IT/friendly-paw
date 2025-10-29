@@ -178,9 +178,9 @@ public class MedicineEditForm extends VBox {
             descriptionField.setText(medicine.getDescription() != null ? medicine.getDescription() : "");
             isActiveCheckBox.setSelected(medicine.getIsActive());
 
-            if (medicine.getBrandId() != null) {
+            if (medicine.getBrandUuid() != null) {
                 brandComboBox.getItems().forEach(brand -> {
-                    if (brand.getId().equals(medicine.getBrandId())) {
+                    if (brand.getUuid().equals(medicine.getBrandUuid())) {
                         brandComboBox.setValue(brand);
                     }
                 });
@@ -212,12 +212,12 @@ public class MedicineEditForm extends VBox {
         }
 
         MedicineBrand selectedBrand = brandComboBox.getValue();
-        Integer brandId = selectedBrand != null ? selectedBrand.getId() : null;
+        java.util.UUID brandUuid = selectedBrand != null ? selectedBrand.getUuid() : null;
         String description = descriptionField.getText().trim();
         Boolean isActive = isActiveCheckBox.isSelected();
 
         try {
-            controller.update(medicine.getId(), name, brandId, quantity, description, isActive);
+            controller.update(medicine.getUuid(), name, brandUuid, quantity, description, isActive);
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Medicamento editado com sucesso!");
             alert.setTitle("Sucesso");
             alert.setHeaderText(null);

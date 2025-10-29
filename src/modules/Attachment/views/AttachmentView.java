@@ -26,11 +26,11 @@ public class AttachmentView extends VBox {
     private ObservableList<Attachment> attachmentList;
     private Connection conn;
     private final BorderPane mainLayout;
-    private final UUID animalId;
+    private final UUID animalUuid;
 
-    public AttachmentView(BorderPane mainLayout, UUID animalId) {
+    public AttachmentView(BorderPane mainLayout, UUID animalUuid) {
         this.mainLayout = mainLayout;
-        this.animalId = animalId;
+        this.animalUuid = animalUuid;
 
         try {
             this.conn = Database.getConnection();
@@ -43,7 +43,7 @@ public class AttachmentView extends VBox {
 
         Button addButton = new Button("Adicionar Anexo");
         addButton.setOnAction(e -> {
-            this.mainLayout.setCenter(new AttachmentForm(this.mainLayout, this.animalId));
+            this.mainLayout.setCenter(new AttachmentForm(this.mainLayout, this.animalUuid));
         });
 
         // Botão "Voltar" para voltar à tela anterior
@@ -55,20 +55,20 @@ public class AttachmentView extends VBox {
         HBox buttonBox = new HBox(10, addButton, backButton);
         buttonBox.setPadding(new Insets(10, 10, 10, 10));
 
-        TableColumn<Attachment, String> urlColumn = new TableColumn<>("URL");
-        urlColumn.setCellValueFactory(new PropertyValueFactory<>("url"));
-        urlColumn.setCellFactory(column -> new TableCell<>() {
+        TableColumn<Attachment, String> fileColumn = new TableColumn<>("Arquivo");
+        fileColumn.setCellValueFactory(new PropertyValueFactory<>("file"));
+        fileColumn.setCellFactory(column -> new TableCell<>() {
             @Override
-            protected void updateItem(String url, boolean empty) {
-                super.updateItem(url, empty);
-                if (empty || url == null) {
+            protected void updateItem(String file, boolean empty) {
+                super.updateItem(file, empty);
+                if (empty || file == null) {
                     setText(null);
                     setGraphic(null);
                 } else {
-                    Hyperlink link = new Hyperlink(url);
+                    Hyperlink link = new Hyperlink(file);
                     link.setOnAction(event -> {
                         try {
-                            java.awt.Desktop.getDesktop().browse(new java.net.URI(url));
+                            java.awt.Desktop.getDesktop().browse(new java.net.URI(file));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -96,7 +96,7 @@ public class AttachmentView extends VBox {
                     alert.showAndWait().ifPresent(response -> {
                         if (response == ButtonType.YES) {
                             try {
-                                AttachmentController.deleteAttachment(conn, attachment.getId());
+                                AttachmentController.deleteAttachment(conn, attachment.getUuid());
                                 getTableView().getItems().remove(attachment);
                                 System.out.println("Anexo deletado com sucesso!");
                             } catch (SQLException e) {
@@ -119,14 +119,14 @@ public class AttachmentView extends VBox {
             }
         });
 
-        tableView.getColumns().addAll(urlColumn, descriptionColumn, createdAtColumn, actionColumn);
+        tableView.getColumns().addAll(fileColumn, descriptionColumn, createdAtColumn, actionColumn);
         this.getChildren().addAll(buttonBox, tableView);
         loadAttachments();
     }
 
     private void loadAttachments() {
         try {
-            List<Attachment> attachments = AttachmentController.getAttachmentsForAnimal(conn, this.animalId);
+            List<Attachment> attachments = AttachmentController.getAttachmentsForAnimal(conn, this.animalUuid);
             attachmentList.clear();
             attachmentList.addAll(attachments);
             tableView.setItems(attachmentList);

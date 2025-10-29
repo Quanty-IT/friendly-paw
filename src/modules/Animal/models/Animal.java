@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class Animal {
-    private UUID id;
+    private UUID uuid;
     private String name;
     private String sex;
     private String species;
@@ -23,10 +23,10 @@ public class Animal {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Animal(UUID id, String name, String sex, String species, String breed, String size, String color,
+    public Animal(UUID uuid, String name, String sex, String species, String breed, String size, String color,
                   LocalDate birthdate, String microchip, String rga, boolean castrated, String fiv, String felv, String status,
                   String notes, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
+        this.uuid = uuid;
         this.name = name;
         this.sex = sex;
         this.species = species;
@@ -45,8 +45,8 @@ public class Animal {
         this.updatedAt = updatedAt;
     }
 
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
+    public UUID getUuid() { return uuid; }
+    public void setUuid(UUID uuid) { this.uuid = uuid; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
