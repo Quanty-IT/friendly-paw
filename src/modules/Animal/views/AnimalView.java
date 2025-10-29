@@ -180,17 +180,6 @@ public class AnimalView extends VBox {
         loadAnimals();
     }
 
-    private void loadAnimals() {
-        try {
-            List<Animal> animals = AnimalController.getAllAnimals(conn);
-            animalList.clear();
-            animalList.addAll(animals);
-            tableView.setItems(animalList);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
     /**
      * Carrega a lista de animais do banco de dados e atualiza a tabela.
      */

@@ -33,14 +33,14 @@ public class UserAuthController {
 
                 UUID uuid = (UUID) rs.getObject("uuid");
                 String name = rs.getString("name");
-                String email = rs.getString("email");
+                String userEmail = rs.getString("email");
                 Timestamp createdAt = rs.getTimestamp("created_at");
                 Timestamp updatedAt = rs.getTimestamp("updated_at");
 
                 return new User(
                         uuid,
                         name,
-                        email,
+                        userEmail,
                         createdAt != null ? createdAt.toLocalDateTime() : LocalDateTime.now(),
                         updatedAt != null ? updatedAt.toLocalDateTime() : LocalDateTime.now()
                 );
