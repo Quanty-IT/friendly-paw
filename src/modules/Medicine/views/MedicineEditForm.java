@@ -29,6 +29,12 @@ public class MedicineEditForm extends VBox {
     private MedicineController controller;
     private Connection conn;
 
+    /**
+     * Construtor do formulário de edição de medicamento.
+     * 
+     * @param medicine Medicamento a ser editado
+     * @param controller Controller responsável pelas operações de medicamento
+     */
     public MedicineEditForm(Medicine medicine, MedicineController controller) {
         this.medicine = medicine;
         this.controller = controller;
@@ -53,6 +59,9 @@ public class MedicineEditForm extends VBox {
         this.getChildren().add(0, titleLabel);
     }
 
+    /**
+     * Configura todos os componentes do formulário, incluindo campos e botões.
+     */
     private void setupComponents() {
         // Nome
         Label nameLabel = new Label("Nome do Medicamento:");
@@ -132,6 +141,9 @@ public class MedicineEditForm extends VBox {
         this.getStylesheets().add(getClass().getResource("/modules/Medicine/styles/MedicineEditForm.css").toExternalForm());
     }
 
+    /**
+     * Carrega a lista de marcas de medicamentos do banco de dados e popula o ComboBox.
+     */
     private void loadBrands() {
         try {
             MedicineBrandController brandController = new MedicineBrandController(conn);
@@ -171,6 +183,9 @@ public class MedicineEditForm extends VBox {
         }
     }
 
+    /**
+     * Pré-preenche os campos do formulário com os dados do medicamento sendo editado.
+     */
     private void populateFields() {
         if (medicine != null) {
             nameField.setText(medicine.getName());
@@ -188,6 +203,10 @@ public class MedicineEditForm extends VBox {
         }
     }
 
+    /**
+     * Atualiza os dados do medicamento no banco de dados.
+     * Valida os campos antes de prosseguir.
+     */
     private void updateMedicine() {
         String name = nameField.getText().trim();
         if (name.isEmpty()) {
@@ -232,6 +251,9 @@ public class MedicineEditForm extends VBox {
         }
     }
 
+    /**
+     * Fecha a janela do formulário de edição.
+     */
     private void closeWindow() {
         Stage stage = (Stage) this.getScene().getWindow();
         stage.close();

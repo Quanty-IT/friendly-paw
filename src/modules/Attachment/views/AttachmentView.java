@@ -41,12 +41,13 @@ public class AttachmentView extends VBox {
         tableView = new TableView<>();
         attachmentList = FXCollections.observableArrayList();
 
+        // Botão para adicionar um novo anexo
         Button addButton = new Button("Adicionar Anexo");
         addButton.setOnAction(e -> {
             this.mainLayout.setCenter(new AttachmentForm(this.mainLayout, this.animalUuid));
         });
 
-        // Botão "Voltar" para voltar à tela anterior
+        // Botão para retornar à tela de animais
         Button backButton = new Button("Voltar");
         backButton.setOnAction(e -> {
             this.mainLayout.setCenter(new AnimalView(this.mainLayout));
@@ -55,6 +56,7 @@ public class AttachmentView extends VBox {
         HBox buttonBox = new HBox(10, addButton, backButton);
         buttonBox.setPadding(new Insets(10, 10, 10, 10));
 
+        // Coluna de arquivo com link clicável para abrir no navegador
         TableColumn<Attachment, String> fileColumn = new TableColumn<>("Arquivo");
         fileColumn.setCellValueFactory(new PropertyValueFactory<>("file"));
         fileColumn.setCellFactory(column -> new TableCell<>() {
@@ -65,6 +67,7 @@ public class AttachmentView extends VBox {
                     setText(null);
                     setGraphic(null);
                 } else {
+                    // Cria um link clicável que abre o arquivo no navegador
                     Hyperlink link = new Hyperlink(file);
                     link.setOnAction(event -> {
                         try {
@@ -84,12 +87,14 @@ public class AttachmentView extends VBox {
         TableColumn<Attachment, LocalDateTime> createdAtColumn = new TableColumn<>("Criado em");
         createdAtColumn.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
 
+        // Coluna de ações com botão para deletar anexo
         TableColumn<Attachment, Void> actionColumn = new TableColumn<>("Ações");
         actionColumn.setCellFactory(param -> new TableCell<>() {
             private final Button deleteButton = new Button("❌");
             private final HBox pane = new HBox(5, deleteButton);
 
             {
+                // Botão para deletar anexo (com confirmação)
                 deleteButton.setOnAction(event -> {
                     Attachment attachment = getTableView().getItems().get(getIndex());
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Tem certeza que deseja deletar este anexo?", ButtonType.YES, ButtonType.NO);
@@ -120,10 +125,14 @@ public class AttachmentView extends VBox {
         });
 
         tableView.getColumns().addAll(fileColumn, descriptionColumn, createdAtColumn, actionColumn);
+        // Adiciona os botões e a tabela ao layout principal
         this.getChildren().addAll(buttonBox, tableView);
         loadAttachments();
     }
 
+    /**
+     * Carrega a lista de anexos do banco de dados e atualiza a tabela.
+     */
     private void loadAttachments() {
         try {
             List<Attachment> attachments = AttachmentController.getAttachmentsForAnimal(conn, this.animalUuid);

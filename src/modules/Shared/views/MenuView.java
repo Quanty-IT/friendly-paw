@@ -11,26 +11,32 @@ public class MenuView extends VBox {
 
     private BorderPane mainLayout;
 
+    /**
+     * Construtor da view do menu principal.
+     * 
+     * @param mainLayout Layout principal da aplicação para navegação entre telas
+     * @param stage Stage da aplicação (não utilizado atualmente)
+     */
     public MenuView(BorderPane mainLayout, Stage stage) {
         this.mainLayout = mainLayout;
 
-        // Botões "Animais" e "Produtos"
+        // Botões de navegação principal
         Button btnAnimais = new Button("Animais");
         Button btnMedicamentos = new Button("Medicamentos");
 
-        // Ao clicar em "Animais", carrega a view de animais
+        // Navega para a view de animais ao clicar no botão
         btnAnimais.setOnAction(e -> {
             AnimalView animalView = new AnimalView(this.mainLayout);
             this.mainLayout.setCenter(animalView);
         });
 
-        // Ao clicar em "Medicamentos", carrega a view de medicamentos
+        // Navega para a view de medicamentos ao clicar no botão
         btnMedicamentos.setOnAction(e -> {
             MedicineView medicineView = new MedicineView(this.mainLayout);
             this.mainLayout.setCenter(medicineView);
         });
 
-        // Organiza os botões na tela
+        // Adiciona os botões ao layout
         this.getChildren().addAll(btnAnimais, btnMedicamentos);
     }
 }

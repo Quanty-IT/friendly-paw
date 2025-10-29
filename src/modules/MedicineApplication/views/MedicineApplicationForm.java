@@ -54,7 +54,8 @@ public class MedicineApplicationForm extends VBox {
     public MedicineApplicationForm(BorderPane mainLayout, Animal selectedAnimal) {
         this.mainLayout = mainLayout;
         this.selectedAnimal = selectedAnimal;
-        this.currentUser = Session.get(); // Pega o usuário logado da sessão
+        // Obtém o usuário logado da sessão
+        this.currentUser = Session.get();
 
         try {
             this.conn = Database.getConnection();
@@ -77,16 +78,18 @@ public class MedicineApplicationForm extends VBox {
         setPadding(new Insets(20));
 
         animalField.setText(selectedAnimal.getName());
-        animalField.setDisable(true); // O campo do animal não pode ser editado
+        // O campo do animal não pode ser editado, apenas exibido
+        animalField.setDisable(true);
 
         quantityField.setPromptText("Ex: 1.5");
         
-        // Configurar ComboBox de frequência
+        // Configura o ComboBox de frequência com todos os valores disponíveis
         frequencyComboBox.getItems().addAll(MedicineApplication.Frequency.values());
         frequencyComboBox.setPromptText("Selecione a frequência");
-        frequencyComboBox.setValue(MedicineApplication.Frequency.DOES_NOT_REPEAT); // Valor padrão
+        // Define valor padrão como "Não se repete"
+        frequencyComboBox.setValue(MedicineApplication.Frequency.DOES_NOT_REPEAT);
         
-        // Configurar exibição do enum na ComboBox
+        // Configura a exibição do enum na ComboBox para mostrar nomes em português
         frequencyComboBox.setCellFactory(param -> new ListCell<>() {
             @Override
             protected void updateItem(MedicineApplication.Frequency item, boolean empty) {
@@ -110,7 +113,7 @@ public class MedicineApplicationForm extends VBox {
             }
         });
         
-        // Configurar eventos dos campos
+        // Configura os eventos dos campos para habilitar/desabilitar campos relacionados
         frequencyComboBox.setOnAction(e -> {
             MedicineApplication.Frequency selectedFrequency = frequencyComboBox.getValue();
             boolean isRecurring = selectedFrequency != null && selectedFrequency.isRecurring();
@@ -151,7 +154,7 @@ public class MedicineApplicationForm extends VBox {
         try {
             medicineComboBox.setItems(FXCollections.observableArrayList(medicineController.listAll()));
 
-            // Melhora a exibição do nome do medicamento na ComboBox
+            // Configura a exibição do nome do medicamento na ComboBox
             medicineComboBox.setCellFactory(param -> new ListCell<>() {
                 @Override
                 protected void updateItem(Medicine item, boolean empty) {
@@ -200,9 +203,11 @@ public class MedicineApplicationForm extends VBox {
 
                 LocalDate localDate = appliedDatePicker.getValue();
                 newApp.setAppliedAt(ZonedDateTime.of(localDate, LocalTime.now(), ZoneId.systemDefault()));
-                newApp.setQuantity(new BigDecimal(quantityField.getText().replace(',', '.'))); // Aceita vírgula e ponto
+                // Converte vírgula para ponto para aceitar formato brasileiro de números
+                newApp.setQuantity(new BigDecimal(quantityField.getText().replace(',', '.')));
                 
                 MedicineApplication.Frequency frequency = frequencyComboBox.getValue();
+                // Define frequência padrão se nenhuma foi selecionada
                 newApp.setFrequency(frequency != null ? frequency : MedicineApplication.Frequency.DOES_NOT_REPEAT);
 
                 if (nextDatePicker.getValue() != null) {
@@ -212,13 +217,15 @@ public class MedicineApplicationForm extends VBox {
                     newApp.setEndsAt(ZonedDateTime.of(endsDatePicker.getValue(), LocalTime.MIDNIGHT, ZoneId.systemDefault()));
                 }
 
-                // Criar evento no Google Calendar se solicitado
+                // Cria evento no Google Calendar se o usuário solicitou
                 if (googleCalendarCheckBox.isSelected()) {
                     try {
+                        // Usa a próxima aplicação como início, ou a aplicação atual se não houver próxima
                         ZonedDateTime startDateTime = newApp.getNextApplicationAt() != null ? 
                             newApp.getNextApplicationAt() : 
                             newApp.getAppliedAt();
                             
+                        // Cria o evento recorrente no Google Calendar
                         String eventUuid = modules.MedicineApplication.services.GoogleCalendarService.createMedicineApplicationEvent(
                             selectedAnimal.getName(),
                             selectedMedicine.getName(),
@@ -227,8 +234,6 @@ public class MedicineApplicationForm extends VBox {
                             frequency,
                             newApp.getEndsAt()
                         );
-                        
-                        // Evento criado com sucesso no Google Calendar
                         
                     } catch (Exception calendarException) {
                         showErrorAlert("Erro no Google Calendar", 
@@ -243,7 +248,7 @@ public class MedicineApplicationForm extends VBox {
                 alert.setHeaderText("Sucesso");
                 alert.showAndWait();
 
-                // Volta para a tela de animais
+                // Retorna para a tela de lista de animais após salvar
                 this.mainLayout.setCenter(new AnimalView(this.mainLayout));
 
             } catch (NumberFormatException e) {
@@ -255,6 +260,12 @@ public class MedicineApplicationForm extends VBox {
         });
     }
 
+    /**
+     * Exibe um alerta de erro na interface.
+     * 
+     * @param title Título do alerta
+     * @param message Mensagem de erro a ser exibida
+     */
     private void showErrorAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Erro");

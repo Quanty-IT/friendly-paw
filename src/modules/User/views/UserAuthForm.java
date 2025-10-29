@@ -21,6 +21,11 @@ public class UserAuthForm extends GridPane {
 
     private final Consumer<User> onSuccess;
 
+    /**
+     * Construtor do formulário de autenticação de usuário.
+     * 
+     * @param onSuccess Callback executado após login bem-sucedido
+     */
     public UserAuthForm(Consumer<User> onSuccess) {
         this.onSuccess = onSuccess;
 
@@ -53,6 +58,10 @@ public class UserAuthForm extends GridPane {
         passwordField.setPrefWidth(260);
     }
 
+    /**
+     * Realiza a autenticação do usuário com email e senha.
+     * Valida os campos antes de tentar autenticar e chama o callback onSuccess em caso de sucesso.
+     */
     private void doLogin() {
         if (conn == null) {
             showError("Sem conexão com o banco.");
@@ -79,6 +88,11 @@ public class UserAuthForm extends GridPane {
         }
     }
 
+    /**
+     * Exibe uma mensagem de erro em um Alert.
+     * 
+     * @param msg Mensagem de erro a ser exibida
+     */
     private void showError(String msg) {
         Alert alert = new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK);
         alert.setHeaderText("Erro");

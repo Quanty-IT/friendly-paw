@@ -25,10 +25,14 @@ public class AnimalView extends VBox {
     private ObservableList<Animal> animalList;
     private Connection conn;
 
-     // Adicionado: referência ao layout principal
-     private final BorderPane mainLayout;
+    // Referência ao layout principal para navegação entre telas
+    private final BorderPane mainLayout;
 
-     // Construtor modificado para receber o mainLayout
+     /**
+      * Construtor da view de lista de animais.
+      * 
+      * @param mainLayout Layout principal da aplicação para navegação entre telas
+      */
     public AnimalView(BorderPane mainLayout) {
         this.mainLayout = mainLayout;
 
@@ -41,24 +45,22 @@ public class AnimalView extends VBox {
         tableView = new TableView<>();
         animalList = FXCollections.observableArrayList();
 
-        // Botão para Cadastrar um novo animal
+        // Botão para cadastrar um novo animal
         Button addButton = new Button("Cadastrar");
         addButton.setOnAction(e -> {
-              // Navega para o formulário de cadastro, passando o mainLayout
+            // Navega para o formulário de cadastro de animais
             this.mainLayout.setCenter(new AnimalForm(this.mainLayout));
         });
 
-        // Botão "Voltar" para voltar à tela anterior
+        // Botão para retornar ao menu principal
         Button backButton = new Button("Voltar");
         backButton.setOnAction(e -> {
             this.mainLayout.setCenter(new MenuView(this.mainLayout, null));
         });
 
-        // HBox para agrupar os botões
+        // Container para agrupar os botões horizontalmente
         HBox buttonBox = new HBox(10, addButton, backButton);
         buttonBox.setPadding(new Insets(10, 10, 10, 10));
-
-        // ... (código das colunas e CellFactory) ...
         TableColumn<Animal, String> statusColumn = new TableColumn<>("Status");
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
         statusColumn.setCellFactory(col -> new TableCell<>() {
@@ -94,7 +96,7 @@ public class AnimalView extends VBox {
         TableColumn<Animal, String> felvColumn = new TableColumn<>("Felv");
         felvColumn.setCellValueFactory(new PropertyValueFactory<>("felv"));
 
-        // Coluna de Ações com CellFactory personalizado
+        // Coluna de ações com botões para editar, deletar, anexos e aplicação de medicamentos
         TableColumn<Animal, Void> actionColumn = new TableColumn<>("Ações");
         actionColumn.setCellFactory(param -> new TableCell<>() {
             private final Button editButton = new Button("✏️");
@@ -104,7 +106,7 @@ public class AnimalView extends VBox {
             private final HBox pane = new HBox(5, editButton, deleteButton, attachmentsButton, applyMedicineButton);
 
             {
-                // Ação de Editar
+                // Botão para editar o animal selecionado
                 editButton.setOnAction(event -> {
                     Animal animal = getTableView().getItems().get(getIndex());
                     if (animal != null) {
@@ -118,7 +120,7 @@ public class AnimalView extends VBox {
                     }
                 });
 
-                // Ação de Deletar
+                // Botão para deletar o animal selecionado (com confirmação)
                 deleteButton.setOnAction(event -> {
                     Animal animal = getTableView().getItems().get(getIndex());
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Tem certeza que deseja deletar este animal?", ButtonType.YES, ButtonType.NO);
@@ -136,7 +138,7 @@ public class AnimalView extends VBox {
                     });
                 });
 
-                // Ação de Anexos
+                // Botão para acessar os anexos do animal
                 attachmentsButton.setOnAction(event -> {
                     Animal animal = getTableView().getItems().get(getIndex());
                     if (animal != null) {
@@ -149,11 +151,12 @@ public class AnimalView extends VBox {
                         alert.showAndWait();
                     }
                 });
-                // Ação para o botão de aplicar medicamento
+
+                // Botão para registrar aplicação de medicamento no animal
                 applyMedicineButton.setOnAction(event -> {
                     Animal animal = getTableView().getItems().get(getIndex());
                     if (animal != null) {
-                        // Navega para o novo formulário, passando o layout e o animal selecionado
+                        // Navega para o formulário de aplicação de medicamentos
                         AnimalView.this.mainLayout.setCenter(new MedicineApplicationForm(AnimalView.this.mainLayout, animal));
                     }
                 });
@@ -172,10 +175,25 @@ public class AnimalView extends VBox {
         });
 
         tableView.getColumns().addAll(statusColumn, nameColumn, speciesColumn, breedColumn, sizeColumn, castratedColumn, fivColumn, felvColumn, actionColumn);
-        this.getChildren().addAll(buttonBox, tableView); // Adiciona o HBox com botões ao layout
+        // Adiciona os botões e a tabela ao layout principal
+        this.getChildren().addAll(buttonBox, tableView);
         loadAnimals();
     }
 
+    private void loadAnimals() {
+        try {
+            List<Animal> animals = AnimalController.getAllAnimals(conn);
+            animalList.clear();
+            animalList.addAll(animals);
+            tableView.setItems(animalList);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Carrega a lista de animais do banco de dados e atualiza a tabela.
+     */
     private void loadAnimals() {
         try {
             List<Animal> animals = AnimalController.getAllAnimals(conn);

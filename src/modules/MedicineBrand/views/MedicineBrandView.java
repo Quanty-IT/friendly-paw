@@ -30,6 +30,11 @@ public class MedicineBrandView extends VBox {
     private MedicineBrandController controller;
     private BorderPane mainLayout;
 
+    /**
+     * Construtor da view de lista de marcas de medicamentos.
+     * 
+     * @param mainLayout Layout principal da aplicação para navegação entre telas
+     */
     public MedicineBrandView(BorderPane mainLayout) {
         this.mainLayout = mainLayout;
 
@@ -47,6 +52,9 @@ public class MedicineBrandView extends VBox {
         loadData();
     }
 
+    /**
+     * Inicializa os componentes da interface, incluindo a tabela e suas colunas.
+     */
     private void initializeComponents() {
         table = new TableView<>();
         brandsList = FXCollections.observableArrayList();
@@ -118,6 +126,13 @@ public class MedicineBrandView extends VBox {
         table.setPlaceholder(new Label("Nenhuma marca cadastrada"));
     }
 
+    /**
+     * Cria um botão com ícone personalizado.
+     * 
+     * @param icon Texto do ícone a ser exibido
+     * @param type Tipo do botão (edit, delete) para aplicar estilo específico
+     * @return Button configurado com o ícone e estilo apropriados
+     */
     private Button createIconButton(String icon, String type) {
         Button btn = new Button(icon);
         btn.getStyleClass().addAll("icon-btn", "icon-btn-" + type);
@@ -127,6 +142,9 @@ public class MedicineBrandView extends VBox {
         return btn;
     }
 
+    /**
+     * Configura o layout principal da view, incluindo logo, título e botões de ação.
+     */
     private void setupLayout() {
         ImageView logo = new ImageView(new Image(getClass().getResourceAsStream("/assets/logo.png")));
         logo.setFitWidth(140);
@@ -193,6 +211,9 @@ public class MedicineBrandView extends VBox {
         this.getStylesheets().add(getClass().getResource("/modules/MedicineBrand/styles/MedicineBrandView.css").toExternalForm());
     }
 
+    /**
+     * Carrega a lista de marcas de medicamentos do banco de dados e atualiza a tabela.
+     */
     private void loadData() {
         try {
             brandsList.clear();
@@ -203,6 +224,9 @@ public class MedicineBrandView extends VBox {
         }
     }
 
+    /**
+     * Abre uma janela modal com o formulário para cadastrar uma nova marca de medicamento.
+     */
     private void openAddForm() {
         Stage formStage = new Stage();
         formStage.setTitle("Adicionar marca");
@@ -217,6 +241,11 @@ public class MedicineBrandView extends VBox {
         formStage.showAndWait();
     }
 
+    /**
+     * Abre uma janela modal com o formulário para editar a marca de medicamento selecionada.
+     * 
+     * @param selected Marca de medicamento selecionada para edição
+     */
     private void editSelected(MedicineBrand selected) {
         if (selected == null) return;
 
@@ -233,6 +262,11 @@ public class MedicineBrandView extends VBox {
         editStage.showAndWait();
     }
 
+    /**
+     * Exclui a marca de medicamento selecionada após confirmação do usuário.
+     * 
+     * @param selected Marca de medicamento selecionada para exclusão
+     */
     private void deleteSelected(MedicineBrand selected) {
         if (selected == null) return;
 
@@ -255,10 +289,16 @@ public class MedicineBrandView extends VBox {
         });
     }
 
+    /**
+     * Retorna para o menu principal da aplicação.
+     */
     private void returnToMainMenu() {
         mainLayout.setCenter(new MenuView(mainLayout, null));
     }
 
+    /**
+     * Navega para a view de medicamentos.
+     */
     private void openMedicineView() {
         mainLayout.setCenter(new MedicineView(mainLayout));
     }

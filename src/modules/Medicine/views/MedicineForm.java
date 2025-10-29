@@ -26,6 +26,9 @@ public class MedicineForm extends VBox {
     private CheckBox isActiveCheckBox;
     private Connection conn;
 
+    /**
+     * Construtor do formulário de cadastro de novo medicamento.
+     */
     public MedicineForm() {
         this.setSpacing(20);
         this.setPadding(new Insets(30, 40, 30, 40));
@@ -44,6 +47,9 @@ public class MedicineForm extends VBox {
         setupComponents();
     }
 
+    /**
+     * Configura todos os componentes do formulário, incluindo campos e botões.
+     */
     private void setupComponents() {
         // Nome
         Label nameLabel = new Label("Nome do Medicamento:");
@@ -132,6 +138,9 @@ public class MedicineForm extends VBox {
         this.getStylesheets().add(getClass().getResource("/modules/Medicine/styles/MedicineForm.css").toExternalForm());
     }
 
+    /**
+     * Carrega a lista de marcas de medicamentos do banco de dados e popula o ComboBox.
+     */
     private void loadBrands() {
         try {
             MedicineBrandController brandController = new MedicineBrandController(conn);
@@ -171,6 +180,10 @@ public class MedicineForm extends VBox {
         }
     }
 
+    /**
+     * Salva um novo medicamento no banco de dados.
+     * Valida os campos antes de prosseguir.
+     */
     private void saveMedicine() {
         String name = nameField.getText().trim();
         if (name.isEmpty()) {
@@ -216,6 +229,9 @@ public class MedicineForm extends VBox {
         }
     }
 
+    /**
+     * Fecha a janela do formulário de cadastro.
+     */
     private void closeWindow() {
         Stage stage = (Stage) this.getScene().getWindow();
         stage.close();

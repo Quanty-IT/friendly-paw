@@ -15,6 +15,16 @@ public class MedicineController {
         this.conn = conn;
     }
 
+    /**
+     * Insere um novo medicamento no banco de dados.
+     * 
+     * @param name Nome do medicamento
+     * @param brandId UUID da marca do medicamento
+     * @param quantity Quantidade disponível do medicamento
+     * @param description Descrição opcional do medicamento
+     * @param isActive Indica se o medicamento está ativo
+     * @throws SQLException Se ocorrer erro na operação do banco de dados
+     */
     public void insert(String name, UUID brandId, Integer quantity, String description, Boolean isActive) throws SQLException {
         String sql = "INSERT INTO public.medicines (name, brand_uuid, quantity, description, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, now(), now())";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -27,6 +37,13 @@ public class MedicineController {
         }
     }
 
+    /**
+     * Retorna uma lista com todos os medicamentos cadastrados no banco de dados.
+     * Os medicamentos são ordenados por data de criação (mais recentes primeiro).
+     * 
+     * @return Lista de objetos Medicine contendo todos os medicamentos cadastrados
+     * @throws SQLException Se ocorrer erro na operação do banco de dados
+     */
     public List<Medicine> listAll() throws SQLException {
         List<Medicine> medicines = new ArrayList<>();
         String sql = """
@@ -44,6 +61,13 @@ public class MedicineController {
         return medicines;
     }
 
+    /**
+     * Busca um medicamento específico pelo seu UUID.
+     * 
+     * @param uuid UUID do medicamento a ser buscado
+     * @return Objeto Medicine se encontrado, null caso contrário
+     * @throws SQLException Se ocorrer erro na operação do banco de dados
+     */
     public Medicine findByUuid(UUID uuid) throws SQLException {
         String sql = """
                 SELECT m.uuid, m.name, m.brand_uuid, mb.name as brand_name, m.quantity, 
@@ -63,6 +87,17 @@ public class MedicineController {
         return null;
     }
 
+    /**
+     * Atualiza os dados de um medicamento existente no banco de dados.
+     * 
+     * @param uuid UUID do medicamento a ser atualizado
+     * @param name Novo nome do medicamento
+     * @param brandId Novo UUID da marca do medicamento
+     * @param quantity Nova quantidade disponível do medicamento
+     * @param description Nova descrição do medicamento
+     * @param isActive Novo status de ativação do medicamento
+     * @throws SQLException Se ocorrer erro na operação do banco de dados
+     */
     public void update(UUID uuid, String name, UUID brandId, Integer quantity, String description, Boolean isActive) throws SQLException {
         String sql = "UPDATE public.medicines SET name = ?, brand_uuid = ?, quantity = ?, description = ?, is_active = ?, updated_at = now() WHERE uuid = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -76,6 +111,12 @@ public class MedicineController {
         }
     }
 
+    /**
+     * Remove um medicamento do banco de dados.
+     * 
+     * @param uuid UUID do medicamento a ser removido
+     * @throws SQLException Se ocorrer erro na operação do banco de dados
+     */
     public void delete(UUID uuid) throws SQLException {
         String sql = "DELETE FROM public.medicines WHERE uuid = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {

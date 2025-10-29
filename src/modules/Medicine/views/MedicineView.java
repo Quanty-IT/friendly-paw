@@ -32,6 +32,11 @@ public class MedicineView extends VBox {
     private MedicineController controller;
     private BorderPane mainLayout;
 
+    /**
+     * Construtor da view de lista de medicamentos.
+     * 
+     * @param mainLayout Layout principal da aplicação para navegação entre telas
+     */
     public MedicineView(BorderPane mainLayout) {
         this.mainLayout = mainLayout;
 
@@ -49,6 +54,9 @@ public class MedicineView extends VBox {
         loadData();
     }
 
+    /**
+     * Inicializa os componentes da interface, incluindo a tabela e suas colunas.
+     */
     private void initializeComponents() {
         table = new TableView<>();
         medicinesList = FXCollections.observableArrayList();
@@ -169,6 +177,13 @@ public class MedicineView extends VBox {
         table.setPlaceholder(new Label("Nenhum medicamento cadastrado"));
     }
 
+    /**
+     * Cria um botão com ícone personalizado.
+     * 
+     * @param icon Texto do ícone a ser exibido
+     * @param type Tipo do botão (edit, delete) para aplicar estilo específico
+     * @return Button configurado com o ícone e estilo apropriados
+     */
     private Button createIconButton(String icon, String type) {
         Button btn = new Button(icon);
         btn.getStyleClass().addAll("icon-btn", "icon-btn-" + type);
@@ -178,6 +193,9 @@ public class MedicineView extends VBox {
         return btn;
     }
 
+    /**
+     * Configura o layout principal da view, incluindo logo, título e botões de ação.
+     */
     private void setupLayout() {
         ImageView logo = new ImageView(new Image(getClass().getResourceAsStream("/assets/logo.png")));
         logo.setFitWidth(140);
@@ -240,6 +258,9 @@ public class MedicineView extends VBox {
         this.getStylesheets().add(getClass().getResource("/modules/Medicine/styles/MedicineView.css").toExternalForm());
     }
 
+    /**
+     * Carrega a lista de medicamentos do banco de dados e atualiza a tabela.
+     */
     private void loadData() {
         try {
             medicinesList.clear();
@@ -250,6 +271,9 @@ public class MedicineView extends VBox {
         }
     }
 
+    /**
+     * Abre uma janela modal com o formulário para cadastrar um novo medicamento.
+     */
     private void openAddForm() {
         Stage formStage = new Stage();
         formStage.setTitle("Adicionar medicamento");
@@ -264,6 +288,11 @@ public class MedicineView extends VBox {
         formStage.showAndWait();
     }
 
+    /**
+     * Abre uma janela modal com o formulário para editar o medicamento selecionado.
+     * 
+     * @param selected Medicamento selecionado para edição
+     */
     private void editSelected(Medicine selected) {
         if (selected == null) return;
 
@@ -280,6 +309,11 @@ public class MedicineView extends VBox {
          editStage.showAndWait();
     }
 
+    /**
+     * Exclui o medicamento selecionado após confirmação do usuário.
+     * 
+     * @param selected Medicamento selecionado para exclusão
+     */
     private void deleteSelected(Medicine selected) {
         if (selected == null) return;
 
@@ -302,10 +336,16 @@ public class MedicineView extends VBox {
         });
     }
 
+    /**
+     * Navega para a view de marcas de medicamentos.
+     */
     private void openBrandView() {
         mainLayout.setCenter(new MedicineBrandView(mainLayout));
     }
 
+    /**
+     * Retorna para o menu principal da aplicação.
+     */
     private void returnToMainMenu() {
         mainLayout.setCenter(new MenuView(mainLayout, null));
     }

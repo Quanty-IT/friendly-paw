@@ -26,6 +26,13 @@ public class AnimalController {
 
     private static final String DELETE_SQL = "DELETE FROM public.animals WHERE uuid = ?";
 
+    /**
+     * Adiciona um novo animal ao banco de dados.
+     * 
+     * @param conn Conexão com o banco de dados
+     * @param animal Objeto Animal com os dados do animal a ser cadastrado
+     * @throws SQLException Se ocorrer erro na operação do banco de dados
+     */
     public static void addAnimal(Connection conn, Animal animal) throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement(INSERT_SQL)) {
             ps.setString(1, animal.getName());
@@ -50,6 +57,13 @@ public class AnimalController {
         }
     }
 
+    /**
+     * Atualiza os dados de um animal existente no banco de dados.
+     * 
+     * @param conn Conexão com o banco de dados
+     * @param animal Objeto Animal com os dados atualizados (deve conter o UUID do animal)
+     * @throws SQLException Se ocorrer erro na operação do banco de dados
+     */
     public static void updateAnimal(Connection conn, Animal animal) throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement(UPDATE_SQL)) {
             ps.setString(1, animal.getName());
@@ -75,6 +89,13 @@ public class AnimalController {
         }
     }
 
+    /**
+     * Remove um animal do banco de dados.
+     * 
+     * @param conn Conexão com o banco de dados
+     * @param animalId UUID do animal a ser removido
+     * @throws SQLException Se ocorrer erro na operação do banco de dados
+     */
     public static void deleteAnimal(Connection conn, UUID animalId) throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement(DELETE_SQL)) {
             ps.setObject(1, animalId);
@@ -82,6 +103,13 @@ public class AnimalController {
         }
     }
 
+    /**
+     * Retorna uma lista com todos os animais cadastrados no banco de dados.
+     * 
+     * @param conn Conexão com o banco de dados
+     * @return Lista de objetos Animal contendo todos os animais cadastrados
+     * @throws SQLException Se ocorrer erro na operação do banco de dados
+     */
     public static List<Animal> getAllAnimals(Connection conn) throws SQLException {
         List<Animal> animals = new ArrayList<>();
         try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(SELECT_SQL)) {

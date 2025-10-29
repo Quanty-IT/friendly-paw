@@ -19,6 +19,9 @@ public class MedicineBrandForm extends VBox {
     private TextField nameField;
     private Connection conn;
 
+    /**
+     * Construtor do formulário de cadastro de nova marca de medicamento.
+     */
     public MedicineBrandForm() {
         this.setSpacing(20);
         this.setPadding(new Insets(30, 40, 30, 40));
@@ -63,6 +66,10 @@ public class MedicineBrandForm extends VBox {
         this.getStylesheets().add(getClass().getResource("/modules/MedicineBrand/styles/MedicineBrandForm.css").toExternalForm());
     }
 
+    /**
+     * Salva uma nova marca de medicamento no banco de dados.
+     * Valida se o nome foi preenchido antes de prosseguir.
+     */
     private void saveBrand() {
         String name = nameField.getText().trim();
         if (name.isEmpty()) {
@@ -89,6 +96,9 @@ public class MedicineBrandForm extends VBox {
         }
     }
 
+    /**
+     * Fecha a janela do formulário de cadastro.
+     */
     private void closeWindow() {
         Stage stage = (Stage) this.getScene().getWindow();
         stage.close();

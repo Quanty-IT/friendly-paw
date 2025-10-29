@@ -17,6 +17,12 @@ public class MedicineBrandEditForm extends VBox {
     private MedicineBrand brand;
     private MedicineBrandController controller;
 
+    /**
+     * Construtor do formulário de edição de marca de medicamento.
+     * 
+     * @param brand Marca de medicamento a ser editada
+     * @param controller Controller responsável pelas operações de marca de medicamento
+     */
     public MedicineBrandEditForm(MedicineBrand brand, MedicineBrandController controller) {
         this.brand = brand;
         this.controller = controller;
@@ -57,6 +63,10 @@ public class MedicineBrandEditForm extends VBox {
         this.getStylesheets().add(getClass().getResource("/modules/MedicineBrand/styles/MedicineBrandEditForm.css").toExternalForm());
     }
 
+    /**
+     * Atualiza os dados da marca de medicamento no banco de dados.
+     * Valida se o nome foi preenchido antes de prosseguir.
+     */
     private void updateBrand() {
         String name = nameField.getText().trim();
         if (name.isEmpty()) {
@@ -82,6 +92,9 @@ public class MedicineBrandEditForm extends VBox {
         }
     }
 
+    /**
+     * Fecha a janela do formulário de edição.
+     */
     private void closeWindow() {
         Stage stage = (Stage) this.getScene().getWindow();
         stage.close();

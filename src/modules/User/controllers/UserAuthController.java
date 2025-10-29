@@ -15,6 +15,15 @@ public class UserAuthController {
         LIMIT 1
     """;
 
+    /**
+     * Autentica um usuário através de email e senha.
+     * 
+     * @param conn Conexão com o banco de dados
+     * @param email Email do usuário para autenticação
+     * @param password Senha do usuário para autenticação
+     * @return Objeto User se as credenciais forem válidas, null caso contrário
+     * @throws SQLException Se ocorrer erro na operação do banco de dados
+     */
     public static User login(Connection conn, String email, String password) throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement(LOGIN_SQL)) {
             ps.setString(1, email);

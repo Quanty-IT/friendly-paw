@@ -38,13 +38,22 @@ public class AnimalForm extends GridPane {
     // Variável para guardar o animal que está sendo editado
     private Animal animalToEdit;
 
-    // Construtor para NOVO cadastro
+    /**
+     * Construtor para criação de novo animal.
+     * 
+     * @param mainLayout Layout principal da aplicação para navegação entre telas
+     */
     public AnimalForm(BorderPane mainLayout) {
         // Chamada ao construtor de edição, passando null como animal
         this(mainLayout, null);
     }
 
-    // Construtor para EDIÇÃO
+    /**
+     * Construtor para edição de animal existente ou criação de novo.
+     * 
+     * @param mainLayout Layout principal da aplicação para navegação entre telas
+     * @param animal Animal a ser editado (null para criação de novo animal)
+     */
     public AnimalForm(BorderPane mainLayout, Animal animal) {
         this.mainLayout = mainLayout;
         this.animalToEdit = animal;
@@ -129,9 +138,9 @@ public class AnimalForm extends GridPane {
 
         this.setPrefSize(520, 600);
 
-        // Se o animal não for nulo, preenche o formulário para edição
+        // Se houver um animal para editar, preenche o formulário com os dados existentes
         if (this.animalToEdit != null) {
-            // Usa o objeto animalToEdit para pré-preencher os campos
+            // Pré-preenche todos os campos do formulário com os dados do animal
             nameField.setText(this.animalToEdit.getName());
             sexComboBox.setValue(convertSexToPt(this.animalToEdit.getSex()));
             speciesComboBox.setValue(convertSpeciesToPt(this.animalToEdit.getSpecies()));
@@ -147,11 +156,15 @@ public class AnimalForm extends GridPane {
             statusComboBox.setValue(convertStatusToPt(this.animalToEdit.getStatus()));
             notesField.setText(this.animalToEdit.getNotes());
 
-            // Muda o texto do botão para indicar "Atualizar"
+            // Altera o texto do botão para indicar que está em modo de edição
             saveButton.setText("Atualizar");
         }
     }
 
+    /**
+     * Salva ou atualiza um animal no banco de dados.
+     * Verifica se o animal está sendo editado ou criado e chama o método apropriado do controller.
+     */
     private void saveAnimal() {
         String name = nameField.getText();
         String sex = sexComboBox.getValue() != null ? convertSex(sexComboBox.getValue()) : null;
@@ -168,32 +181,37 @@ public class AnimalForm extends GridPane {
         String notes = notesField.getText();
         boolean castrated = castratedCheckBox.isSelected();
 
+        // Cria o objeto Animal com os dados do formulário
+        // Se estiver editando, preserva o UUID e a data de criação originais
         Animal animal = new Animal(
-                this.animalToEdit != null ? this.animalToEdit.getUuid() : null, // Se for edição, mantém o ID
+                this.animalToEdit != null ? this.animalToEdit.getUuid() : null, // Em edição, mantém o UUID original
                 name, sex, species, breed, size, color, birthdate,
                 microchip, rga, castrated, fiv, felv, status, notes,
-                this.animalToEdit != null ? this.animalToEdit.getCreatedAt() : LocalDateTime.now(), // Mantém created_at
-                LocalDateTime.now()
+                this.animalToEdit != null ? this.animalToEdit.getCreatedAt() : LocalDateTime.now(), // Em edição, mantém a data de criação original
+                LocalDateTime.now() // Sempre atualiza a data de modificação
         );
 
         try {
             if (this.animalToEdit == null) {
-                // Modo de criação: chama o método de adicionar
+                // Modo de criação: adiciona um novo animal ao banco de dados
                 AnimalController.addAnimal(conn, animal);
                 System.out.println("Animal adicionado com sucesso!");
                 clearForm();
             } else {
-                // Modo de edição: chama o método de atualização
+                // Modo de edição: atualiza os dados do animal existente
                 AnimalController.updateAnimal(conn, animal);
                 System.out.println("Animal atualizado com sucesso!");
             }
-            // Navega de volta para a lista após salvar
+            // Retorna para a tela de lista de animais após salvar
             mainLayout.setCenter(new AnimalView(mainLayout));
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Limpa todos os campos do formulário.
+     */
     private void clearForm() {
         nameField.clear();
         sexComboBox.getSelectionModel().clearSelection();
@@ -211,7 +229,7 @@ public class AnimalForm extends GridPane {
         castratedCheckBox.setSelected(false);
     }
 
-    // Métodos de conversão...
+    // Métodos auxiliares para conversão entre valores em português e inglês
     private String convertSex(String value) {
         return switch (value) {
             case "Macho" -> "male";
