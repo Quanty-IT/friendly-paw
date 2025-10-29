@@ -67,21 +67,21 @@ public class UserAuthForm extends GridPane {
         }
 
         try {
-            User u = UserAuthController.login(conn, email, password);
-            if (u == null) {
+            User user = UserAuthController.login(conn, email, password);
+            if (user == null) {
                 showError("Credenciais inválidas.");
                 return;
             }
-            Session.set(u);
-            if (onSuccess != null) onSuccess.accept(u);
+            Session.set(user);
+            if (onSuccess != null) onSuccess.accept(user);
         } catch (SQLException ex) {
             showError("Erro ao autenticar:\n" + ex.getMessage());
         }
     }
 
     private void showError(String msg) {
-        Alert a = new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK);
-        a.setHeaderText("Erro");
-        a.showAndWait();
+        Alert alert = new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK);
+        alert.setHeaderText("Erro");
+        alert.showAndWait();
     }
 }

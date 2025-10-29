@@ -168,7 +168,7 @@ public class AnimalForm extends GridPane {
         String notes = notesField.getText();
         boolean castrated = castratedCheckBox.isSelected();
 
-        Animal a = new Animal(
+        Animal animal = new Animal(
                 this.animalToEdit != null ? this.animalToEdit.getUuid() : null, // Se for edição, mantém o ID
                 name, sex, species, breed, size, color, birthdate,
                 microchip, rga, castrated, fiv, felv, status, notes,
@@ -179,12 +179,12 @@ public class AnimalForm extends GridPane {
         try {
             if (this.animalToEdit == null) {
                 // Modo de criação: chama o método de adicionar
-                AnimalController.addAnimal(conn, a);
+                AnimalController.addAnimal(conn, animal);
                 System.out.println("Animal adicionado com sucesso!");
                 clearForm();
             } else {
                 // Modo de edição: chama o método de atualização
-                AnimalController.updateAnimal(conn, a);
+                AnimalController.updateAnimal(conn, animal);
                 System.out.println("Animal atualizado com sucesso!");
             }
             // Navega de volta para a lista após salvar
@@ -212,24 +212,24 @@ public class AnimalForm extends GridPane {
     }
 
     // Métodos de conversão...
-    private String convertSex(String v) {
-        return switch (v) {
+    private String convertSex(String value) {
+        return switch (value) {
             case "Macho" -> "male";
             case "Fêmea" -> "female";
             default -> null;
         };
     }
 
-    private String convertSpecies(String v) {
-        return switch (v) {
+    private String convertSpecies(String value) {
+        return switch (value) {
             case "Cachorro" -> "dog";
             case "Gato" -> "cat";
             default -> null;
         };
     }
 
-    private String convertBreed(String v) {
-        return switch (v) {
+    private String convertBreed(String value) {
+        return switch (value) {
             case "S.R.D" -> "mixed-breed";
             case "Shih-tzu" -> "shih-tzu";
             case "Yorkshire Terrier" -> "yorkshire-terrier";
@@ -250,8 +250,8 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertSize(String v) {
-        return switch (v) {
+    private String convertSize(String value) {
+        return switch (value) {
             case "Pequeno" -> "small";
             case "Médio" -> "medium";
             case "Grande" -> "large";
@@ -259,8 +259,8 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertColor(String v) {
-        return switch (v) {
+    private String convertColor(String value) {
+        return switch (value) {
             case "Preto" -> "black";
             case "Branco" -> "white";
             case "Cinza" -> "gray";
@@ -273,8 +273,8 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertYesNoNotTested(String v) {
-        return switch (v) {
+    private String convertYesNoNotTested(String value) {
+        return switch (value) {
             case "Sim" -> "yes";
             case "Não" -> "no";
             case "Não testado" -> "not-tested";
@@ -282,8 +282,8 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertStatus(String v) {
-        return switch (v) {
+    private String convertStatus(String value) {
+        return switch (value) {
             case "Quarentena" -> "quarantine";
             case "Abrigado" -> "sheltered";
             case "Adotado" -> "adopted";
@@ -292,24 +292,24 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertSexToPt(String v) {
-        return switch (v) {
+    private String convertSexToPt(String value) {
+        return switch (value) {
             case "male" -> "Macho";
             case "female" -> "Fêmea";
             default -> null;
         };
     }
 
-    private String convertSpeciesToPt(String v) {
-        return switch (v) {
+    private String convertSpeciesToPt(String value) {
+        return switch (value) {
             case "dog" -> "Cachorro";
             case "cat" -> "Gato";
             default -> null;
         };
     }
 
-    private String convertBreedToPt(String v) {
-        return switch (v) {
+    private String convertBreedToPt(String value) {
+        return switch (value) {
             case "mixed-breed" -> "S.R.D";
             case "shih-tzu" -> "Shih-tzu";
             case "yorkshire-terrier" -> "Yorkshire Terrier";
@@ -330,8 +330,8 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertSizeToPt(String v) {
-        return switch (v) {
+    private String convertSizeToPt(String value) {
+        return switch (value) {
             case "small" -> "Pequeno";
             case "medium" -> "Médio";
             case "large" -> "Grande";
@@ -339,8 +339,8 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertColorToPt(String v) {
-        return switch (v) {
+    private String convertColorToPt(String value) {
+        return switch (value) {
             case "black" -> "Preto";
             case "white" -> "Branco";
             case "gray" -> "Cinza";
@@ -353,8 +353,8 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertYesNoNotTestedToPt(String v) {
-        return switch (v) {
+    private String convertYesNoNotTestedToPt(String value) {
+        return switch (value) {
             case "yes" -> "Sim";
             case "no" -> "Não";
             case "not-tested" -> "Não testado";
@@ -362,8 +362,8 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertStatusToPt(String v) {
-        return switch (v) {
+    private String convertStatusToPt(String value) {
+        return switch (value) {
             case "quarantine" -> "Quarentena";
             case "sheltered" -> "Abrigado";
             case "adopted" -> "Adotado";

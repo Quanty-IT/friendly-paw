@@ -24,16 +24,16 @@ public class UserAuthController {
 
                 UUID uuid = (UUID) rs.getObject("uuid");
                 String name = rs.getString("name");
-                String mail = rs.getString("email");
-                Timestamp cat = rs.getTimestamp("created_at");
-                Timestamp uat = rs.getTimestamp("updated_at");
+                String email = rs.getString("email");
+                Timestamp createdAt = rs.getTimestamp("created_at");
+                Timestamp updatedAt = rs.getTimestamp("updated_at");
 
                 return new User(
                         uuid,
                         name,
-                        mail,
-                        cat != null ? cat.toLocalDateTime() : LocalDateTime.now(),
-                        uat != null ? uat.toLocalDateTime() : LocalDateTime.now()
+                        email,
+                        createdAt != null ? createdAt.toLocalDateTime() : LocalDateTime.now(),
+                        updatedAt != null ? updatedAt.toLocalDateTime() : LocalDateTime.now()
                 );
             }
         }

@@ -26,51 +26,51 @@ public class AnimalController {
 
     private static final String DELETE_SQL = "DELETE FROM public.animals WHERE uuid = ?";
 
-    public static void addAnimal(Connection conn, Animal a) throws SQLException {
+    public static void addAnimal(Connection conn, Animal animal) throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement(INSERT_SQL)) {
-            ps.setString(1, a.getName());
-            ps.setString(2, a.getSex());
-            ps.setString(3, a.getSpecies());
-            ps.setString(4, a.getBreed());
-            ps.setString(5, a.getSize());
-            ps.setString(6, a.getColor());
-            if (a.getBirthdate() != null) {
-                ps.setDate(7, Date.valueOf(a.getBirthdate()));
+            ps.setString(1, animal.getName());
+            ps.setString(2, animal.getSex());
+            ps.setString(3, animal.getSpecies());
+            ps.setString(4, animal.getBreed());
+            ps.setString(5, animal.getSize());
+            ps.setString(6, animal.getColor());
+            if (animal.getBirthdate() != null) {
+                ps.setDate(7, Date.valueOf(animal.getBirthdate()));
             } else {
                 ps.setNull(7, Types.DATE);
             }
-            ps.setString(8, a.getMicrochip());
-            ps.setString(9, a.getRga());
-            ps.setBoolean(10, a.getCastrated());
-            ps.setString(11, a.getFiv());
-            ps.setString(12, a.getFelv());
-            ps.setString(13, a.getStatus());
-            ps.setString(14, a.getNotes());
+            ps.setString(8, animal.getMicrochip());
+            ps.setString(9, animal.getRga());
+            ps.setBoolean(10, animal.getCastrated());
+            ps.setString(11, animal.getFiv());
+            ps.setString(12, animal.getFelv());
+            ps.setString(13, animal.getStatus());
+            ps.setString(14, animal.getNotes());
             ps.executeUpdate();
         }
     }
 
-    public static void updateAnimal(Connection conn, Animal a) throws SQLException {
+    public static void updateAnimal(Connection conn, Animal animal) throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement(UPDATE_SQL)) {
-            ps.setString(1, a.getName());
-            ps.setString(2, a.getSex());
-            ps.setString(3, a.getSpecies());
-            ps.setString(4, a.getBreed());
-            ps.setString(5, a.getSize());
-            ps.setString(6, a.getColor());
-            if (a.getBirthdate() != null) {
-                ps.setDate(7, Date.valueOf(a.getBirthdate()));
+            ps.setString(1, animal.getName());
+            ps.setString(2, animal.getSex());
+            ps.setString(3, animal.getSpecies());
+            ps.setString(4, animal.getBreed());
+            ps.setString(5, animal.getSize());
+            ps.setString(6, animal.getColor());
+            if (animal.getBirthdate() != null) {
+                ps.setDate(7, Date.valueOf(animal.getBirthdate()));
             } else {
                 ps.setNull(7, Types.DATE);
             }
-            ps.setString(8, a.getMicrochip());
-            ps.setString(9, a.getRga());
-            ps.setBoolean(10, a.getCastrated());
-            ps.setString(11, a.getFiv());
-            ps.setString(12, a.getFelv());
-            ps.setString(13, a.getStatus());
-            ps.setString(14, a.getNotes());
-            ps.setObject(15, a.getUuid());
+            ps.setString(8, animal.getMicrochip());
+            ps.setString(9, animal.getRga());
+            ps.setBoolean(10, animal.getCastrated());
+            ps.setString(11, animal.getFiv());
+            ps.setString(12, animal.getFelv());
+            ps.setString(13, animal.getStatus());
+            ps.setString(14, animal.getNotes());
+            ps.setObject(15, animal.getUuid());
             ps.executeUpdate();
         }
     }
@@ -101,10 +101,10 @@ public class AnimalController {
                 String felv = rs.getString("felv");
                 String status = rs.getString("status");
                 String notes = rs.getString("notes");
-                Timestamp cat = rs.getTimestamp("created_at");
-                Timestamp uat = rs.getTimestamp("updated_at");
+                Timestamp createdAt = rs.getTimestamp("created_at");
+                Timestamp updatedAt = rs.getTimestamp("updated_at");
 
-                Animal a = new Animal(
+                Animal animal = new Animal(
                         uuid,
                         name,
                         sex,
@@ -120,10 +120,10 @@ public class AnimalController {
                         felv,
                         status,
                         notes,
-                        cat != null ? cat.toLocalDateTime() : LocalDateTime.now(),
-                        uat != null ? uat.toLocalDateTime() : LocalDateTime.now()
+                        createdAt != null ? createdAt.toLocalDateTime() : LocalDateTime.now(),
+                        updatedAt != null ? updatedAt.toLocalDateTime() : LocalDateTime.now()
                 );
-                animals.add(a);
+                animals.add(animal);
             }
         }
         return animals;

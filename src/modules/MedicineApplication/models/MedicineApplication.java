@@ -110,83 +110,33 @@ public class MedicineApplication {
     public MedicineApplication() {
     }
 
-    public UUID getApplicationUuid() {
-        return applicationUuid;
-    }
+    public UUID getApplicationUuid() { return applicationUuid; }
+    public void setApplicationUuid(UUID applicationUuid) { this.applicationUuid = applicationUuid; }
 
-    public void setApplicationUuid(UUID applicationUuid) {
-        this.applicationUuid = applicationUuid;
-    }
+    public UUID getMedicineUuid() { return medicineUuid; }
+    public void setMedicineUuid(UUID medicineUuid) { this.medicineUuid = medicineUuid; }
 
-    public UUID getMedicineUuid() {
-        return medicineUuid;
-    }
+    public UUID getUserUuid() { return userUuid; }
+    public void setUserUuid(UUID userUuid) { this.userUuid = userUuid; }
 
-    public void setMedicineUuid(UUID medicineUuid) {
-        this.medicineUuid = medicineUuid;
-    }
+    public UUID getAnimalUuid() { return animalUuid; }
+    public void setAnimalUuid(UUID animalUuid) { this.animalUuid = animalUuid; }
 
-    public UUID getUserUuid() {
-        return userUuid;
-    }
+    public ZonedDateTime getAppliedAt() { return appliedAt; }
+    public void setAppliedAt(ZonedDateTime appliedAt) { this.appliedAt = appliedAt; }
 
-    public void setUserUuid(UUID userUuid) {
-        this.userUuid = userUuid;
-    }
+    public BigDecimal getQuantity() { return quantity; }
+    public void setQuantity(BigDecimal quantity) { this.quantity = quantity; }
 
-    public UUID getAnimalUuid() {
-        return animalUuid;
-    }
+    public ZonedDateTime getNextApplicationAt() { return nextApplicationAt; }
+    public void setNextApplicationAt(ZonedDateTime nextApplicationAt) { this.nextApplicationAt = nextApplicationAt; }
 
-    public void setAnimalUuid(UUID animalUuid) {
-        this.animalUuid = animalUuid;
-    }
+    public Frequency getFrequency() { return frequency; }
+    public void setFrequency(Frequency frequency) { this.frequency = frequency; }
 
-    public ZonedDateTime getAppliedAt() {
-        return appliedAt;
-    }
+    public ZonedDateTime getEndsAt() { return endsAt; }
+    public void setEndsAt(ZonedDateTime endsAt) { this.endsAt = endsAt; }
 
-    public void setAppliedAt(ZonedDateTime appliedAt) {
-        this.appliedAt = appliedAt;
-    }
-
-    public BigDecimal getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(BigDecimal quantity) {
-        this.quantity = quantity;
-    }
-
-    public ZonedDateTime getNextApplicationAt() {
-        return nextApplicationAt;
-    }
-
-    public void setNextApplicationAt(ZonedDateTime nextApplicationAt) {
-        this.nextApplicationAt = nextApplicationAt;
-    }
-
-    public Frequency getFrequency() {
-        return frequency;
-    }
-
-    public void setFrequency(Frequency frequency) {
-        this.frequency = frequency;
-    }
-
-    public ZonedDateTime getEndsAt() {
-        return endsAt;
-    }
-
-    public void setEndsAt(ZonedDateTime endsAt) {
-        this.endsAt = endsAt;
-    }
-
-    public ZonedDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(ZonedDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+    public ZonedDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(ZonedDateTime createdAt) { this.createdAt = createdAt; }
 }

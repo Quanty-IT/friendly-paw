@@ -22,11 +22,11 @@ public class AttachmentController {
 
     private static final String DELETE_SQL = "DELETE FROM public.attachments WHERE uuid = ?";
 
-    public static void addAttachment(Connection conn, Attachment a) throws SQLException {
+    public static void addAttachment(Connection conn, Attachment attachment) throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement(INSERT_SQL)) {
-            ps.setString(1, a.getFile());
-            ps.setString(2, a.getDescription());
-            ps.setObject(3, a.getAnimalUuid());
+            ps.setString(1, attachment.getFile());
+            ps.setString(2, attachment.getDescription());
+            ps.setObject(3, attachment.getAnimalUuid());
             ps.executeUpdate();
         }
     }
@@ -67,16 +67,16 @@ public class AttachmentController {
                     UUID uuid = (UUID) rs.getObject("uuid");
                     String file = rs.getString("file");
                     String description = rs.getString("description");
-                    Timestamp cat = rs.getTimestamp("created_at");
+                    Timestamp createdAt = rs.getTimestamp("created_at");
 
-                    Attachment a = new Attachment(
+                    Attachment attachment = new Attachment(
                             uuid,
                             file,
                             description,
                             animalId,
-                            cat != null ? cat.toLocalDateTime() : LocalDateTime.now()
+                            createdAt != null ? createdAt.toLocalDateTime() : LocalDateTime.now()
                     );
-                    attachments.add(a);
+                    attachments.add(attachment);
                 }
             }
         }

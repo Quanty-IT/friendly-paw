@@ -189,11 +189,11 @@ public class AnimalView extends VBox {
 
     /**
      * Converte o sexo do animal de inglês para português.
-     * @param v O valor do sexo em inglês ("male" ou "female").
+     * @param value O valor do sexo em inglês ("male" ou "female").
      * @return O valor em português ("Macho" ou "Fêmea").
      */
-    private String convertSexToPt(String v) {
-        return switch (v) {
+    private String convertSexToPt(String value) {
+        return switch (value) {
             case "male" -> "Macho";
             case "female" -> "Fêmea";
             default -> null;
@@ -202,11 +202,11 @@ public class AnimalView extends VBox {
 
     /**
      * Converte a espécie do animal de inglês para português.
-     * @param v O valor da espécie em inglês ("dog" ou "cat").
+     * @param value O valor da espécie em inglês ("dog" ou "cat").
      * @return O valor em português ("Cachorro" ou "Gato").
      */
-    private String convertSpeciesToPt(String v) {
-        return switch (v) {
+    private String convertSpeciesToPt(String value) {
+        return switch (value) {
             case "dog" -> "Cachorro";
             case "cat" -> "Gato";
             default -> null;
@@ -215,11 +215,11 @@ public class AnimalView extends VBox {
 
     /**
      * Converte a raça do animal de inglês para português.
-     * @param v O valor da raça em inglês.
+     * @param value O valor da raça em inglês.
      * @return O valor em português.
      */
-    private String convertBreedToPt(String v) {
-        return switch (v) {
+    private String convertBreedToPt(String value) {
+        return switch (value) {
             case "mixed-breed" -> "S.R.D";
             case "shih-tzu" -> "Shih-tzu";
             case "yorkshire-terrier" -> "Yorkshire Terrier";
@@ -242,11 +242,11 @@ public class AnimalView extends VBox {
 
     /**
      * Converte o porte do animal de inglês para português.
-     * @param v O valor do porte em inglês ("small", "medium" ou "large").
+     * @param value O valor do porte em inglês ("small", "medium" ou "large").
      * @return O valor em português ("Pequeno", "Médio" ou "Grande").
      */
-    private String convertSizeToPt(String v) {
-        return switch (v) {
+    private String convertSizeToPt(String value) {
+        return switch (value) {
             case "small" -> "Pequeno";
             case "medium" -> "Médio";
             case "large" -> "Grande";
@@ -256,11 +256,11 @@ public class AnimalView extends VBox {
 
     /**
      * Converte a cor do animal de inglês para português.
-     * @param v O valor da cor em inglês.
+     * @param value O valor da cor em inglês.
      * @return O valor em português.
      */
-    private String convertColorToPt(String v) {
-        return switch (v) {
+    private String convertColorToPt(String value) {
+        return switch (value) {
             case "black" -> "Preto";
             case "white" -> "Branco";
             case "gray" -> "Cinza";
@@ -275,11 +275,11 @@ public class AnimalView extends VBox {
 
     /**
      * Converte o status de teste de inglês para português.
-     * @param v O valor do status em inglês ("yes", "no" ou "not-tested").
+     * @param value O valor do status em inglês ("yes", "no" ou "not-tested").
      * @return O valor em português ("Sim", "Não" ou "Não testado").
      */
-    private String convertYesNoNotTestedToPt(String v) {
-        return switch (v) {
+    private String convertYesNoNotTestedToPt(String value) {
+        return switch (value) {
             case "yes" -> "Sim";
             case "no" -> "Não";
             case "not-tested" -> "Não testado";
@@ -289,11 +289,11 @@ public class AnimalView extends VBox {
 
     /**
      * Converte o status do animal de inglês para português.
-     * @param v O valor do status em inglês.
+     * @param value O valor do status em inglês.
      * @return O valor em português.
      */
-    private String convertStatusToPt(String v) {
-        return switch (v) {
+    private String convertStatusToPt(String value) {
+        return switch (value) {
             case "quarantine" -> "Quarentena";
             case "sheltered" -> "Abrigado";
             case "adopted" -> "Adotado";
