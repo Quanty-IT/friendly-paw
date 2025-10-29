@@ -5,12 +5,13 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import modules.MedicineBrand.controllers.MedicineBrandController;
 import modules.Medicine.controllers.MedicineController;
 import modules.Medicine.models.Medicine;
+import modules.Medicine.views.MedicineView;
 import modules.MedicineBrand.models.MedicineBrand;
 import config.Database;
 
@@ -24,20 +25,25 @@ public class MedicineEditForm extends VBox {
     private ComboBox<MedicineBrand> brandComboBox;
     private TextField quantityField;
     private TextArea descriptionField;
-    private CheckBox isActiveCheckBox;
     private Medicine medicine;
     private MedicineController controller;
     private Connection conn;
+    private BorderPane mainLayout;
+    private MedicineView medicineView;
 
     /**
      * Construtor do formulário de edição de medicamento.
      * 
      * @param medicine Medicamento a ser editado
      * @param controller Controller responsável pelas operações de medicamento
+     * @param mainLayout Layout principal para navegação
+     * @param medicineView View de medicamentos para recarregar dados após salvar
      */
-    public MedicineEditForm(Medicine medicine, MedicineController controller) {
+    public MedicineEditForm(Medicine medicine, MedicineController controller, BorderPane mainLayout, MedicineView medicineView) {
         this.medicine = medicine;
         this.controller = controller;
+        this.mainLayout = mainLayout;
+        this.medicineView = medicineView;
 
         this.setSpacing(20);
         this.setPadding(new Insets(30, 40, 30, 40));
@@ -52,11 +58,16 @@ public class MedicineEditForm extends VBox {
 
         Label titleLabel = new Label("Editar medicamento");
         titleLabel.getStyleClass().add("form-title");
+        
+        // Centraliza o título usando um HBox
+        HBox titleBox = new HBox(titleLabel);
+        titleBox.setAlignment(Pos.CENTER);
+        titleBox.setPadding(new Insets(0, 0, 10, 0));
 
         setupComponents();
         populateFields();
 
-        this.getChildren().add(0, titleLabel);
+        this.getChildren().add(0, titleBox);
     }
 
     /**
@@ -68,10 +79,20 @@ public class MedicineEditForm extends VBox {
         nameLabel.getStyleClass().add("form-label");
 
         nameField = new TextField();
-        nameField.setPrefWidth(400);
+        // Largura igual a Marca (280) + Quantidade (280) + espaçamento (20) = 580
+        nameField.setPrefWidth(580);
+        nameField.setMaxWidth(580);
         nameField.getStyleClass().add("form-input");
 
-        VBox nameBox = new VBox(8, nameLabel, nameField);
+        // Container fixo com largura do input - label à esquerda, input centralizado
+        HBox nameInputWrapper = new HBox(nameField);
+        nameInputWrapper.setAlignment(Pos.CENTER);
+        nameInputWrapper.setPrefWidth(580);
+        nameInputWrapper.setMaxWidth(580);
+        
+        VBox nameBox = new VBox(8, nameLabel, nameInputWrapper);
+        nameBox.setPrefWidth(580);
+        nameBox.setMaxWidth(580);
         nameBox.setAlignment(Pos.CENTER_LEFT);
 
         // Marca
@@ -79,11 +100,20 @@ public class MedicineEditForm extends VBox {
         brandLabel.getStyleClass().add("form-label");
 
         brandComboBox = new ComboBox<>();
-        brandComboBox.setPrefWidth(400);
+        brandComboBox.setPrefWidth(280);
+        brandComboBox.setMaxWidth(280);
         brandComboBox.getStyleClass().add("combo-box");
         loadBrands();
 
-        VBox brandBox = new VBox(8, brandLabel, brandComboBox);
+        // Container fixo com largura do input - label à esquerda, input centralizado
+        HBox brandInputWrapper = new HBox(brandComboBox);
+        brandInputWrapper.setAlignment(Pos.CENTER);
+        brandInputWrapper.setPrefWidth(280);
+        brandInputWrapper.setMaxWidth(280);
+        
+        VBox brandBox = new VBox(8, brandLabel, brandInputWrapper);
+        brandBox.setPrefWidth(280);
+        brandBox.setMaxWidth(280);
         brandBox.setAlignment(Pos.CENTER_LEFT);
 
         // Quantidade
@@ -91,50 +121,64 @@ public class MedicineEditForm extends VBox {
         quantityLabel.getStyleClass().add("form-label");
 
         quantityField = new TextField();
-        quantityField.setPrefWidth(400);
+        quantityField.setPrefWidth(280);
+        quantityField.setMaxWidth(280);
         quantityField.getStyleClass().add("form-input");
 
-        VBox quantityBox = new VBox(8, quantityLabel, quantityField);
+        // Container fixo com largura do input - label à esquerda, input centralizado
+        HBox quantityInputWrapper = new HBox(quantityField);
+        quantityInputWrapper.setAlignment(Pos.CENTER);
+        quantityInputWrapper.setPrefWidth(280);
+        quantityInputWrapper.setMaxWidth(280);
+        
+        VBox quantityBox = new VBox(8, quantityLabel, quantityInputWrapper);
+        quantityBox.setPrefWidth(280);
+        quantityBox.setMaxWidth(280);
         quantityBox.setAlignment(Pos.CENTER_LEFT);
+
+        // Marca e Quantidade na mesma linha
+        HBox brandQuantityRow = new HBox(20, brandBox, quantityBox);
+        brandQuantityRow.setAlignment(Pos.CENTER);
 
         // Descrição
         Label descriptionLabel = new Label("Descrição:");
         descriptionLabel.getStyleClass().add("form-label");
 
         descriptionField = new TextArea();
-        descriptionField.setPrefSize(400, 100);
+        // Largura igual a Marca (280) + Quantidade (280) + espaçamento (20) = 580
+        descriptionField.setPrefWidth(580);
+        descriptionField.setMaxWidth(580);
+        descriptionField.setPrefHeight(120);
         descriptionField.setWrapText(true);
-        descriptionField.getStyleClass().add("text-area");
+        descriptionField.getStyleClass().add("form-textarea");
 
-        VBox descriptionBox = new VBox(8, descriptionLabel, descriptionField);
+        // Container fixo com largura do input - label à esquerda, input centralizado
+        HBox descriptionInputWrapper = new HBox(descriptionField);
+        descriptionInputWrapper.setAlignment(Pos.CENTER);
+        descriptionInputWrapper.setPrefWidth(580);
+        descriptionInputWrapper.setMaxWidth(580);
+        
+        VBox descriptionBox = new VBox(8, descriptionLabel, descriptionInputWrapper);
+        descriptionBox.setPrefWidth(580);
+        descriptionBox.setMaxWidth(580);
         descriptionBox.setAlignment(Pos.CENTER_LEFT);
 
-        // Ativo
-        Label activeLabel = new Label("Medicamento ativo:");
-        activeLabel.getStyleClass().add("form-label");
-
-        isActiveCheckBox = new CheckBox("Sim");
-        isActiveCheckBox.getStyleClass().add("check-box");
-
-        HBox activeBox = new HBox(15, activeLabel, isActiveCheckBox);
-        activeBox.setAlignment(Pos.CENTER_LEFT);
-
         // Botões
-        Button saveButton = new Button("Salvar alterações");
+        Button saveButton = new Button("Salvar");
         saveButton.getStyleClass().add("form-btn-save");
         saveButton.setPrefWidth(150);
         saveButton.setOnAction(e -> updateMedicine());
 
-        Button cancelButton = new Button("Cancelar");
-        cancelButton.getStyleClass().add("form-btn-cancel");
-        cancelButton.setPrefWidth(150);
-        cancelButton.setOnAction(e -> closeWindow());
+        Button backButton = new Button("Voltar");
+        backButton.getStyleClass().add("form-btn-cancel");
+        backButton.setPrefWidth(150);
+        backButton.setOnAction(e -> goBack());
 
-        HBox buttonBox = new HBox(15, cancelButton, saveButton);
+        HBox buttonBox = new HBox(15, backButton, saveButton);
         buttonBox.setAlignment(Pos.CENTER);
 
-        VBox formContent = new VBox(15, nameBox, brandBox, quantityBox, descriptionBox, activeBox);
-        formContent.setAlignment(Pos.CENTER_LEFT);
+        VBox formContent = new VBox(20, nameBox, brandQuantityRow, descriptionBox);
+        formContent.setAlignment(Pos.CENTER);
         formContent.setPadding(new Insets(10, 0, 10, 0));
 
         this.getChildren().addAll(formContent, buttonBox);
@@ -189,9 +233,13 @@ public class MedicineEditForm extends VBox {
     private void populateFields() {
         if (medicine != null) {
             nameField.setText(medicine.getName());
-            quantityField.setText(medicine.getQuantity() != null ? medicine.getQuantity().toString() : "");
+            // Se quantity for -1, deixar em branco; caso contrário, mostrar o valor
+            if (medicine.getQuantity() != null && medicine.getQuantity() != -1) {
+                quantityField.setText(medicine.getQuantity().toString());
+            } else {
+                quantityField.setText("");
+            }
             descriptionField.setText(medicine.getDescription() != null ? medicine.getDescription() : "");
-            isActiveCheckBox.setSelected(medicine.getIsActive());
 
             if (medicine.getBrandUuid() != null) {
                 brandComboBox.getItems().forEach(brand -> {
@@ -233,7 +281,8 @@ public class MedicineEditForm extends VBox {
         MedicineBrand selectedBrand = brandComboBox.getValue();
         java.util.UUID brandUuid = selectedBrand != null ? selectedBrand.getUuid() : null;
         String description = descriptionField.getText().trim();
-        Boolean isActive = isActiveCheckBox.isSelected();
+        // O status ativo/inativo só pode ser alterado através do botão na tabela
+        Boolean isActive = medicine.getIsActive();
 
         try {
             controller.update(medicine.getUuid(), name, brandUuid, quantity, description, isActive);
@@ -241,7 +290,11 @@ public class MedicineEditForm extends VBox {
             alert.setTitle("Sucesso");
             alert.setHeaderText(null);
             alert.showAndWait();
-            closeWindow();
+            // Recarrega os dados e volta para a view
+            if (medicineView != null) {
+                medicineView.loadData();
+            }
+            goBack();
         } catch (SQLException e) {
             e.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR, "Erro ao editar o medicamento: " + e.getMessage());
@@ -252,10 +305,11 @@ public class MedicineEditForm extends VBox {
     }
 
     /**
-     * Fecha a janela do formulário de edição.
+     * Volta para a view de lista de medicamentos.
      */
-    private void closeWindow() {
-        Stage stage = (Stage) this.getScene().getWindow();
-        stage.close();
+    private void goBack() {
+        if (mainLayout != null && medicineView != null) {
+            mainLayout.setCenter(medicineView);
+        }
     }
 }

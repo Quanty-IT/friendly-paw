@@ -30,7 +30,7 @@ public class MedicineController {
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, name);
             ps.setObject(2, brandId);
-            ps.setObject(3, quantity);
+            ps.setObject(3, quantity != null ? quantity : -1);
             ps.setString(4, description);
             ps.setBoolean(5, isActive);
             ps.executeUpdate();
@@ -103,7 +103,7 @@ public class MedicineController {
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, name);
             ps.setObject(2, brandId);
-            ps.setObject(3, quantity);
+            ps.setObject(3, quantity != null ? quantity : -1);
             ps.setString(4, description);
             ps.setBoolean(5, isActive);
             ps.setObject(6, uuid);

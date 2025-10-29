@@ -129,6 +129,11 @@
   -fx-text-fill: #4a2c10;
   -fx-font-size: 12px;
   -fx-border-color: transparent;
+  -fx-alignment: center-left;
+}
+
+.custom-table .table-cell .label {
+  -fx-alignment: center-left;
 }
 
 .custom-table .placeholder .label {
@@ -174,19 +179,19 @@
 }
 
 .icon-btn-edit {
-  -fx-background-color: linear-gradient(to bottom, #5a9f5e, #4a8a4e);
+  -fx-background-color: #FFD700;
   -fx-text-fill: white;
 }
 
 .icon-btn-edit:hover {
-  -fx-background-color: linear-gradient(to bottom, #6bb56f, #5a9f5e);
+  -fx-background-color: #FFED4E;
   -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 6, 0, 0, 3);
   -fx-scale-x: 1.1;
   -fx-scale-y: 1.1;
 }
 
 .icon-btn-edit:pressed {
-  -fx-background-color: linear-gradient(to bottom, #4a8a4e, #3a7a3e);
+  -fx-background-color: #E6C200;
   -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0, 0, 1);
 }
 
@@ -215,4 +220,50 @@
 
 .label {
   -fx-text-fill: #5c3317;
+}
+
+.status-active {
+  -fx-text-fill: #4a8a4e;
+  -fx-font-weight: bold;
+}
+
+.status-inactive {
+  -fx-text-fill: #c44545;
+  -fx-font-weight: bold;
+}
+
+.icon-btn {
+  -fx-background-radius: 17.5;
+  -fx-padding: 0;
+  -fx-content-display: graphic-only;
+  -fx-alignment: center;
+}
+
+.icon-btn .graphic-container {
+  -fx-alignment: center;
+}
+
+.icon-btn .stack-pane {
+  -fx-alignment: center;
+}
+
+.icon-btn StackPane {
+  -fx-alignment: center;
+}
+
+.icon-btn-toggle {
+  -fx-background-color: #000000;
+  -fx-text-fill: white;
+}
+
+.icon-btn-toggle:hover {
+  -fx-background-color: #2a2a2a;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 6, 0, 0, 3);
+  -fx-scale-x: 1.1;
+  -fx-scale-y: 1.1;
+}
+
+.icon-btn-toggle:pressed {
+  -fx-background-color: #1a1a1a;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0, 0, 1);
 }

@@ -16,7 +16,8 @@
   -fx-text-fill: #5c3317;
 }
 
-.form-input {
+.form-input,
+.text-field {
   -fx-background-color: #ffffff;
   -fx-background-radius: 6;
   -fx-border-color: #d4b896;
@@ -27,9 +28,88 @@
   -fx-text-fill: #4a2c10;
 }
 
-.form-input:focused {
+.form-input:focused,
+.text-field:focused {
   -fx-border-color: #8b5a2b;
   -fx-effect: dropshadow(gaussian, rgba(139, 90, 43, 0.3), 6, 0, 0, 0);
+}
+
+.form-textarea,
+.text-area {
+  -fx-background-color: #ffffff;
+  -fx-background-radius: 6;
+  -fx-border-color: #d4b896;
+  -fx-border-width: 2;
+  -fx-border-radius: 6;
+  -fx-padding: 10 15 10 15;
+  -fx-font-size: 13px;
+  -fx-text-fill: #4a2c10;
+  -fx-control-inner-background: #ffffff;
+}
+
+.form-textarea .content,
+.text-area .content {
+  -fx-background-color: #ffffff;
+  -fx-background-radius: 4;
+}
+
+.form-textarea:focused,
+.text-area:focused {
+  -fx-border-color: #8b5a2b;
+  -fx-effect: dropshadow(gaussian, rgba(139, 90, 43, 0.3), 6, 0, 0, 0);
+}
+
+.combo-box {
+  -fx-background-color: #ffffff;
+  -fx-background-radius: 6;
+  -fx-border-color: #d4b896;
+  -fx-border-width: 2;
+  -fx-border-radius: 6;
+}
+
+.combo-box:focused {
+  -fx-border-color: #8b5a2b;
+  -fx-effect: dropshadow(gaussian, rgba(139, 90, 43, 0.3), 6, 0, 0, 0);
+}
+
+.combo-box .list-cell {
+  -fx-background-color: #ffffff;
+  -fx-text-fill: #4a2c10;
+  -fx-padding: 8 12 8 12;
+}
+
+.combo-box-popup .list-view {
+  -fx-background-color: #ffffff;
+  -fx-border-color: #d4b896;
+  -fx-border-width: 2;
+  -fx-border-radius: 6;
+}
+
+.combo-box-popup .list-view .list-cell:hover {
+  -fx-background-color: #e8d4b8;
+}
+
+.combo-box-popup .list-view .list-cell:selected {
+  -fx-background-color: #d4b896;
+}
+
+.check-box {
+  -fx-text-fill: #5c3317;
+}
+
+.check-box .box {
+  -fx-background-color: #ffffff;
+  -fx-border-color: #d4b896;
+  -fx-border-width: 2;
+  -fx-border-radius: 4;
+}
+
+.check-box:selected .mark {
+  -fx-background-color: #8b5a2b;
+}
+
+.check-box:focused .box {
+  -fx-border-color: #8b5a2b;
 }
 
 .form-btn-save {
@@ -88,4 +168,9 @@
 
 .label {
   -fx-text-fill: #5c3317;
+}
+
+.grid-pane {
+  -fx-background-color: linear-gradient(to bottom, #f5e6d3, #e8d4b8);
+  -fx-background-radius: 10;
 }

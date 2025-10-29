@@ -40,6 +40,13 @@
             <version>17.0.2</version>
         </dependency>
 
+        <!-- JavaFX Web (para renderizar SVGs) -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>17.0.2</version>
+        </dependency>
+
         <!-- Google Calendar API -->
         <dependency>
             <groupId>com.google.apis</groupId>

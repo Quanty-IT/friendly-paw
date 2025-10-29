@@ -4,23 +4,24 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import javafx.scene.shape.SVGPath;
 import modules.MedicineBrand.controllers.MedicineBrandController;
 import modules.MedicineBrand.models.MedicineBrand;
 import modules.Shared.views.MenuView;
 import modules.Medicine.views.MedicineView;
 import config.Database;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Optional;
 
 public class MedicineBrandView extends VBox {
 
@@ -60,47 +61,47 @@ public class MedicineBrandView extends VBox {
         brandsList = FXCollections.observableArrayList();
         table.setItems(brandsList);
 
-        TableColumn<MedicineBrand, String> nameColumn = new TableColumn<>("Nome da Marca");
+        // Coluna Nome
+        TableColumn<MedicineBrand, String> nameColumn = new TableColumn<>("nome");
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        nameColumn.setStyle("-fx-alignment: CENTER-LEFT; -fx-padding: 0 0 0 20;");
-
-        TableColumn<MedicineBrand, Void> editColumn = new TableColumn<>("Editar");
-        editColumn.setPrefWidth(100);
-        editColumn.setMinWidth(100);
-        editColumn.setMaxWidth(100);
-        editColumn.setStyle("-fx-alignment: CENTER;");
-        editColumn.setCellFactory(param -> new TableCell<>() {
-            private final Button editBtn = createIconButton("E", "edit");
-
+        nameColumn.setCellFactory(column -> new TableCell<MedicineBrand, String>() {
             {
-                editBtn.setOnAction(e -> {
-                    MedicineBrand brand = getTableView().getItems().get(getIndex());
-                    if (brand != null) editSelected(brand);
-                });
+                setAlignment(Pos.CENTER_LEFT);
+                setPadding(new Insets(0, 8, 0, 12));
             }
-
             @Override
-            protected void updateItem(Void item, boolean empty) {
+            protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
+                if (empty || item == null) {
+                    setText(null);
                 } else {
-                    HBox box = new HBox(editBtn);
-                    box.setAlignment(Pos.CENTER);
-                    setGraphic(box);
+                    setText(item);
+                    setAlignment(Pos.CENTER_LEFT);
                 }
             }
         });
 
-        TableColumn<MedicineBrand, Void> deleteColumn = new TableColumn<>("Excluir");
-        deleteColumn.setPrefWidth(100);
-        deleteColumn.setMinWidth(100);
-        deleteColumn.setMaxWidth(100);
-        deleteColumn.setStyle("-fx-alignment: CENTER;");
-        deleteColumn.setCellFactory(param -> new TableCell<>() {
-            private final Button delBtn = createIconButton("x", "delete");
+        // Coluna Ações (editar e deletar)
+        TableColumn<MedicineBrand, Void> actionsColumn = new TableColumn<>("ações");
+        actionsColumn.setPrefWidth(120);
+        actionsColumn.setMinWidth(120);
+        actionsColumn.setMaxWidth(120);
+        actionsColumn.setStyle("-fx-alignment: CENTER;");
+        actionsColumn.setCellFactory(param -> new TableCell<>() {
+            private final Button editBtn = createIconButton("/assets/icons/edit.svg", "edit");
+            private final Button delBtn = createIconButton("/assets/icons/trash.svg", "delete");
+            private final HBox actionsBox = new HBox(8, editBtn, delBtn);
 
             {
+                actionsBox.setAlignment(Pos.CENTER);
+                
+                editBtn.setTooltip(new Tooltip("Editar"));
+                editBtn.setOnAction(e -> {
+                    MedicineBrand brand = getTableView().getItems().get(getIndex());
+                    if (brand != null) editSelected(brand);
+                });
+
+                delBtn.setTooltip(new Tooltip("Excluir"));
                 delBtn.setOnAction(e -> {
                     MedicineBrand brand = getTableView().getItems().get(getIndex());
                     if (brand != null) deleteSelected(brand);
@@ -113,32 +114,154 @@ public class MedicineBrandView extends VBox {
                 if (empty) {
                     setGraphic(null);
                 } else {
-                    HBox box = new HBox(delBtn);
-                    box.setAlignment(Pos.CENTER);
-                    setGraphic(box);
+                    setGraphic(actionsBox);
                 }
             }
         });
 
-        table.getColumns().addAll(nameColumn, editColumn, deleteColumn);
+        table.getColumns().addAll(nameColumn, actionsColumn);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         table.getStyleClass().add("custom-table");
         table.setPlaceholder(new Label("Nenhuma marca cadastrada"));
     }
 
     /**
-     * Cria um botão com ícone personalizado.
+     * Cria um ícone SVG usando SVGPath com escala correta baseada no viewBox.
      * 
-     * @param icon Texto do ícone a ser exibido
+     * @param svgPath Caminho do arquivo SVG
+     * @param color Cor do ícone
+     * @return StackPane com o ícone renderizado e dimensionado corretamente
+     */
+    private StackPane createSvgIcon(String svgPath, String color) {
+        StackPane iconPane = new StackPane();
+        iconPane.setPrefSize(18, 18);
+        iconPane.setMaxSize(18, 18);
+        iconPane.setAlignment(Pos.CENTER);
+        
+        try {
+            // Lê o conteúdo do SVG
+            String svgContent = new BufferedReader(
+                new InputStreamReader(
+                    getClass().getResourceAsStream(svgPath),
+                    StandardCharsets.UTF_8
+                )
+            ).lines().collect(Collectors.joining("\n"));
+            
+            if (svgContent == null || svgContent.isEmpty()) {
+                return iconPane;
+            }
+            
+            // Extrai o viewBox do SVG
+            java.util.regex.Pattern viewBoxPattern = java.util.regex.Pattern.compile(
+                "viewBox\\s*=\\s*[\"']([^\"']+)[\"']", 
+                java.util.regex.Pattern.CASE_INSENSITIVE
+            );
+            java.util.regex.Matcher viewBoxMatcher = viewBoxPattern.matcher(svgContent);
+            
+            double viewBoxWidth = 24.0; // Default do SVG comum
+            double viewBoxHeight = 24.0;
+            
+            if (viewBoxMatcher.find()) {
+                String[] viewBoxValues = viewBoxMatcher.group(1).trim().split("[\\s,]+");
+                if (viewBoxValues.length >= 4) {
+                    viewBoxWidth = Double.parseDouble(viewBoxValues[2]);
+                    viewBoxHeight = Double.parseDouble(viewBoxValues[3]);
+                }
+            }
+            
+            // Calcula o scale para caber no tamanho desejado (18x18)
+            double targetSize = 18.0;
+            double scale = Math.min(targetSize / viewBoxWidth, targetSize / viewBoxHeight);
+            scale *= 0.75; // Margem para evitar bordas cortadas e garantir espaço
+            
+            // Cria um Group para conter todos os paths
+            javafx.scene.Group svgGroup = new javafx.scene.Group();
+            
+            // Extrai todos os paths do SVG
+            java.util.regex.Pattern pathPattern = java.util.regex.Pattern.compile(
+                "<path[^>]*d\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>", 
+                java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.DOTALL
+            );
+            java.util.regex.Matcher pathMatcher = pathPattern.matcher(svgContent);
+            
+            while (pathMatcher.find()) {
+                String pathData = pathMatcher.group(1);
+                SVGPath svgPathShape = new SVGPath();
+                svgPathShape.setContent(pathData);
+                svgPathShape.setFill(javafx.scene.paint.Color.valueOf(color));
+                svgPathShape.setStrokeWidth(0);
+                svgGroup.getChildren().add(svgPathShape);
+            }
+            
+            // Se não encontrou paths, retorna vazio
+            if (svgGroup.getChildren().isEmpty()) {
+                return iconPane;
+            }
+            
+            // Cria um wrapper Group para aplicar transformações
+            javafx.scene.Group wrapper = new javafx.scene.Group();
+            
+            // Primeiro, centraliza o conteúdo SVG em relação ao viewBox
+            // Move o grupo para que seu centro fique em (0,0)
+            svgGroup.setTranslateX(-viewBoxWidth / 2);
+            svgGroup.setTranslateY(-viewBoxHeight / 2);
+            
+            // Aplica a escala no wrapper (escalando do centro)
+            wrapper.setScaleX(scale);
+            wrapper.setScaleY(scale);
+            wrapper.getChildren().add(svgGroup);
+            
+            // O wrapper já está centralizado, apenas adiciona ao pane
+            iconPane.getChildren().add(wrapper);
+            
+        } catch (Exception e) {
+            System.err.println("Erro ao carregar SVG: " + svgPath + " - " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return iconPane;
+    }
+
+    /**
+     * Cria um botão com ícone SVG personalizado.
+     * 
+     * @param svgPath Caminho do arquivo SVG a ser exibido
      * @param type Tipo do botão (edit, delete) para aplicar estilo específico
      * @return Button configurado com o ícone e estilo apropriados
      */
-    private Button createIconButton(String icon, String type) {
-        Button btn = new Button(icon);
+    private Button createIconButton(String svgPath, String type) {
+        Button btn = new Button();
+
+        String iconColor = "#FFFFFF";
+        try {
+            StackPane iconView = createSvgIcon(svgPath, iconColor);
+            if (iconView != null && !iconView.getChildren().isEmpty()) {
+                btn.setGraphic(iconView);
+            } else {
+                btn.setText(null); // sem fallback de texto
+            }
+        } catch (Exception e) {
+            btn.setText(null); // sem texto mesmo no fallback
+        }
+
         btn.getStyleClass().addAll("icon-btn", "icon-btn-" + type);
+
+        // tamanho fixo
         btn.setPrefSize(35, 35);
         btn.setMinSize(35, 35);
         btn.setMaxSize(35, 35);
+
+        // **centralização real do gráfico**
+        btn.setGraphicTextGap(0);
+        btn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        btn.setAlignment(Pos.CENTER);
+        
+        // Garante que o StackPane do ícone esteja centralizado
+        if (btn.getGraphic() != null && btn.getGraphic() instanceof StackPane) {
+            StackPane iconStack = (StackPane) btn.getGraphic();
+            iconStack.setAlignment(Pos.CENTER);
+        }
+
         return btn;
     }
 
@@ -146,22 +269,25 @@ public class MedicineBrandView extends VBox {
      * Configura o layout principal da view, incluindo logo, título e botões de ação.
      */
     private void setupLayout() {
+        // Logo no topo esquerdo
         ImageView logo = new ImageView(new Image(getClass().getResourceAsStream("/assets/logo.png")));
         logo.setFitWidth(140);
         logo.setPreserveRatio(true);
 
-        Label title = new Label("Marcas de medicamentos");
+        // Título centralizado no topo
+        Label title = new Label("Marcas");
         title.getStyleClass().add("title");
 
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
+        // Botões de ação no topo direito
         ImageView paw1 = new ImageView(new Image(getClass().getResourceAsStream("/assets/patas.png")));
         ImageView paw2 = new ImageView(new Image(getClass().getResourceAsStream("/assets/patas.png")));
         ImageView paw3 = new ImageView(new Image(getClass().getResourceAsStream("/assets/patas.png")));
 
+        paw1.setFitWidth(16);
         paw1.setPreserveRatio(true);
+        paw2.setFitWidth(16);
         paw2.setPreserveRatio(true);
+        paw3.setFitWidth(16);
         paw3.setPreserveRatio(true);
 
         Label addLabel = new Label("Cadastrar");
@@ -185,10 +311,6 @@ public class MedicineBrandView extends VBox {
         menuButton.setGraphic(menuContent);
         menuButton.getStyleClass().add("top-btn");
 
-        addButton.getStyleClass().add("top-btn");
-        productsButton.getStyleClass().add("top-btn");
-        menuButton.getStyleClass().add("top-btn");
-
         addButton.setOnAction(e -> openAddForm());
         productsButton.setOnAction(e -> openMedicineView());
         menuButton.setOnAction(e -> returnToMainMenu());
@@ -196,11 +318,32 @@ public class MedicineBrandView extends VBox {
         HBox buttonBar = new HBox(15, addButton, productsButton, menuButton);
         buttonBar.setAlignment(Pos.CENTER_RIGHT);
 
-        HBox topBar = new HBox(15, logo, spacer, buttonBar);
-        topBar.setAlignment(Pos.CENTER_LEFT);
-        topBar.setPadding(new Insets(30, 40, 0, 40));
+        // Layout usando StackPane para centralizar o título absolutamente sobre a tabela
+        // O título fica centralizado ignorando logo e botões
+        HBox leftSection = new HBox(logo);
+        leftSection.setAlignment(Pos.CENTER_LEFT);
+        
+        HBox rightSection = new HBox(buttonBar);
+        rightSection.setAlignment(Pos.CENTER_RIGHT);
+        
+        // StackPane permite que o título fique centralizado absolutamente
+        StackPane topBar = new StackPane();
+        topBar.getChildren().addAll(leftSection, title, rightSection);
+        
+        // Define alinhamento: logo à esquerda, título no centro, botões à direita
+        StackPane.setAlignment(leftSection, Pos.CENTER_LEFT);
+        StackPane.setAlignment(title, Pos.CENTER);
+        StackPane.setAlignment(rightSection, Pos.CENTER_RIGHT);
+        
+        // Garante que leftSection e rightSection não ocupem todo o espaço
+        leftSection.setMaxWidth(Double.MAX_VALUE);
+        rightSection.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(leftSection, Priority.ALWAYS);
+        HBox.setHgrow(rightSection, Priority.ALWAYS);
+        
+        topBar.setPadding(new Insets(30, 60, 0, 60));
 
-        VBox content = new VBox(30, title, table);
+        VBox content = new VBox(30, table);
         content.setAlignment(Pos.CENTER);
         content.setPadding(new Insets(40, 60, 40, 60));
         VBox.setVgrow(table, Priority.ALWAYS);
@@ -214,7 +357,7 @@ public class MedicineBrandView extends VBox {
     /**
      * Carrega a lista de marcas de medicamentos do banco de dados e atualiza a tabela.
      */
-    private void loadData() {
+    public void loadData() {
         try {
             brandsList.clear();
             brandsList.addAll(controller.listAll());
@@ -225,41 +368,23 @@ public class MedicineBrandView extends VBox {
     }
 
     /**
-     * Abre uma janela modal com o formulário para cadastrar uma nova marca de medicamento.
+     * Abre o formulário para cadastrar uma nova marca de medicamento na mesma tela.
      */
     private void openAddForm() {
-        Stage formStage = new Stage();
-        formStage.setTitle("Adicionar marca");
-        formStage.initModality(Modality.APPLICATION_MODAL);
-
-        MedicineBrandForm form = new MedicineBrandForm();
-        Scene scene = new Scene(form, 450, 250);
-        scene.getStylesheets().add(getClass().getResource("/modules/MedicineBrand/styles/MedicineBrandView.css").toExternalForm());
-        formStage.setScene(scene);
-        formStage.setResizable(false);
-        formStage.setOnHidden(e -> loadData());
-        formStage.showAndWait();
+        MedicineBrandForm form = new MedicineBrandForm(mainLayout, this);
+        mainLayout.setCenter(form);
     }
 
     /**
-     * Abre uma janela modal com o formulário para editar a marca de medicamento selecionada.
+     * Abre o formulário para editar a marca de medicamento selecionada na mesma tela.
      * 
      * @param selected Marca de medicamento selecionada para edição
      */
     private void editSelected(MedicineBrand selected) {
         if (selected == null) return;
 
-        Stage editStage = new Stage();
-        editStage.setTitle("Editar marca");
-        editStage.initModality(Modality.APPLICATION_MODAL);
-
-        MedicineBrandEditForm form = new MedicineBrandEditForm(selected, controller);
-        Scene scene = new Scene(form, 450, 250);
-        scene.getStylesheets().add(getClass().getResource("/modules/MedicineBrand/styles/MedicineBrandView.css").toExternalForm());
-        editStage.setScene(scene);
-        editStage.setResizable(false);
-        editStage.setOnHidden(e -> loadData());
-        editStage.showAndWait();
+        MedicineBrandEditForm form = new MedicineBrandEditForm(selected, controller, mainLayout, this);
+        mainLayout.setCenter(form);
     }
 
     /**

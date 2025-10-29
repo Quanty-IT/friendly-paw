@@ -10,8 +10,13 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.shape.SVGPath;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 import modules.Medicine.controllers.MedicineController;
 import modules.Medicine.models.Medicine;
 import modules.Shared.views.MenuView;
@@ -20,8 +25,6 @@ import config.Database;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 public class MedicineView extends VBox {
@@ -62,96 +65,174 @@ public class MedicineView extends VBox {
         medicinesList = FXCollections.observableArrayList();
         table.setItems(medicinesList);
 
-        TableColumn<Medicine, String> nameColumn = new TableColumn<>("Nome");
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        nameColumn.setStyle("-fx-alignment: CENTER-LEFT; -fx-padding: 0 0 0 20;");
-
-        TableColumn<Medicine, String> brandColumn = new TableColumn<>("Marca");
-        brandColumn.setCellValueFactory(new PropertyValueFactory<>("brandName"));
-        brandColumn.setPrefWidth(150);
-        brandColumn.setStyle("-fx-alignment: CENTER-LEFT;");
-
-        TableColumn<Medicine, Integer> quantityColumn = new TableColumn<>("Quantidade");
-        quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
-        quantityColumn.setPrefWidth(100);
-        quantityColumn.setStyle("-fx-alignment: CENTER;");
-
-        TableColumn<Medicine, String> descriptionColumn = new TableColumn<>("Descrição");
-        descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
-        descriptionColumn.setPrefWidth(200);
-        descriptionColumn.setStyle("-fx-alignment: CENTER-LEFT;");
-
-        TableColumn<Medicine, Boolean> activeColumn = new TableColumn<>("Ativo");
-        activeColumn.setCellValueFactory(new PropertyValueFactory<>("isActive"));
-        activeColumn.setPrefWidth(80);
-        activeColumn.setStyle("-fx-alignment: CENTER;");
-        activeColumn.setCellFactory(column -> new TableCell<Medicine, Boolean>() {
+        // Coluna Status (primeira coluna conforme Figma)
+        TableColumn<Medicine, Boolean> statusColumn = new TableColumn<>("status");
+        statusColumn.setCellValueFactory(new PropertyValueFactory<>("isActive"));
+        statusColumn.setPrefWidth(100);
+        statusColumn.setCellFactory(column -> new TableCell<Medicine, Boolean>() {
+            {
+                setAlignment(Pos.CENTER_LEFT);
+                setPadding(new Insets(0, 8, 0, 12));
+            }
             @Override
             protected void updateItem(Boolean item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
                     setText(null);
+                    setStyle("");
                 } else {
-                    setText(item ? "Sim" : "Não");
+                    setAlignment(Pos.CENTER_LEFT);
+                    if (item) {
+                        setText("Ativo");
+                        getStyleClass().clear();
+                        getStyleClass().add("status-active");
+                    } else {
+                        setText("Inativo");
+                        getStyleClass().clear();
+                        getStyleClass().add("status-inactive");
+                    }
                 }
             }
         });
 
-        TableColumn<Medicine, LocalDateTime> createdAtColumn = new TableColumn<>("Data Criação");
-        createdAtColumn.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
-        createdAtColumn.setPrefWidth(130);
-        createdAtColumn.setStyle("-fx-alignment: CENTER;");
-        createdAtColumn.setCellFactory(column -> new TableCell<Medicine, LocalDateTime>() {
-            private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-
+        // Coluna Nome
+        TableColumn<Medicine, String> nameColumn = new TableColumn<>("nome");
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        nameColumn.setCellFactory(column -> new TableCell<Medicine, String>() {
+            {
+                setAlignment(Pos.CENTER_LEFT);
+                setPadding(new Insets(0, 8, 0, 12));
+            }
             @Override
-            protected void updateItem(LocalDateTime item, boolean empty) {
+            protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
                     setText(null);
                 } else {
-                    setText(formatter.format(item));
+                    setText(item);
+                    setAlignment(Pos.CENTER_LEFT);
                 }
             }
         });
 
-        TableColumn<Medicine, Void> editColumn = new TableColumn<>("Editar");
-        editColumn.setPrefWidth(100);
-        editColumn.setMinWidth(100);
-        editColumn.setMaxWidth(100);
-        editColumn.setStyle("-fx-alignment: CENTER;");
-        editColumn.setCellFactory(param -> new TableCell<>() {
-            private final Button editBtn = createIconButton("E", "edit");
+        // Coluna Marca
+        TableColumn<Medicine, String> brandColumn = new TableColumn<>("marca");
+        brandColumn.setCellValueFactory(new PropertyValueFactory<>("brandName"));
+        brandColumn.setPrefWidth(150);
+        brandColumn.setCellFactory(column -> new TableCell<Medicine, String>() {
+            {
+                setAlignment(Pos.CENTER_LEFT);
+                setPadding(new Insets(0, 8, 0, 12));
+            }
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item);
+                    setAlignment(Pos.CENTER_LEFT);
+                }
+            }
+        });
+
+        // Coluna Quantidade
+        TableColumn<Medicine, Integer> quantityColumn = new TableColumn<>("quantidade");
+        quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        quantityColumn.setPrefWidth(120);
+        quantityColumn.setCellFactory(column -> new TableCell<Medicine, Integer>() {
+            {
+                setAlignment(Pos.CENTER);
+                setPadding(new Insets(0, 8, 0, 8));
+            }
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                Medicine medicine = empty ? null : getTableView().getItems().get(getIndex());
+                if (empty || medicine == null) {
+                    setText(null);
+                } else {
+                    setAlignment(Pos.CENTER);
+                    // Mostra "∞" para inativos, quantidade para ativos
+                    if (!medicine.getIsActive() || item == null || item == -1) {
+                        setText("∞");
+                    } else {
+                        setText(item.toString());
+                    }
+                }
+            }
+        });
+
+        // Coluna Descrição
+        TableColumn<Medicine, String> descriptionColumn = new TableColumn<>("descrição");
+        descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
+        descriptionColumn.setPrefWidth(200);
+        descriptionColumn.setCellFactory(column -> new TableCell<Medicine, String>() {
+            {
+                setAlignment(Pos.CENTER_LEFT);
+                setPadding(new Insets(0, 8, 0, 12));
+            }
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item);
+                    setAlignment(Pos.CENTER_LEFT);
+                }
+            }
+        });
+
+        // Coluna Ações (agrupa toggle, editar e deletar)
+        TableColumn<Medicine, Void> actionsColumn = new TableColumn<>("ações");
+        actionsColumn.setPrefWidth(180);
+        actionsColumn.setMinWidth(180);
+        actionsColumn.setMaxWidth(180);
+        actionsColumn.setStyle("-fx-alignment: CENTER;");
+        actionsColumn.setCellFactory(param -> new TableCell<>() {
+            private final Button toggleBtn = new Button();
+            private final Button editBtn = createIconButton("/assets/icons/edit.svg", "edit");
+            private final Button delBtn = createIconButton("/assets/icons/trash.svg", "delete");
+            private final HBox actionsBox = new HBox(8, toggleBtn, editBtn, delBtn);
 
             {
+                actionsBox.setAlignment(Pos.CENTER);
+                
+                // Botão toggle com ícone SVG
+                try {
+                    StackPane toggleIcon = createSvgIcon("/assets/icons/turn-on-off.svg", "#FFFFFF");
+                    if (toggleIcon != null && !toggleIcon.getChildren().isEmpty()) {
+                        toggleIcon.setAlignment(Pos.CENTER);
+                        toggleBtn.setGraphic(toggleIcon);
+                    } else {
+                        toggleBtn.setText("⏻");
+                    }
+                } catch (Exception e) {
+                    System.err.println("Erro ao carregar ícone toggle SVG: " + e.getMessage());
+                    toggleBtn.setText("⏻");
+                }
+                
+                toggleBtn.getStyleClass().addAll("icon-btn", "icon-btn-toggle");
+                toggleBtn.setPrefSize(35, 35);
+                toggleBtn.setMinSize(35, 35);
+                toggleBtn.setMaxSize(35, 35);
+                toggleBtn.setGraphicTextGap(0);
+                toggleBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+                toggleBtn.setAlignment(Pos.CENTER);
+                toggleBtn.setTooltip(new Tooltip("Ativar/Inativar"));
+                toggleBtn.setOnAction(e -> {
+                    Medicine medicine = getTableView().getItems().get(getIndex());
+                    if (medicine != null) toggleActiveStatus(medicine);
+                });
+
+                editBtn.setTooltip(new Tooltip("Editar"));
                 editBtn.setOnAction(e -> {
                     Medicine medicine = getTableView().getItems().get(getIndex());
                     if (medicine != null) editSelected(medicine);
                 });
-            }
 
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    HBox box = new HBox(editBtn);
-                    box.setAlignment(Pos.CENTER);
-                    setGraphic(box);
-                }
-            }
-        });
-
-        TableColumn<Medicine, Void> deleteColumn = new TableColumn<>("Excluir");
-        deleteColumn.setPrefWidth(100);
-        deleteColumn.setMinWidth(100);
-        deleteColumn.setMaxWidth(100);
-        deleteColumn.setStyle("-fx-alignment: CENTER;");
-        deleteColumn.setCellFactory(param -> new TableCell<>() {
-            private final Button delBtn = createIconButton("x", "delete");
-
-            {
+                delBtn.setTooltip(new Tooltip("Excluir"));
                 delBtn.setOnAction(e -> {
                     Medicine medicine = getTableView().getItems().get(getIndex());
                     if (medicine != null) deleteSelected(medicine);
@@ -164,32 +245,159 @@ public class MedicineView extends VBox {
                 if (empty) {
                     setGraphic(null);
                 } else {
-                    HBox box = new HBox(delBtn);
-                    box.setAlignment(Pos.CENTER);
-                    setGraphic(box);
+                    setGraphic(actionsBox);
                 }
             }
         });
 
-        table.getColumns().addAll(nameColumn, brandColumn, quantityColumn, descriptionColumn, activeColumn, createdAtColumn, editColumn, deleteColumn);
+        table.getColumns().addAll(statusColumn, nameColumn, brandColumn, quantityColumn, descriptionColumn, actionsColumn);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         table.getStyleClass().add("custom-table");
         table.setPlaceholder(new Label("Nenhum medicamento cadastrado"));
     }
 
     /**
-     * Cria um botão com ícone personalizado.
+     * Cria um ícone SVG usando SVGPath com escala correta baseada no viewBox.
      * 
-     * @param icon Texto do ícone a ser exibido
-     * @param type Tipo do botão (edit, delete) para aplicar estilo específico
+     * @param svgPath Caminho do arquivo SVG
+     * @param color Cor do ícone
+     * @return StackPane com o ícone renderizado e dimensionado corretamente
+     */
+    private StackPane createSvgIcon(String svgPath, String color) {
+        StackPane iconPane = new StackPane();
+        iconPane.setPrefSize(18, 18);
+        iconPane.setMaxSize(18, 18);
+        iconPane.setAlignment(Pos.CENTER);
+        
+        try {
+            // Lê o conteúdo do SVG
+            String svgContent = new BufferedReader(
+                new InputStreamReader(
+                    getClass().getResourceAsStream(svgPath),
+                    StandardCharsets.UTF_8
+                )
+            ).lines().collect(Collectors.joining("\n"));
+            
+            if (svgContent == null || svgContent.isEmpty()) {
+                return iconPane;
+            }
+            
+            // Extrai o viewBox do SVG
+            java.util.regex.Pattern viewBoxPattern = java.util.regex.Pattern.compile(
+                "viewBox\\s*=\\s*[\"']([^\"']+)[\"']", 
+                java.util.regex.Pattern.CASE_INSENSITIVE
+            );
+            java.util.regex.Matcher viewBoxMatcher = viewBoxPattern.matcher(svgContent);
+            
+            double viewBoxWidth = 24.0; // Default do SVG comum
+            double viewBoxHeight = 24.0;
+            
+            if (viewBoxMatcher.find()) {
+                String[] viewBoxValues = viewBoxMatcher.group(1).trim().split("[\\s,]+");
+                if (viewBoxValues.length >= 4) {
+                    viewBoxWidth = Double.parseDouble(viewBoxValues[2]);
+                    viewBoxHeight = Double.parseDouble(viewBoxValues[3]);
+                }
+            }
+            
+            // Calcula o scale para caber no tamanho desejado (18x18)
+            double targetSize = 18.0;
+            double scale = Math.min(targetSize / viewBoxWidth, targetSize / viewBoxHeight);
+            scale *= 0.75; // Margem para evitar bordas cortadas e garantir espaço
+            
+            // Cria um Group para conter todos os paths
+            javafx.scene.Group svgGroup = new javafx.scene.Group();
+            
+            // Extrai todos os paths do SVG
+            java.util.regex.Pattern pathPattern = java.util.regex.Pattern.compile(
+                "<path[^>]*d\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>", 
+                java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.DOTALL
+            );
+            java.util.regex.Matcher pathMatcher = pathPattern.matcher(svgContent);
+            
+            while (pathMatcher.find()) {
+                String pathData = pathMatcher.group(1);
+                SVGPath svgPathShape = new SVGPath();
+                svgPathShape.setContent(pathData);
+                svgPathShape.setFill(javafx.scene.paint.Color.valueOf(color));
+                svgPathShape.setStrokeWidth(0);
+                svgGroup.getChildren().add(svgPathShape);
+            }
+            
+            // Se não encontrou paths, retorna vazio
+            if (svgGroup.getChildren().isEmpty()) {
+                return iconPane;
+            }
+            
+            // Cria um wrapper Group para aplicar transformações
+            javafx.scene.Group wrapper = new javafx.scene.Group();
+            wrapper.getChildren().add(svgGroup);
+            
+            // Calcula o tamanho após a escala
+            double scaledWidth = viewBoxWidth * scale;
+            double scaledHeight = viewBoxHeight * scale;
+            
+            // Centraliza o SVG movendo para que seu canto superior esquerdo fique no centro
+            // Depois aplica a escala e ajusta para centralizar no espaço 18x18
+            svgGroup.setTranslateX(-viewBoxWidth / 2);
+            svgGroup.setTranslateY(-viewBoxHeight / 2);
+            
+            // Aplica a escala no wrapper
+            wrapper.setScaleX(scale);
+            wrapper.setScaleY(scale);
+            
+            // Adiciona ao pane - o StackPane vai centralizar automaticamente
+            // já que o conteúdo está centralizado em relação a (0,0) após a escala
+            iconPane.getChildren().add(wrapper);
+            
+        } catch (Exception e) {
+            System.err.println("Erro ao carregar SVG: " + svgPath + " - " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return iconPane;
+    }
+
+    /**
+     * Cria um botão com ícone SVG personalizado.
+     * 
+     * @param svgPath Caminho do arquivo SVG a ser exibido
+     * @param type Tipo do botão (edit, delete, toggle) para aplicar estilo específico
      * @return Button configurado com o ícone e estilo apropriados
      */
-    private Button createIconButton(String icon, String type) {
-        Button btn = new Button(icon);
+    private Button createIconButton(String svgPath, String type) {
+        Button btn = new Button();
+
+        String iconColor = "#FFFFFF";
+        try {
+            StackPane iconView = createSvgIcon(svgPath, iconColor);
+            if (iconView != null && !iconView.getChildren().isEmpty()) {
+                btn.setGraphic(iconView);
+            } else {
+                btn.setText(null); // sem fallback de texto
+            }
+        } catch (Exception e) {
+            btn.setText(null); // sem texto mesmo no fallback
+        }
+
         btn.getStyleClass().addAll("icon-btn", "icon-btn-" + type);
+
+        // tamanho fixo
         btn.setPrefSize(35, 35);
         btn.setMinSize(35, 35);
         btn.setMaxSize(35, 35);
+
+        // **centralização real do gráfico**
+        btn.setGraphicTextGap(0);
+        btn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        btn.setAlignment(Pos.CENTER);
+        
+        // Garante que o StackPane do ícone esteja centralizado
+        if (btn.getGraphic() != null && btn.getGraphic() instanceof StackPane) {
+            StackPane iconStack = (StackPane) btn.getGraphic();
+            iconStack.setAlignment(Pos.CENTER);
+        }
+
         return btn;
     }
 
@@ -197,22 +405,25 @@ public class MedicineView extends VBox {
      * Configura o layout principal da view, incluindo logo, título e botões de ação.
      */
     private void setupLayout() {
+        // Logo no topo esquerdo
         ImageView logo = new ImageView(new Image(getClass().getResourceAsStream("/assets/logo.png")));
         logo.setFitWidth(140);
         logo.setPreserveRatio(true);
 
+        // Título centralizado no topo
         Label title = new Label("Medicamentos");
         title.getStyleClass().add("title");
 
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
+        // Botões de ação no topo direito
         ImageView paw1 = new ImageView(new Image(getClass().getResourceAsStream("/assets/patas.png")));
         ImageView paw2 = new ImageView(new Image(getClass().getResourceAsStream("/assets/patas.png")));
         ImageView paw3 = new ImageView(new Image(getClass().getResourceAsStream("/assets/patas.png")));
 
+        paw1.setFitWidth(16);
         paw1.setPreserveRatio(true);
+        paw2.setFitWidth(16);
         paw2.setPreserveRatio(true);
+        paw3.setFitWidth(16);
         paw3.setPreserveRatio(true);
 
         Label addLabel = new Label("Cadastrar");
@@ -243,11 +454,32 @@ public class MedicineView extends VBox {
         HBox buttonBar = new HBox(15, addButton, brandsButton, menuButton);
         buttonBar.setAlignment(Pos.CENTER_RIGHT);
 
-        HBox topBar = new HBox(15, logo, spacer, buttonBar);
-        topBar.setAlignment(Pos.CENTER_LEFT);
-        topBar.setPadding(new Insets(30, 40, 0, 40));
+        // Layout usando StackPane para centralizar o título absolutamente sobre a tabela
+        // O título fica centralizado ignorando logo e botões
+        HBox leftSection = new HBox(logo);
+        leftSection.setAlignment(Pos.CENTER_LEFT);
+        
+        HBox rightSection = new HBox(buttonBar);
+        rightSection.setAlignment(Pos.CENTER_RIGHT);
+        
+        // StackPane permite que o título fique centralizado absolutamente
+        StackPane topBar = new StackPane();
+        topBar.getChildren().addAll(leftSection, title, rightSection);
+        
+        // Define alinhamento: logo à esquerda, título no centro, botões à direita
+        StackPane.setAlignment(leftSection, Pos.CENTER_LEFT);
+        StackPane.setAlignment(title, Pos.CENTER);
+        StackPane.setAlignment(rightSection, Pos.CENTER_RIGHT);
+        
+        // Garante que leftSection e rightSection não ocupem todo o espaço
+        leftSection.setMaxWidth(Double.MAX_VALUE);
+        rightSection.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(leftSection, Priority.ALWAYS);
+        HBox.setHgrow(rightSection, Priority.ALWAYS);
+        
+        topBar.setPadding(new Insets(30, 60, 0, 60));
 
-        VBox content = new VBox(30, title, table);
+        VBox content = new VBox(30, table);
         content.setAlignment(Pos.CENTER);
         content.setPadding(new Insets(40, 60, 40, 60));
         VBox.setVgrow(table, Priority.ALWAYS);
@@ -261,7 +493,7 @@ public class MedicineView extends VBox {
     /**
      * Carrega a lista de medicamentos do banco de dados e atualiza a tabela.
      */
-    private void loadData() {
+    public void loadData() {
         try {
             medicinesList.clear();
             medicinesList.addAll(controller.listAll());
@@ -272,41 +504,54 @@ public class MedicineView extends VBox {
     }
 
     /**
-     * Abre uma janela modal com o formulário para cadastrar um novo medicamento.
+     * Abre o formulário para cadastrar um novo medicamento na mesma tela.
      */
     private void openAddForm() {
-        Stage formStage = new Stage();
-        formStage.setTitle("Adicionar medicamento");
-        formStage.initModality(Modality.APPLICATION_MODAL);
-
-        MedicineForm form = new MedicineForm();
-        Scene scene = new Scene(form, 500, 550);
-        scene.getStylesheets().add(getClass().getResource("/modules/Medicine/styles/MedicineView.css").toExternalForm());
-        formStage.setScene(scene);
-        formStage.setResizable(false);
-        formStage.setOnHidden(e -> loadData());
-        formStage.showAndWait();
+        MedicineForm form = new MedicineForm(mainLayout, this);
+        mainLayout.setCenter(form);
     }
 
     /**
-     * Abre uma janela modal com o formulário para editar o medicamento selecionado.
+     * Abre o formulário para editar o medicamento selecionado na mesma tela.
      * 
      * @param selected Medicamento selecionado para edição
      */
     private void editSelected(Medicine selected) {
         if (selected == null) return;
 
-         Stage editStage = new Stage();
-         editStage.setTitle("Editar medicamento");
-         editStage.initModality(Modality.APPLICATION_MODAL);
+        MedicineEditForm form = new MedicineEditForm(selected, controller, mainLayout, this);
+        mainLayout.setCenter(form);
+    }
 
-         MedicineEditForm form = new MedicineEditForm(selected, controller);
-         Scene scene = new Scene(form, 500, 550);
-         scene.getStylesheets().add(getClass().getResource("/modules/Medicine/styles/MedicineView.css").toExternalForm());
-         editStage.setScene(scene);
-         editStage.setResizable(false);
-         editStage.setOnHidden(e -> loadData());
-         editStage.showAndWait();
+    /**
+     * Alterna o status ativo/inativo do medicamento.
+     * 
+     * @param selected Medicamento selecionado para alterar status
+     */
+    private void toggleActiveStatus(Medicine selected) {
+        if (selected == null) return;
+
+        String action = selected.getIsActive() ? "inativar" : "ativar";
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                "Tem certeza que deseja " + action + " o medicamento '" + selected.getName() + "'?",
+                ButtonType.YES, ButtonType.NO);
+        confirm.setTitle("Confirmar " + (selected.getIsActive() ? "inativação" : "ativação"));
+        confirm.setHeaderText(null);
+
+        confirm.showAndWait().ifPresent(type -> {
+            if (type == ButtonType.YES) {
+                try {
+                    Boolean newStatus = !selected.getIsActive();
+                    controller.update(selected.getUuid(), selected.getName(), selected.getBrandUuid(), 
+                                    selected.getQuantity(), selected.getDescription(), newStatus);
+                    loadData();
+                    String message = newStatus ? "Medicamento ativado com sucesso!" : "Medicamento inativado com sucesso!";
+                    new Alert(Alert.AlertType.INFORMATION, message).showAndWait();
+                } catch (SQLException e) {
+                    new Alert(Alert.AlertType.ERROR, "Erro ao alterar status do medicamento: " + e.getMessage()).showAndWait();
+                }
+            }
+        });
     }
 
     /**
