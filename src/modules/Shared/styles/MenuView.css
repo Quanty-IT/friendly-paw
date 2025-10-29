@@ -1,0 +1,91 @@
+.main-bg {
+  -fx-background-color: linear-gradient(to bottom, #f5e6d3, #e8d4b8);
+}
+
+.menu-title {
+  -fx-font-size: 32px;
+  -fx-font-weight: bold;
+  -fx-text-fill: #5c3317;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 3, 0, 0, 2);
+  -fx-padding: 0 0 10 0;
+}
+
+.top-btn {
+  -fx-background-color: linear-gradient(to bottom, #8b5a2b, #6b3a18);
+  -fx-text-fill: #ffffff;
+  -fx-font-size: 13px;
+  -fx-font-weight: bold;
+  -fx-background-radius: 8;
+  -fx-padding: 10 20 10 20;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 6, 0, 0, 3);
+  -fx-cursor: hand;
+  -fx-border-color: transparent;
+}
+
+.top-btn .label {
+  -fx-text-fill: #ffffff;
+}
+
+.top-btn:hover {
+  -fx-background-color: linear-gradient(to bottom, #a0672f, #7d4520);
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 8, 0, 0, 4);
+  -fx-scale-x: 1.05;
+  -fx-scale-y: 1.05;
+}
+
+.top-btn:pressed {
+  -fx-background-color: linear-gradient(to bottom, #6b3a18, #5c3317);
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0, 0, 1);
+}
+
+.top-btn:focused {
+  -fx-background-insets: 0;
+  -fx-border-color: transparent;
+}
+
+.column-title {
+  -fx-font-size: 24px;
+  -fx-font-weight: bold;
+  -fx-text-fill: #ffffff;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 4, 0, 0, 2);
+  -fx-padding: 15 20 15 20;
+  -fx-background-color: transparent;
+  -fx-alignment: center;
+}
+
+.stats-box {
+  -fx-background-radius: 10;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 8, 0, 0, 4);
+  -fx-alignment: center;
+}
+
+.stats-box-dark {
+  -fx-background-color: linear-gradient(to bottom, #8b5a2b, #6b3a18);
+}
+
+.stats-box-light {
+  -fx-background-color: linear-gradient(to bottom, #9c6b3f, #7d5526);
+}
+
+.stats-number {
+  -fx-font-size: 48px;
+  -fx-font-weight: bold;
+  -fx-text-fill: #ffffff !important;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0, 0, 1);
+}
+
+.stats-label {
+  -fx-font-size: 14px;
+  -fx-font-weight: normal;
+  -fx-text-fill: #ffffff !important;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 2, 0, 0, 1);
+}
+
+.stats-box .label {
+  -fx-text-fill: #ffffff !important;
+}
+
+.label {
+  -fx-text-fill: #5c3317;
+}
+
