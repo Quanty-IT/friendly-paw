@@ -3,10 +3,9 @@ package modules.MedicineApplication.views;
 import config.Database;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import modules.MedicineApplication.controllers.MedicineApplicationController;
 import modules.Medicine.controllers.MedicineController;
 import modules.Animal.models.Animal;
@@ -42,19 +41,13 @@ public class MedicineApplicationForm extends VBox {
     private final ComboBox<MedicineApplication.Frequency> frequencyComboBox = new ComboBox<>();
     private final DatePicker nextDatePicker = new DatePicker();
     private final DatePicker endsDatePicker = new DatePicker();
-    private final CheckBox googleCalendarCheckBox = new CheckBox("Agendar no Google Calendar");
-    private final Button saveButton = new Button("Salvar Aplicação");
+    private final ComboBox<String> googleCalendarCombo = new ComboBox<>();
+    private final Button saveButton = new Button("Salvar");
+    private final Button backButton = new Button("Voltar");
 
-    /**
-     * Construtor do formulário de aplicação de medicamentos.
-     * 
-     * @param mainLayout Layout principal da aplicação
-     * @param selectedAnimal Animal selecionado para aplicação
-     */
     public MedicineApplicationForm(BorderPane mainLayout, Animal selectedAnimal) {
         this.mainLayout = mainLayout;
         this.selectedAnimal = selectedAnimal;
-        // Obtém o usuário logado da sessão
         this.currentUser = Session.get();
 
         try {
@@ -70,127 +63,237 @@ public class MedicineApplicationForm extends VBox {
         setupActions();
     }
 
-    /**
-     * Configura a interface do usuário do formulário.
-     */
+    // =========================
+    // UI
+    // =========================
     private void setupUI() {
-        setSpacing(10);
-        setPadding(new Insets(20));
+        // estilo base (igual AnimalForm/MedicineForm)
+        getStyleClass().add("form-bg");
+        setPadding(new Insets(30, 40, 30, 40));
+        setSpacing(18);
+        setAlignment(Pos.TOP_CENTER);
+        getStylesheets().add(getClass().getResource("/modules/MedicineApplication/styles/MedicineApplicationForm.css").toExternalForm());
 
+        // Título
+        Label title = new Label("Aplicar medicamento");
+        title.getStyleClass().add("form-title");
+        HBox titleBox = new HBox(title);
+        titleBox.setAlignment(Pos.CENTER);
+
+        // Larguras padrão
+        double HALF = 280, FULL = 580; double THIRD = 180;
+
+        // Animal (read-only)
         animalField.setText(selectedAnimal.getName());
-        // O campo do animal não pode ser editado, apenas exibido
-        animalField.setDisable(true);
+        animalField.setEditable(false);
+        animalField.setPrefWidth(FULL);
+        animalField.getStyleClass().add("form-input-readonly");
 
+        // Medicamento
+        medicineComboBox.setPromptText("Selecione um medicamento");
+        medicineComboBox.setPrefWidth(HALF);
+        medicineComboBox.getStyleClass().add("combo-box");
+
+        // Data de aplicação
+        appliedDatePicker.setPrefWidth(HALF);
+        appliedDatePicker.getStyleClass().add("date-picker");
+
+        // Quantidade
         quantityField.setPromptText("Ex: 1.5");
-        
-        // Configura o ComboBox de frequência com todos os valores disponíveis
+        quantityField.setPrefWidth(THIRD);
+        quantityField.getStyleClass().add("form-input");
+
+        // Google Calendar (Combo "Sim/Não")
+        googleCalendarCombo.getItems().addAll("Sim", "Não");
+        googleCalendarCombo.setPrefWidth(THIRD);
+        googleCalendarCombo.getStyleClass().add("combo-box");
+        googleCalendarCombo.setValue("Não");
+
+        // Frequência
+        frequencyComboBox.setPrefWidth(THIRD);
+        frequencyComboBox.getStyleClass().add("combo-box");
         frequencyComboBox.getItems().addAll(MedicineApplication.Frequency.values());
         frequencyComboBox.setPromptText("Selecione a frequência");
-        // Define valor padrão como "Não se repete"
         frequencyComboBox.setValue(MedicineApplication.Frequency.DOES_NOT_REPEAT);
-        
-        // Configura a exibição do enum na ComboBox para mostrar nomes em português
+        frequencyComboBox.setDisable(true);
         frequencyComboBox.setCellFactory(param -> new ListCell<>() {
-            @Override
-            protected void updateItem(MedicineApplication.Frequency item, boolean empty) {
+            @Override protected void updateItem(MedicineApplication.Frequency item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item.getDisplayName());
-                }
+                setText(empty || item == null ? null : item.getDisplayName());
             }
         });
         frequencyComboBox.setButtonCell(new ListCell<>() {
-            @Override
-            protected void updateItem(MedicineApplication.Frequency item, boolean empty) {
+            @Override protected void updateItem(MedicineApplication.Frequency item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item.getDisplayName());
-                }
-            }
-        });
-        
-        // Configura os eventos dos campos para habilitar/desabilitar campos relacionados
-        frequencyComboBox.setOnAction(e -> {
-            MedicineApplication.Frequency selectedFrequency = frequencyComboBox.getValue();
-            boolean isRecurring = selectedFrequency != null && selectedFrequency.isRecurring();
-            nextDatePicker.setDisable(!isRecurring);
-            endsDatePicker.setDisable(!isRecurring);
-        });
-        
-        googleCalendarCheckBox.setOnAction(e -> {
-            boolean useGoogleCalendar = googleCalendarCheckBox.isSelected();
-            frequencyComboBox.setDisable(!useGoogleCalendar);
-            if (!useGoogleCalendar) {
-                frequencyComboBox.setValue(MedicineApplication.Frequency.DOES_NOT_REPEAT);
-                nextDatePicker.setDisable(true);
-                endsDatePicker.setDisable(true);
+                setText(empty || item == null ? null : item.getDisplayName());
             }
         });
 
-        Button backButton = new Button("Voltar");
-        backButton.setOnAction(e -> this.mainLayout.setCenter(new AnimalView(this.mainLayout)));
+        // Próxima aplicação / Fim do tratamento
+        nextDatePicker.setDisable(true);
+        endsDatePicker.setDisable(true);
+        nextDatePicker.setPrefWidth(HALF);
+        endsDatePicker.setPrefWidth(HALF);
+        nextDatePicker.getStyleClass().add("date-picker");
+        endsDatePicker.getStyleClass().add("date-picker");
 
-        getChildren().addAll(
-                new Label("Animal:"), animalField,
-                new Label("Medicamento:"), medicineComboBox,
-                new Label("Data da Aplicação:"), appliedDatePicker,
-                new Label("Quantidade (Em mmg):"), quantityField,
-                googleCalendarCheckBox,
-                new Label("Frequência:"), frequencyComboBox,
-                new Label("Próxima Aplicação (opcional):"), nextDatePicker,
-                new Label("Fim do Tratamento (opcional):"), endsDatePicker,
-                new HBox(10, saveButton, backButton)
+        // Botões
+        backButton.getStyleClass().add("form-btn-cancel");
+        backButton.setPrefWidth(150);
+        saveButton.getStyleClass().add("form-btn-save");
+        saveButton.setPrefWidth(150);
+
+        // Layout (helpers iguais ao AnimalForm: blocos com label acima + wrapper centralizado)
+        VBox form = new VBox(20);
+        form.setAlignment(Pos.CENTER);
+
+        form.getChildren().setAll(
+                titleBox,
+                rowFull("Animal:", animalField, FULL),
+                rowHalf("Medicamento:", medicineComboBox, "Data da aplicação:", appliedDatePicker, HALF),
+
+                // 👇 NOVA LINHA COM 3 COLUNAS
+                rowThird(
+                        "Quantidade (em mg):",        quantityField,
+                        "Agendar no Google Calendar:", googleCalendarCombo,
+                        "Frequência:",                 frequencyComboBox,
+                        THIRD
+                ),
+
+                // 👇 LINHA ABAIXO COM 2 COLUNAS
+                rowHalf("Próxima aplicação (opcional):", nextDatePicker, "Fim do tratamento (opcional):", endsDatePicker, HALF)
         );
+
+        HBox buttons = new HBox(15, backButton, saveButton);
+        buttons.setAlignment(Pos.CENTER);
+
+        getChildren().setAll(form, buttons);
     }
 
-    /**
-     * Carrega os dados necessários para o formulário.
-     */
+    // Helpers visuais
+    private VBox rowFull(String labelText, Control field, double width) {
+        Label label = new Label(labelText);
+        label.getStyleClass().add("form-label");
+
+        HBox wrapper = new HBox(field);
+        wrapper.setAlignment(Pos.CENTER);
+        wrapper.setPrefWidth(width);
+        wrapper.setMaxWidth(width);
+
+        VBox box = new VBox(8, label, wrapper);
+        box.setAlignment(Pos.CENTER_LEFT);
+        box.setPrefWidth(width);
+        box.setMaxWidth(width);
+
+        // Checkbox alinhado à esquerda se aparecer em full
+        if (field instanceof CheckBox cb) {
+            wrapper.setAlignment(Pos.CENTER_LEFT);
+            cb.setMinWidth(24);
+        }
+        return box;
+    }
+
+    private HBox rowHalf(String l1, Control f1, String l2, Control f2, double width) {
+        VBox left = labeledBox(l1, f1, width);
+        VBox right = labeledBox(l2, f2, width);
+        HBox row = new HBox(20, left, right);
+        row.setAlignment(Pos.CENTER);
+        return row;
+    }
+
+    private VBox labeledBox(String labelText, Control field, double width) {
+        Label label = new Label(labelText);
+        label.getStyleClass().add("form-label");
+
+        HBox wrapper = new HBox(field);
+        wrapper.setAlignment(field instanceof CheckBox ? Pos.CENTER_LEFT : Pos.CENTER);
+        wrapper.setPrefWidth(width);
+        wrapper.setMaxWidth(width);
+
+        // larguras padrão para consistência
+        if (!(field instanceof DatePicker) && !(field instanceof ComboBox) && !(field instanceof CheckBox)) {
+            field.setPrefWidth(width);
+        }
+
+        VBox box = new VBox(8, label, wrapper);
+        box.setAlignment(Pos.CENTER_LEFT);
+        box.setPrefWidth(width);
+        box.setMaxWidth(width);
+        return box;
+    }
+
+    private HBox rowThird(String l1, Control f1, String l2, Control f2, String l3, Control f3, double widthEach) {
+        VBox c1 = labeledBox(l1, f1, widthEach);
+        VBox c2 = labeledBox(l2, f2, widthEach);
+        VBox c3 = labeledBox(l3, f3, widthEach);
+
+        HBox row = new HBox(20, c1, c2, c3);
+        row.setAlignment(Pos.CENTER);
+        return row;
+    }
+
+
+    // =========================
+    // Dados e ações
+    // =========================
     private void loadData() {
         try {
             medicineComboBox.setItems(FXCollections.observableArrayList(medicineController.listAll()));
-
-            // Configura a exibição do nome do medicamento na ComboBox
             medicineComboBox.setCellFactory(param -> new ListCell<>() {
-                @Override
-                protected void updateItem(Medicine item, boolean empty) {
+                @Override protected void updateItem(Medicine item, boolean empty) {
                     super.updateItem(item, empty);
-                    if (empty || item == null) {
-                        setText(null);
-                    } else {
-                        setText(item.getName());
-                    }
+                    setText(empty || item == null ? null : item.getName());
                 }
             });
             medicineComboBox.setButtonCell(new ListCell<>() {
-                @Override
-                protected void updateItem(Medicine item, boolean empty) {
+                @Override protected void updateItem(Medicine item, boolean empty) {
                     super.updateItem(item, empty);
-                    if (empty || item == null) {
-                        setText(null);
-                    } else {
-                        setText(item.getName());
-                    }
+                    setText(empty || item == null ? null : item.getName());
                 }
             });
-
         } catch (SQLException e) {
             showErrorAlert("Falha ao Carregar Dados", "Não foi possível carregar a lista de medicamentos.");
         }
     }
 
-    /**
-     * Configura as ações dos botões e eventos do formulário.
-     */
     private void setupActions() {
+        // toggle de recorrência conforme Google Calendar
+        frequencyComboBox.setOnAction(e -> {
+            boolean useGC = "Sim".equals(googleCalendarCombo.getValue());
+            if (!useGC) {
+                // se não for para usar o GC, mantém tudo travado
+                nextDatePicker.setDisable(true);
+                endsDatePicker.setDisable(true);
+                return;
+            }
+            var f = frequencyComboBox.getValue();
+            boolean isRecurring = f != null && f.isRecurring();
+            nextDatePicker.setDisable(!isRecurring);
+            endsDatePicker.setDisable(!isRecurring);
+        });
+
+        googleCalendarCombo.setOnAction(e -> {
+            boolean useGC = "Sim".equals(googleCalendarCombo.getValue());
+            frequencyComboBox.setDisable(!useGC);
+
+            if (!useGC) {
+                frequencyComboBox.setValue(MedicineApplication.Frequency.DOES_NOT_REPEAT);
+                nextDatePicker.setValue(null);
+                endsDatePicker.setValue(null);
+                nextDatePicker.setDisable(true);
+                endsDatePicker.setDisable(true);
+            } else {
+                boolean isRecurring = frequencyComboBox.getValue() != null && frequencyComboBox.getValue().isRecurring();
+                nextDatePicker.setDisable(!isRecurring);
+                endsDatePicker.setDisable(!isRecurring);
+            }
+        });
+
+        backButton.setOnAction(e -> this.mainLayout.setCenter(new AnimalView(this.mainLayout)));
+
         saveButton.setOnAction(event -> {
             try {
                 Medicine selectedMedicine = medicineComboBox.getValue();
-
                 if (selectedMedicine == null) {
                     showErrorAlert("Dados Incompletos", "Por favor, selecione um medicamento.");
                     return;
@@ -203,11 +306,15 @@ public class MedicineApplicationForm extends VBox {
 
                 LocalDate localDate = appliedDatePicker.getValue();
                 newApp.setAppliedAt(ZonedDateTime.of(localDate, LocalTime.now(), ZoneId.systemDefault()));
-                // Converte vírgula para ponto para aceitar formato brasileiro de números
-                newApp.setQuantity(new BigDecimal(quantityField.getText().replace(',', '.')));
-                
+
+                String qtyText = quantityField.getText() == null ? "" : quantityField.getText().trim();
+                if (qtyText.isEmpty()) {
+                    showErrorAlert("Dados Incompletos", "Informe a quantidade (ex: 1.5).");
+                    return;
+                }
+                newApp.setQuantity(new BigDecimal(qtyText.replace(',', '.')));
+
                 MedicineApplication.Frequency frequency = frequencyComboBox.getValue();
-                // Define frequência padrão se nenhuma foi selecionada
                 newApp.setFrequency(frequency != null ? frequency : MedicineApplication.Frequency.DOES_NOT_REPEAT);
 
                 if (nextDatePicker.getValue() != null) {
@@ -217,27 +324,22 @@ public class MedicineApplicationForm extends VBox {
                     newApp.setEndsAt(ZonedDateTime.of(endsDatePicker.getValue(), LocalTime.MIDNIGHT, ZoneId.systemDefault()));
                 }
 
-                // Cria evento no Google Calendar se o usuário solicitou
-                if (googleCalendarCheckBox.isSelected()) {
+                if ("Sim".equals(googleCalendarCombo.getValue())) {
                     try {
-                        // Usa a próxima aplicação como início, ou a aplicação atual se não houver próxima
-                        ZonedDateTime startDateTime = newApp.getNextApplicationAt() != null ? 
-                            newApp.getNextApplicationAt() : 
-                            newApp.getAppliedAt();
-                            
-                        // Cria o evento recorrente no Google Calendar
-                        String eventUuid = modules.MedicineApplication.services.GoogleCalendarService.createMedicineApplicationEvent(
-                            selectedAnimal.getName(),
-                            selectedMedicine.getName(),
-                            newApp.getQuantity().toString(),
-                            startDateTime,
-                            frequency,
-                            newApp.getEndsAt()
+                        ZonedDateTime startDateTime =
+                                newApp.getNextApplicationAt() != null ? newApp.getNextApplicationAt() : newApp.getAppliedAt();
+
+                        modules.MedicineApplication.services.GoogleCalendarService.createMedicineApplicationEvent(
+                                selectedAnimal.getName(),
+                                selectedMedicine.getName(),
+                                newApp.getQuantity().toString(),
+                                startDateTime,
+                                frequency,
+                                newApp.getEndsAt()
                         );
-                        
                     } catch (Exception calendarException) {
-                        showErrorAlert("Erro no Google Calendar", 
-                            "Não foi possível criar o evento no Google Calendar: " + calendarException.getMessage());
+                        showErrorAlert("Erro no Google Calendar",
+                                "Não foi possível criar o evento no Google Calendar: " + calendarException.getMessage());
                         calendarException.printStackTrace();
                     }
                 }
@@ -248,7 +350,6 @@ public class MedicineApplicationForm extends VBox {
                 alert.setHeaderText("Sucesso");
                 alert.showAndWait();
 
-                // Retorna para a tela de lista de animais após salvar
                 this.mainLayout.setCenter(new AnimalView(this.mainLayout));
 
             } catch (NumberFormatException e) {
@@ -260,12 +361,9 @@ public class MedicineApplicationForm extends VBox {
         });
     }
 
-    /**
-     * Exibe um alerta de erro na interface.
-     * 
-     * @param title Título do alerta
-     * @param message Mensagem de erro a ser exibida
-     */
+    // =========================
+    // Alerts
+    // =========================
     private void showErrorAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Erro");

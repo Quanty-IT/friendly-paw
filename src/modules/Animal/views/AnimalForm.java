@@ -129,6 +129,7 @@ public class AnimalForm extends GridPane {
         castratedComboBox.getItems().addAll("Sim", "Não");
         castratedComboBox.setPrefWidth(280);
         castratedComboBox.getStyleClass().add("combo-box");
+        castratedComboBox.setValue("Não");
 
         // larguras padronizadas
         double HALF = 280;
