@@ -1,11 +1,9 @@
-
 package modules.Attachment.views;
 
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import modules.Attachment.controllers.AttachmentController;
 import modules.Attachment.models.Attachment;
@@ -30,12 +28,6 @@ public class AttachmentForm extends GridPane {
     private BorderPane mainLayout;
     private UUID animalUuid;
 
-    /**
-     * Construtor do formulário de anexos.
-     * 
-     * @param mainLayout Layout principal da aplicação para navegação entre telas
-     * @param animalUuid UUID do animal associado ao anexo
-     */
     public AttachmentForm(BorderPane mainLayout, UUID animalUuid) {
         this.mainLayout = mainLayout;
         this.animalUuid = animalUuid;
@@ -49,100 +41,149 @@ public class AttachmentForm extends GridPane {
             e.printStackTrace();
         }
 
-        Button saveButton = new Button("Salvar");
-        saveButton.setOnAction(e -> saveAttachment());
+        // === estilo base (mesmo padrão do AnimalForm/MedicineForm) ===
+        getStyleClass().add("form-bg");
+        setPadding(new Insets(30, 40, 30, 40));
+        setHgap(20);
+        setVgap(14);
+        setAlignment(Pos.TOP_CENTER);
+        getStylesheets().add(getClass().getResource("/modules/Attachment/styles/AttachmentForm.css").toExternalForm());
 
-        Button backButton = new Button("Voltar");
-        backButton.setOnAction(e -> mainLayout.setCenter(new AnimalView(mainLayout)));
+        // ===== título =====
+        Label title = new Label("Adicionar anexo");
+        title.getStyleClass().add("form-title");
+        HBox titleBox = new HBox(title);
+        titleBox.setAlignment(Pos.CENTER);
+        add(titleBox, 0, 0, 4, 1);
 
-        HBox buttonBox = new HBox(10, saveButton, backButton);
+        // ===== campos =====
+        double HALF = 280, FULL = 580;
 
-        selectFileButton = new Button("Selecionar Arquivo");
+        // Botão Selecionar + campo nome/URL (lado a lado)
+        selectFileButton = new Button("Selecionar arquivo");
+        selectFileButton.getStyleClass().add("form-btn-upload");
+        selectFileButton.setPrefWidth(HALF);
         selectFileButton.setOnAction(e -> selectFile());
 
-        this.setVgap(10);
-        this.setHgap(10);
-        this.setPadding(new Insets(20, 20, 20, 20));
-
-        int row = 0;
-        this.add(new Label("Arquivo:"), 0, row); 
-        HBox fileBox = new HBox(10, selectFileButton);
-        this.add(fileBox, 1, row++);
-        
-        this.add(new Label("URL do arquivo:"), 0, row); this.add(urlField, 1, row++);
-        this.add(new Label("Descrição:"), 0, row); this.add(descriptionField, 1, row++);
-        this.add(buttonBox, 1, row);
-
-        urlField.setPrefWidth(240);
+        urlField.setPromptText("Arquivo selecionado / URL (Drive)");
         urlField.setEditable(false);
-        urlField.setStyle("-fx-background-color: #f0f0f0;");
-        descriptionField.setPrefWidth(240);
-        descriptionField.setPrefHeight(100);
+        urlField.setPrefWidth(HALF);
+        urlField.getStyleClass().add("form-input-readonly");
 
-        this.setPrefSize(520, 600);
+        descriptionField.setPromptText("Descrição (opcional)");
+        descriptionField.setPrefRowCount(5);
+        descriptionField.setPrefWidth(FULL);
+        descriptionField.getStyleClass().add("form-textarea");
+
+        // Linhas no mesmo layout helper do AnimalForm
+        int r = 1;
+        addRowHalf("Arquivo:", selectFileButton, "Nome/URL:", urlField, r++, HALF);
+        addRowFull("Descrição:", descriptionField, r++, FULL);
+
+        // ===== botões =====
+        Button backButton = new Button("Voltar");
+        backButton.getStyleClass().add("form-btn-cancel");
+        backButton.setPrefWidth(150);
+        backButton.setOnAction(e -> mainLayout.setCenter(new AnimalView(mainLayout)));
+
+        Button saveButton = new Button("Salvar");
+        saveButton.getStyleClass().add("form-btn-save");
+        saveButton.setPrefWidth(150);
+        saveButton.setOnAction(e -> saveAttachment());
+
+        HBox buttonBox = new HBox(15, backButton, saveButton);
+        buttonBox.setAlignment(Pos.CENTER);
+        add(buttonBox, 0, r, 4, 1);
+
+        setPrefSize(520, 600);
     }
 
-    /**
-     * Abre um diálogo para seleção de arquivo (PNG, JPEG, JPG ou PDF).
-     * O arquivo selecionado será usado para upload no Google Drive.
-     */
+    // ===== helpers de layout iguais aos do AnimalForm =====
+    private void addRowFull(String labelText, Control field, int row, double width) {
+        Label label = new Label(labelText);
+        label.getStyleClass().add("form-label");
+
+        HBox wrapper = new HBox(field);
+        wrapper.setAlignment(Pos.CENTER);
+        wrapper.setPrefWidth(width);
+        wrapper.setMaxWidth(width);
+
+        VBox box = new VBox(8, label, wrapper);
+        box.setPrefWidth(width);
+        box.setMaxWidth(width);
+        box.setAlignment(Pos.CENTER_LEFT);
+
+        add(box, 0, row, 4, 1);
+    }
+
+    private void addRowHalf(String l1, Control f1, String l2, Control f2, int row, double width) {
+        VBox left = buildLabeledBox(l1, f1, width);
+        VBox right = buildLabeledBox(l2, f2, width);
+
+        HBox rowBox = new HBox(20, left, right);
+        rowBox.setAlignment(Pos.CENTER);
+
+        add(rowBox, 0, row, 4, 1);
+    }
+
+    private VBox buildLabeledBox(String labelText, Control field, double width) {
+        if (labelText == null || labelText.isBlank()) labelText = " ";
+
+        Label label = new Label(labelText);
+        label.getStyleClass().add("form-label");
+
+        HBox wrapper = new HBox(field);
+        wrapper.setAlignment(Pos.CENTER);
+        wrapper.setPrefWidth(width);
+        wrapper.setMaxWidth(width);
+
+        VBox box = new VBox(8, label, wrapper);
+        box.setPrefWidth(width);
+        box.setMaxWidth(width);
+        box.setAlignment(Pos.CENTER_LEFT);
+        return box;
+    }
+
+    // ===== lógica =====
     private void selectFile() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Selecionar Arquivo");
-        
-        // Configura os filtros de extensão de arquivos aceitos (PNG, JPEG, JPG ou PDF)
+        fileChooser.setTitle("Selecionar arquivo");
         FileChooser.ExtensionFilter images = new FileChooser.ExtensionFilter("Imagens", "*.png", "*.jpg", "*.jpeg");
         FileChooser.ExtensionFilter pdf = new FileChooser.ExtensionFilter("PDF", "*.pdf");
-        FileChooser.ExtensionFilter allSupported = new FileChooser.ExtensionFilter("Todos Suportados", "*.png", "*.jpg", "*.jpeg", "*.pdf");
-        
-        fileChooser.getExtensionFilters().addAll(allSupported, images, pdf);
-        
+        FileChooser.ExtensionFilter all = new FileChooser.ExtensionFilter("Todos suportados", "*.png", "*.jpg", "*.jpeg", "*.pdf");
+        fileChooser.getExtensionFilters().addAll(all, images, pdf);
+
         selectedFile = fileChooser.showOpenDialog(null);
-        
+
         if (selectedFile != null) {
+            // Mostra o nome do arquivo no campo (continua read-only)
             urlField.setText(selectedFile.getName());
-            System.out.println("Arquivo selecionado: " + selectedFile.getAbsolutePath());
         }
     }
 
-    /**
-     * Salva um anexo no banco de dados após fazer upload do arquivo no Google Drive.
-     * Valida se um arquivo foi selecionado antes de prosseguir.
-     */
     private void saveAttachment() {
         if (selectedFile == null) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Aviso");
-            alert.setHeaderText("Nenhum arquivo selecionado");
-            alert.setContentText("Por favor, selecione um arquivo para fazer upload.");
-            alert.showAndWait();
+            new Alert(Alert.AlertType.WARNING, "Por favor, selecione um arquivo para fazer upload.").showAndWait();
             return;
         }
 
         String description = descriptionField.getText();
-        if (description != null && description.trim().isEmpty()) {
-            description = null;
-        }
+        if (description != null && description.trim().isEmpty()) description = null;
 
         try {
-            // Faz upload do arquivo para o Google Drive usando OAuth 2.0
-            // O arquivo é organizado na pasta do animal específico
             String fileUrl = GoogleDriveOAuthService.uploadFile(selectedFile, this.animalUuid);
-            System.out.println("Arquivo enviado para Google Drive: " + fileUrl);
 
-            // Cria o objeto Attachment (o UUID é gerado automaticamente pelo banco de dados)
             Attachment attachment = new Attachment(
-                    null, // UUID gerado automaticamente pelo banco de dados
-                    fileUrl,
-                    description,
-                    this.animalUuid,
-                    LocalDateTime.now()
+                null,
+                fileUrl,
+                description,
+                this.animalUuid,
+                LocalDateTime.now()
             );
 
             AttachmentController.addAttachment(conn, attachment);
-            System.out.println("Anexo adicionado com sucesso!");
             mainLayout.setCenter(new AttachmentView(mainLayout, this.animalUuid));
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR);
