@@ -266,7 +266,11 @@ public class AttachmentView extends VBox {
         backButton.getStyleClass().add("top-btn");
         backButton.setOnAction(e -> mainLayout.setCenter(new AnimalView(mainLayout)));
 
-        HBox rightBar = new HBox(15, addButton, backButton);
+        Button menuButton = new Button("Menu");
+        menuButton.getStyleClass().add("top-btn");
+        menuButton.setOnAction(e -> mainLayout.setCenter(new modules.Shared.views.MenuView(mainLayout, null)));
+
+        HBox rightBar = new HBox(15, addButton, backButton, menuButton);
         rightBar.setAlignment(Pos.CENTER_RIGHT);
 
         HBox leftBar = new HBox(logo);

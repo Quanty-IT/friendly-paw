@@ -84,7 +84,9 @@ public class AttachmentForm extends GridPane {
         Button backButton = new Button("Voltar");
         backButton.getStyleClass().add("form-btn-cancel");
         backButton.setPrefWidth(150);
-        backButton.setOnAction(e -> mainLayout.setCenter(new AnimalView(mainLayout)));
+        backButton.setOnAction(e ->
+            mainLayout.setCenter(new modules.Attachment.views.AttachmentView(mainLayout, animalUuid))
+        );
 
         Button saveButton = new Button("Salvar");
         saveButton.getStyleClass().add("form-btn-save");
