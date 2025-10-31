@@ -1,13 +1,11 @@
 package modules.Animal.views;
 
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import modules.Animal.controllers.AnimalController;
 import modules.Animal.models.Animal;
-import modules.Animal.views.AnimalView;
 import config.Database;
 
 import java.sql.Connection;
@@ -30,64 +28,19 @@ public class AnimalForm extends GridPane {
     private ComboBox<String> felvComboBox;
     private ComboBox<String> statusComboBox;
     private TextArea notesField;
-    private CheckBox castratedCheckBox;
+    private ComboBox<String> castratedComboBox;
 
     private Connection conn;
-    private BorderPane mainLayout;
+    private final BorderPane mainLayout;
+    private final Animal animalToEdit;
 
-    // Variável para guardar o animal que está sendo editado
-    private Animal animalToEdit;
-
-    /**
-     * Construtor para criação de novo animal.
-     * 
-     * @param mainLayout Layout principal da aplicação para navegação entre telas
-     */
     public AnimalForm(BorderPane mainLayout) {
-        // Chamada ao construtor de edição, passando null como animal
         this(mainLayout, null);
     }
 
-    /**
-     * Construtor para edição de animal existente ou criação de novo.
-     * 
-     * @param mainLayout Layout principal da aplicação para navegação entre telas
-     * @param animal Animal a ser editado (null para criação de novo animal)
-     */
     public AnimalForm(BorderPane mainLayout, Animal animal) {
         this.mainLayout = mainLayout;
         this.animalToEdit = animal;
-
-        nameField = new TextField();
-        sexComboBox = new ComboBox<>();
-        speciesComboBox = new ComboBox<>();
-        breedComboBox = new ComboBox<>();
-        sizeComboBox = new ComboBox<>();
-        colorComboBox = new ComboBox<>();
-        fivComboBox = new ComboBox<>();
-        felvComboBox = new ComboBox<>();
-        statusComboBox = new ComboBox<>();
-
-        sexComboBox.getItems().addAll("Macho", "Fêmea");
-        speciesComboBox.getItems().addAll("Cachorro", "Gato");
-        breedComboBox.getItems().addAll(
-                "S.R.D", "Shih-tzu", "Yorkshire Terrier", "Spitz Alemão",
-                "Buldogue Francês", "Poodle", "Lhasa Apso", "Golden Retriever",
-                "Rottweiler", "Labrador Retriever", "Pug", "Pastor Alemão",
-                "Border Collie", "Chihuahua de Pelo Longo", "Pastor Belga Malinois",
-                "Maltês"
-        );
-        sizeComboBox.getItems().addAll("Pequeno", "Médio", "Grande");
-        colorComboBox.getItems().addAll("Preto", "Branco", "Cinza", "Marrom", "Dourado", "Creme", "Canela", "Malhado");
-        fivComboBox.getItems().addAll("Sim", "Não", "Não testado");
-        felvComboBox.getItems().addAll("Sim", "Não", "Não testado");
-        statusComboBox.getItems().addAll("Quarentena", "Abrigado", "Adotado", "Perdido");
-
-        birthdateField = new DatePicker();
-        microchipField = new TextField();
-        rgaField = new TextField();
-        notesField = new TextArea();
-        castratedCheckBox = new CheckBox();
 
         try {
             this.conn = Database.getConnection();
@@ -95,159 +48,295 @@ public class AnimalForm extends GridPane {
             e.printStackTrace();
         }
 
-        Button saveButton = new Button("Salvar");
-        saveButton.setOnAction(e -> saveAnimal());
+        // estilo base
+        getStyleClass().add("form-bg");
+        setPadding(new Insets(30, 40, 30, 40));
+        setHgap(20);
+        setVgap(14);
+        setAlignment(Pos.TOP_CENTER);
+        getStylesheets().add(getClass().getResource("/modules/Animal/styles/AnimalForm.css").toExternalForm());
 
+        // título
+        Label title = new Label(animalToEdit == null ? "Cadastrar novo animal" : "Editar animal");
+        title.getStyleClass().add("form-title");
+
+        HBox titleBox = new HBox(title);
+        titleBox.setAlignment(Pos.CENTER);
+        add(titleBox, 0, 0, 4, 1);
+
+        // campos
+        nameField = new TextField();
+        nameField.setPromptText("Nome do animal");
+
+        sexComboBox = new ComboBox<>();
+        sexComboBox.getItems().addAll("Macho", "Fêmea");
+
+        speciesComboBox = new ComboBox<>();
+        speciesComboBox.getItems().addAll("Cachorro", "Gato");
+
+        breedComboBox = new ComboBox<>();
+        breedComboBox.getItems().addAll(
+            "S.R.D",
+            "Shih-tzu",
+            "Yorkshire Terrier",
+            "Spitz Alemão",
+            "Buldogue Francês",
+            "Poodle",
+            "Lhasa Apso",
+            "Golden Retriever",
+            "Rottweiler",
+            "Labrador Retriever",
+            "Pug",
+            "Pastor Alemão",
+            "Border Collie",
+            "Chihuahua de Pelo Longo",
+            "Pastor Belga Malinois",
+            "Maltês"
+        );
+
+        sizeComboBox = new ComboBox<>();
+        sizeComboBox.getItems().addAll("Pequeno", "Médio", "Grande");
+
+        colorComboBox = new ComboBox<>();
+        colorComboBox.getItems().addAll("Preto", "Branco", "Cinza", "Marrom", "Dourado", "Creme", "Canela", "Malhado");
+
+        fivComboBox = new ComboBox<>();
+        fivComboBox.getItems().addAll("Sim", "Não", "Não testado");
+
+        felvComboBox = new ComboBox<>();
+        felvComboBox.getItems().addAll("Sim", "Não", "Não testado");
+
+        statusComboBox = new ComboBox<>();
+        statusComboBox.getItems().addAll("Quarentena", "Abrigado", "Adotado", "Perdido");
+
+        birthdateField = new DatePicker();
+        birthdateField.setPromptText("Selecione a data");
+        birthdateField.setMinWidth(280);
+        birthdateField.setPrefWidth(280);
+        birthdateField.setMaxWidth(Double.MAX_VALUE);
+
+        microchipField = new TextField();
+        microchipField.setPromptText("Microchip (opcional)");
+
+        rgaField = new TextField();
+        rgaField.setPromptText("RGA (opcional)");
+
+        notesField = new TextArea();
+        notesField.setPromptText("Observações (opcional)");
+        notesField.setPrefRowCount(5);
+
+        castratedComboBox = new ComboBox<>();
+        castratedComboBox.getItems().addAll("Sim", "Não");
+        castratedComboBox.setPrefWidth(280);
+        castratedComboBox.getStyleClass().add("combo-box");
+
+        // larguras padronizadas
+        double HALF = 280;
+        double FULL = 580;
+
+        nameField.setPrefWidth(FULL);
+        notesField.setPrefWidth(FULL);
+
+        sexComboBox.setPrefWidth(HALF);
+        speciesComboBox.setPrefWidth(HALF);
+        breedComboBox.setPrefWidth(HALF);
+        sizeComboBox.setPrefWidth(HALF);
+        colorComboBox.setPrefWidth(HALF);
+        birthdateField.setPrefWidth(HALF);
+        microchipField.setPrefWidth(HALF);
+        rgaField.setPrefWidth(HALF);
+        fivComboBox.setPrefWidth(HALF);
+        felvComboBox.setPrefWidth(HALF);
+        statusComboBox.setPrefWidth(HALF);
+
+        // classes de estilo
+        addClass(nameField, "form-input");
+        addClass(microchipField, "form-input");
+        addClass(rgaField, "form-input");
+        addClass(notesField, "form-textarea");
+        addClass(sexComboBox, "combo-box");
+        addClass(speciesComboBox, "combo-box");
+        addClass(breedComboBox, "combo-box");
+        addClass(sizeComboBox, "combo-box");
+        addClass(colorComboBox, "combo-box");
+        addClass(fivComboBox, "combo-box");
+        addClass(felvComboBox, "combo-box");
+        addClass(statusComboBox, "combo-box");
+        addClass(birthdateField, "date-picker");
+
+        // linhas
+        int r = 1;
+
+        addRowFull("Nome:", nameField, r++, FULL);
+        addRowHalf("Sexo:", sexComboBox, "Espécie:", speciesComboBox, r++, HALF);
+        addRowHalf("Raça:", breedComboBox, "Porte:", sizeComboBox, r++, HALF);
+        addRowHalf("Cor:", colorComboBox, "Nascimento:", birthdateField, r++, HALF);
+        addRowHalf("Microchip:", microchipField, "RGA:", rgaField, r++, HALF);
+        addRowHalf("FIV:", fivComboBox, "FeLV:", felvComboBox, r++, HALF);
+        addRowHalf("Status:", statusComboBox, "Castrado:", castratedComboBox, r++, HALF);
+        addRowFull("Observações:", notesField, r++, FULL);
+
+        // botões
         Button backButton = new Button("Voltar");
+        backButton.getStyleClass().add("form-btn-cancel");
+        backButton.setPrefWidth(150);
         backButton.setOnAction(e -> mainLayout.setCenter(new AnimalView(mainLayout)));
 
-        HBox buttonBox = new HBox(10, saveButton, backButton);
+        Button saveButton = new Button(animalToEdit == null ? "Salvar" : "Atualizar");
+        saveButton.getStyleClass().add("form-btn-save");
+        saveButton.setPrefWidth(150);
+        saveButton.setOnAction(e -> saveAnimal());
 
-        this.setVgap(10);
-        this.setHgap(10);
-        this.setPadding(new Insets(20, 20, 20, 20));
+        HBox buttons = new HBox(15, backButton, saveButton);
+        buttons.setAlignment(Pos.CENTER);
+        add(buttons, 0, r, 4, 1);
 
-        int row = 0;
-        this.add(new Label("Nome:"), 0, row); this.add(nameField, 1, row++);
-        this.add(new Label("Sexo:"), 0, row); this.add(sexComboBox, 1, row++);
-        this.add(new Label("Espécie:"), 0, row); this.add(speciesComboBox, 1, row++);
-        this.add(new Label("Raça:"), 0, row); this.add(breedComboBox, 1, row++);
-        this.add(new Label("Tamanho:"), 0, row); this.add(sizeComboBox, 1, row++);
-        this.add(new Label("Cor:"), 0, row); this.add(colorComboBox, 1, row++);
-        this.add(new Label("Nascimento:"), 0, row); this.add(birthdateField, 1, row++);
-        this.add(new Label("Microchip:"), 0, row); this.add(microchipField, 1, row++);
-        this.add(new Label("RGA:"), 0, row); this.add(rgaField, 1, row++);
-        this.add(new Label("Castrado:"), 0, row); this.add(castratedCheckBox, 1, row++);
-        this.add(new Label("FIV:"), 0, row); this.add(fivComboBox, 1, row++);
-        this.add(new Label("FeLV:"), 0, row); this.add(felvComboBox, 1, row++);
-        this.add(new Label("Status:"), 0, row); this.add(statusComboBox, 1, row++);
-        this.add(new Label("Observações:"), 0, row); this.add(notesField, 1, row++);
-        this.add(saveButton, 1, row);
-        this.add(buttonBox, 2, row);
-
-        nameField.setPrefWidth(240);
-        sexComboBox.setPrefWidth(240);
-        speciesComboBox.setPrefWidth(240);
-        breedComboBox.setPrefWidth(240);
-        sizeComboBox.setPrefWidth(240);
-        colorComboBox.setPrefWidth(240);
-        microchipField.setPrefWidth(240);
-        rgaField.setPrefWidth(240);
-        notesField.setPrefWidth(240);
-        notesField.setPrefHeight(100);
-
-        this.setPrefSize(520, 600);
-
-        // Se houver um animal para editar, preenche o formulário com os dados existentes
-        if (this.animalToEdit != null) {
-            // Pré-preenche todos os campos do formulário com os dados do animal
-            nameField.setText(this.animalToEdit.getName());
-            sexComboBox.setValue(convertSexToPt(this.animalToEdit.getSex()));
-            speciesComboBox.setValue(convertSpeciesToPt(this.animalToEdit.getSpecies()));
-            breedComboBox.setValue(convertBreedToPt(this.animalToEdit.getBreed()));
-            sizeComboBox.setValue(convertSizeToPt(this.animalToEdit.getSize()));
-            colorComboBox.setValue(convertColorToPt(this.animalToEdit.getColor()));
-            birthdateField.setValue(this.animalToEdit.getBirthdate());
-            microchipField.setText(this.animalToEdit.getMicrochip());
-            rgaField.setText(this.animalToEdit.getRga());
-            castratedCheckBox.setSelected(this.animalToEdit.getCastrated());
-            fivComboBox.setValue(convertYesNoNotTestedToPt(this.animalToEdit.getFiv()));
-            felvComboBox.setValue(convertYesNoNotTestedToPt(this.animalToEdit.getFelv()));
-            statusComboBox.setValue(convertStatusToPt(this.animalToEdit.getStatus()));
-            notesField.setText(this.animalToEdit.getNotes());
-
-            // Altera o texto do botão para indicar que está em modo de edição
-            saveButton.setText("Atualizar");
+        // modo edição
+        if (animalToEdit != null) {
+            nameField.setText(animalToEdit.getName());
+            sexComboBox.setValue(convertSexToPt(animalToEdit.getSex()));
+            speciesComboBox.setValue(convertSpeciesToPt(animalToEdit.getSpecies()));
+            breedComboBox.setValue(convertBreedToPt(animalToEdit.getBreed()));
+            sizeComboBox.setValue(convertSizeToPt(animalToEdit.getSize()));
+            colorComboBox.setValue(convertColorToPt(animalToEdit.getColor()));
+            birthdateField.setValue(animalToEdit.getBirthdate());
+            microchipField.setText(animalToEdit.getMicrochip());
+            rgaField.setText(animalToEdit.getRga());
+            castratedComboBox.setValue(animalToEdit.getCastrated() ? "Sim" : "Não");
+            fivComboBox.setValue(convertYesNoNotTestedToPt(animalToEdit.getFiv()));
+            felvComboBox.setValue(convertYesNoNotTestedToPt(animalToEdit.getFelv()));
+            statusComboBox.setValue(convertStatusToPt(animalToEdit.getStatus()));
+            notesField.setText(animalToEdit.getNotes());
         }
     }
 
-    /**
-     * Salva ou atualiza um animal no banco de dados.
-     * Verifica se o animal está sendo editado ou criado e chama o método apropriado do controller.
-     */
+    // Helpers de layout (mantendo seu padrão)
+    private void addRowFull(String labelText, Control field, int row, double width) {
+        Label label = new Label(labelText);
+        label.getStyleClass().add("form-label");
+
+        HBox wrapper = new HBox(field);
+        wrapper.setAlignment(Pos.CENTER);
+        wrapper.setPrefWidth(width);
+        wrapper.setMaxWidth(width);
+
+        VBox box = new VBox(8, label, wrapper);
+        box.setPrefWidth(width);
+        box.setMaxWidth(width);
+        box.setAlignment(Pos.CENTER_LEFT);
+
+        add(box, 0, row, 4, 1);
+    }
+
+    private void addRowHalf(String l1, Control f1, String l2, Control f2, int row, double width) {
+        VBox left = buildLabeledBox(l1, f1, width);
+        VBox right = buildLabeledBox(l2, f2, width);
+
+        HBox rowBox = new HBox(20, left, right);
+        rowBox.setAlignment(Pos.CENTER);
+
+        add(rowBox, 0, row, 4, 1);
+    }
+
+    private VBox buildLabeledBox(String labelText, Control field, double width) {
+        if (labelText == null || labelText.isBlank()) {
+            labelText = " ";
+        }
+
+        Label label = new Label(labelText);
+        label.getStyleClass().add("form-label");
+
+        HBox wrapper = new HBox(field);
+        wrapper.setAlignment(field instanceof CheckBox ? Pos.CENTER_LEFT : Pos.CENTER);
+        wrapper.setPrefWidth(width);
+        wrapper.setMaxWidth(width);
+
+        VBox box = new VBox(8, label, wrapper);
+        box.setPrefWidth(width);
+        box.setMaxWidth(width);
+        box.setAlignment(Pos.CENTER_LEFT);
+
+        return box;
+    }
+
+    private void addClass(Control c, String cls) {
+        c.getStyleClass().add(cls);
+    }
+
+    // salvar
     private void saveAnimal() {
         String name = nameField.getText();
+
         String sex = sexComboBox.getValue() != null ? convertSex(sexComboBox.getValue()) : null;
         String species = speciesComboBox.getValue() != null ? convertSpecies(speciesComboBox.getValue()) : null;
         String breed = breedComboBox.getValue() != null ? convertBreed(breedComboBox.getValue()) : null;
         String size = sizeComboBox.getValue() != null ? convertSize(sizeComboBox.getValue()) : null;
         String color = colorComboBox.getValue() != null ? convertColor(colorComboBox.getValue()) : null;
+
         LocalDate birthdate = birthdateField.getValue();
+
         String microchip = microchipField.getText();
         String rga = rgaField.getText();
+
         String fiv = fivComboBox.getValue() != null ? convertYesNoNotTested(fivComboBox.getValue()) : null;
         String felv = felvComboBox.getValue() != null ? convertYesNoNotTested(felvComboBox.getValue()) : null;
         String status = statusComboBox.getValue() != null ? convertStatus(statusComboBox.getValue()) : null;
-        String notes = notesField.getText();
-        boolean castrated = castratedCheckBox.isSelected();
 
-        // Cria o objeto Animal com os dados do formulário
-        // Se estiver editando, preserva o UUID e a data de criação originais
+        String notes = notesField.getText();
+        boolean castrated = "Sim".equals(castratedComboBox.getValue());
+
         Animal animal = new Animal(
-                this.animalToEdit != null ? this.animalToEdit.getUuid() : null, // Em edição, mantém o UUID original
-                name, sex, species, breed, size, color, birthdate,
-                microchip, rga, castrated, fiv, felv, status, notes,
-                this.animalToEdit != null ? this.animalToEdit.getCreatedAt() : LocalDateTime.now(), // Em edição, mantém a data de criação original
-                LocalDateTime.now() // Sempre atualiza a data de modificação
+            animalToEdit != null ? animalToEdit.getUuid() : null,
+            name,
+            sex,
+            species,
+            breed,
+            size,
+            color,
+            birthdate,
+            microchip,
+            rga,
+            castrated,
+            fiv,
+            felv,
+            status,
+            notes,
+            animalToEdit != null ? animalToEdit.getCreatedAt() : LocalDateTime.now(),
+            LocalDateTime.now()
         );
 
         try {
-            if (this.animalToEdit == null) {
-                // Modo de criação: adiciona um novo animal ao banco de dados
+            if (animalToEdit == null) {
                 AnimalController.addAnimal(conn, animal);
-                System.out.println("Animal adicionado com sucesso!");
-                clearForm();
             } else {
-                // Modo de edição: atualiza os dados do animal existente
                 AnimalController.updateAnimal(conn, animal);
-                System.out.println("Animal atualizado com sucesso!");
             }
-            // Retorna para a tela de lista de animais após salvar
             mainLayout.setCenter(new AnimalView(mainLayout));
         } catch (SQLException e) {
             e.printStackTrace();
+            new Alert(Alert.AlertType.ERROR, "Erro ao salvar animal: " + e.getMessage()).showAndWait();
         }
     }
 
-    /**
-     * Limpa todos os campos do formulário.
-     */
-    private void clearForm() {
-        nameField.clear();
-        sexComboBox.getSelectionModel().clearSelection();
-        speciesComboBox.getSelectionModel().clearSelection();
-        breedComboBox.getSelectionModel().clearSelection();
-        sizeComboBox.getSelectionModel().clearSelection();
-        colorComboBox.getSelectionModel().clearSelection();
-        birthdateField.setValue(null);
-        microchipField.clear();
-        rgaField.clear();
-        fivComboBox.getSelectionModel().clearSelection();
-        felvComboBox.getSelectionModel().clearSelection();
-        statusComboBox.getSelectionModel().clearSelection();
-        notesField.clear();
-        castratedCheckBox.setSelected(false);
-    }
-
-    // Métodos auxiliares para conversão entre valores em português e inglês
-    private String convertSex(String value) {
-        return switch (value) {
+    // Converters (mantidos)
+    private String convertSex(String v) {
+        return switch (v) {
             case "Macho" -> "male";
             case "Fêmea" -> "female";
             default -> null;
         };
     }
 
-    private String convertSpecies(String value) {
-        return switch (value) {
+    private String convertSpecies(String v) {
+        return switch (v) {
             case "Cachorro" -> "dog";
             case "Gato" -> "cat";
             default -> null;
         };
     }
 
-    private String convertBreed(String value) {
-        return switch (value) {
+    private String convertBreed(String v) {
+        return switch (v) {
             case "S.R.D" -> "mixed-breed";
             case "Shih-tzu" -> "shih-tzu";
             case "Yorkshire Terrier" -> "yorkshire-terrier";
@@ -268,8 +357,8 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertSize(String value) {
-        return switch (value) {
+    private String convertSize(String v) {
+        return switch (v) {
             case "Pequeno" -> "small";
             case "Médio" -> "medium";
             case "Grande" -> "large";
@@ -277,8 +366,8 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertColor(String value) {
-        return switch (value) {
+    private String convertColor(String v) {
+        return switch (v) {
             case "Preto" -> "black";
             case "Branco" -> "white";
             case "Cinza" -> "gray";
@@ -291,8 +380,8 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertYesNoNotTested(String value) {
-        return switch (value) {
+    private String convertYesNoNotTested(String v) {
+        return switch (v) {
             case "Sim" -> "yes";
             case "Não" -> "no";
             case "Não testado" -> "not-tested";
@@ -300,8 +389,8 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertStatus(String value) {
-        return switch (value) {
+    private String convertStatus(String v) {
+        return switch (v) {
             case "Quarentena" -> "quarantine";
             case "Abrigado" -> "sheltered";
             case "Adotado" -> "adopted";
@@ -310,24 +399,24 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertSexToPt(String value) {
-        return switch (value) {
+    private String convertSexToPt(String v) {
+        return switch (v) {
             case "male" -> "Macho";
             case "female" -> "Fêmea";
             default -> null;
         };
     }
 
-    private String convertSpeciesToPt(String value) {
-        return switch (value) {
+    private String convertSpeciesToPt(String v) {
+        return switch (v) {
             case "dog" -> "Cachorro";
             case "cat" -> "Gato";
             default -> null;
         };
     }
 
-    private String convertBreedToPt(String value) {
-        return switch (value) {
+    private String convertBreedToPt(String v) {
+        return switch (v) {
             case "mixed-breed" -> "S.R.D";
             case "shih-tzu" -> "Shih-tzu";
             case "yorkshire-terrier" -> "Yorkshire Terrier";
@@ -348,8 +437,8 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertSizeToPt(String value) {
-        return switch (value) {
+    private String convertSizeToPt(String v) {
+        return switch (v) {
             case "small" -> "Pequeno";
             case "medium" -> "Médio";
             case "large" -> "Grande";
@@ -357,8 +446,8 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertColorToPt(String value) {
-        return switch (value) {
+    private String convertColorToPt(String v) {
+        return switch (v) {
             case "black" -> "Preto";
             case "white" -> "Branco";
             case "gray" -> "Cinza";
@@ -371,8 +460,8 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertYesNoNotTestedToPt(String value) {
-        return switch (value) {
+    private String convertYesNoNotTestedToPt(String v) {
+        return switch (v) {
             case "yes" -> "Sim";
             case "no" -> "Não";
             case "not-tested" -> "Não testado";
@@ -380,8 +469,8 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertStatusToPt(String value) {
-        return switch (value) {
+    private String convertStatusToPt(String v) {
+        return switch (v) {
             case "quarantine" -> "Quarentena";
             case "sheltered" -> "Abrigado";
             case "adopted" -> "Adotado";
