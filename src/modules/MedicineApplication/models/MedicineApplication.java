@@ -12,88 +12,34 @@ public class MedicineApplication {
         WEEKLY("Semanal"),
         MONTHLY("Mensal"),
         ANNUALLY("Anual"),
-        EVERY_WEEKDAY("Todos os dias úteis");
+        EVERY_WEEKDAY("Dias úteis");
 
         private final String displayName;
+        Frequency(String displayName) { this.displayName = displayName; }
+        public String getDisplayName() { return displayName; }
+        @Override public String toString() { return displayName; }
 
-        /**
-         * Construtor do enum Frequency.
-         * 
-         * @param displayName Nome para exibição em português
-         */
-        Frequency(String displayName) {
-            this.displayName = displayName;
-        }
-
-        /**
-         * Retorna o nome para exibição da frequência.
-         * 
-         * @return Nome em português da frequência
-         */
-        public String getDisplayName() {
-            return displayName;
-        }
-
-        /**
-         * Retorna a representação em string da frequência.
-         * 
-         * @return Nome para exibição da frequência
-         */
-        @Override
-        public String toString() {
-            return displayName;
-        }
-
-        /**
-         * Converte a frequência para formato RRULE do Google Calendar.
-         * 
-         * @param endDate Data de fim da recorrência (opcional)
-         * @return String RRULE válida ou null se não se repete
-         */
-        public String toRRULE(java.time.ZonedDateTime endDate) {
-            if (this == DOES_NOT_REPEAT) {
-                return null;
-            }
+        public String toRRULE(ZonedDateTime endDate) {
+            if (this == DOES_NOT_REPEAT) return null;
 
             StringBuilder rule = new StringBuilder("RRULE:");
-            
             switch (this) {
-                case DAILY:
-                    rule.append("FREQ=DAILY");
-                    break;
-                case WEEKLY:
-                    rule.append("FREQ=WEEKLY");
-                    break;
-                case MONTHLY:
-                    rule.append("FREQ=MONTHLY");
-                    break;
-                case ANNUALLY:
-                    rule.append("FREQ=YEARLY");
-                    break;
-                case EVERY_WEEKDAY:
-                    rule.append("FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR");
-                    break;
+                case DAILY -> rule.append("FREQ=DAILY");
+                case WEEKLY -> rule.append("FREQ=WEEKLY");
+                case MONTHLY -> rule.append("FREQ=MONTHLY");
+                case ANNUALLY -> rule.append("FREQ=YEARLY");
+                case EVERY_WEEKDAY -> rule.append("FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR");
             }
 
-            // Adicionar data de fim se especificada (incluindo o dia final)
             if (endDate != null) {
-                // Adicionar 1 dia para incluir o dia final na recorrência
-                java.time.ZonedDateTime endDateInclusive = endDate.plusDays(1);
-                String endDateStr = endDateInclusive.format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"));
-                rule.append(";UNTIL=").append(endDateStr);
+                // inclui o dia final (convenção mais amigável para o usuário)
+                String until = endDate.plusDays(1).format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"));
+                rule.append(";UNTIL=").append(until);
             }
-
             return rule.toString();
         }
 
-        /**
-         * Verifica se a frequência é recorrente.
-         * 
-         * @return true se é recorrente, false caso contrário
-         */
-        public boolean isRecurring() {
-            return this != DOES_NOT_REPEAT;
-        }
+        public boolean isRecurring() { return this != DOES_NOT_REPEAT; }
     }
 
     private UUID applicationUuid;
@@ -107,8 +53,11 @@ public class MedicineApplication {
     private ZonedDateTime endsAt;
     private ZonedDateTime createdAt;
 
-    public MedicineApplication() {
-    }
+    public MedicineApplication() {}
+
+    // Alias compatível com getUuid()/setUuid()
+    public UUID getUuid() { return applicationUuid; }
+    public void setUuid(UUID uuid) { this.applicationUuid = uuid; }
 
     public UUID getApplicationUuid() { return applicationUuid; }
     public void setApplicationUuid(UUID applicationUuid) { this.applicationUuid = applicationUuid; }
@@ -139,4 +88,9 @@ public class MedicineApplication {
 
     public ZonedDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(ZonedDateTime createdAt) { this.createdAt = createdAt; }
+
+    @Override public String toString() {
+        return "MedicineApplication{uuid=%s, animal=%s, med=%s, qty=%s}"
+                .formatted(applicationUuid, animalUuid, medicineUuid, quantity);
+    }
 }

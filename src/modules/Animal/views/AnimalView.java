@@ -13,6 +13,7 @@ import javafx.scene.layout.*;
 import javafx.scene.shape.SVGPath;
 import modules.Animal.controllers.AnimalController;
 import modules.Animal.models.Animal;
+import modules.MedicineApplication.views.MedicineApplicationView;
 import modules.Shared.views.MenuView;
 import modules.Attachment.views.AttachmentView;
 import modules.MedicineApplication.views.MedicineApplicationForm;
@@ -284,7 +285,7 @@ public class AnimalView extends VBox {
                 pane.setPickOnBounds(false);
 
                 attachmentsButton.setTooltip(new Tooltip("Anexos"));
-                applyMedicineBtn.setTooltip(new Tooltip("Aplicar medicamento"));
+                applyMedicineBtn.setTooltip(new Tooltip("Medicamentos Aplicados"));
                 editButton.setTooltip(new Tooltip("Editar"));
                 deleteButton.setTooltip(new Tooltip("Excluir"));
 
@@ -326,9 +327,10 @@ public class AnimalView extends VBox {
                 applyMedicineBtn.setOnAction(event -> {
                     Animal animal = getTableView().getItems().get(getIndex());
                     if (animal != null) {
-                        AnimalView.this.mainLayout.setCenter(new MedicineApplicationForm(AnimalView.this.mainLayout, animal));
+                        mainLayout.setCenter(new MedicineApplicationView(mainLayout, animal));
                     }
                 });
+
             }
 
             @Override
