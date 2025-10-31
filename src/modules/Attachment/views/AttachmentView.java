@@ -14,6 +14,7 @@ import modules.Attachment.controllers.AttachmentController;
 import modules.Attachment.models.Attachment;
 import modules.Animal.views.AnimalView;
 import config.Database;
+import modules.Shared.views.MenuView;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -253,6 +254,13 @@ public class AttachmentView extends VBox {
         logo.setFitWidth(140);
         logo.setPreserveRatio(true);
 
+        Button logoBtn = new Button();
+        logoBtn.setGraphic(logo);
+        logoBtn.setOnAction(e -> mainLayout.setCenter(new MenuView(mainLayout, null)));
+        logoBtn.setCursor(javafx.scene.Cursor.HAND);
+        logoBtn.setStyle("-fx-background-color: transparent; -fx-padding: 0; -fx-border-color: transparent;");
+        logoBtn.setFocusTraversable(false);
+
         // Título centralizado
         Label title = new Label("Anexos");
         title.getStyleClass().add("title");
@@ -266,21 +274,26 @@ public class AttachmentView extends VBox {
         backButton.getStyleClass().add("top-btn");
         backButton.setOnAction(e -> mainLayout.setCenter(new AnimalView(mainLayout)));
 
-        Button menuButton = new Button("Menu");
-        menuButton.getStyleClass().add("top-btn");
-        menuButton.setOnAction(e -> mainLayout.setCenter(new modules.Shared.views.MenuView(mainLayout, null)));
-
-        HBox rightBar = new HBox(15, addButton, backButton, menuButton);
+        HBox rightBar = new HBox(15, addButton);
         rightBar.setAlignment(Pos.CENTER_RIGHT);
 
-        HBox leftBar = new HBox(logo);
+        HBox leftBar = new HBox(logoBtn);
         leftBar.setAlignment(Pos.CENTER_LEFT);
 
-        StackPane topBar = new StackPane(leftBar, title, rightBar);
-        StackPane.setAlignment(leftBar, Pos.CENTER_LEFT);
-        StackPane.setAlignment(title, Pos.CENTER);
-        StackPane.setAlignment(rightBar, Pos.CENTER_RIGHT);
+        var sideMaxWidth = javafx.beans.binding.Bindings.max(leftBar.widthProperty(), rightBar.widthProperty());
+        leftBar.minWidthProperty().bind(sideMaxWidth);
+        rightBar.minWidthProperty().bind(sideMaxWidth);
+
+        BorderPane topBar = new BorderPane();
+        topBar.setLeft(leftBar);
+        topBar.setCenter(title);
+        topBar.setRight(rightBar);
+        BorderPane.setAlignment(title, Pos.CENTER);
         topBar.setPadding(new Insets(30, 60, 0, 60));
+
+        title.setMaxWidth(Region.USE_PREF_SIZE);
+        rightBar.setMaxWidth(Region.USE_PREF_SIZE);
+        leftBar.setMaxWidth(Region.USE_PREF_SIZE);
 
         VBox content = new VBox(30, tableView);
         content.setAlignment(Pos.CENTER);

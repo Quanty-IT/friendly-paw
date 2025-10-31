@@ -54,6 +54,13 @@ public class MenuView extends VBox {
         logo.setFitWidth(140);
         logo.setPreserveRatio(true);
 
+        Button logoBtn = new Button();
+        logoBtn.setGraphic(logo);
+        logoBtn.setOnAction(e -> mainLayout.setCenter(new MenuView(mainLayout, null)));
+        logoBtn.setCursor(javafx.scene.Cursor.HAND);
+        logoBtn.setStyle("-fx-background-color: transparent; -fx-padding: 0; -fx-border-color: transparent;");
+        logoBtn.setFocusTraversable(false);
+
         // Título centralizado no topo
         Label title = new Label("Menu");
         title.getStyleClass().add("menu-title");
@@ -93,28 +100,26 @@ public class MenuView extends VBox {
         buttonBar.setAlignment(Pos.CENTER_RIGHT);
 
         // Layout usando StackPane para centralizar o título absolutamente
-        HBox leftSection = new HBox(logo);
-        leftSection.setAlignment(Pos.CENTER_LEFT);
+        HBox leftBar = new HBox(logoBtn);
+        leftBar.setAlignment(Pos.CENTER_LEFT);
         
-        HBox rightSection = new HBox(buttonBar);
-        rightSection.setAlignment(Pos.CENTER_RIGHT);
+        HBox rightBar = new HBox(buttonBar);
+        rightBar.setAlignment(Pos.CENTER_RIGHT);
+
+        var sideMaxWidth = javafx.beans.binding.Bindings.max(leftBar.widthProperty(), rightBar.widthProperty());
+        leftBar.minWidthProperty().bind(sideMaxWidth);
+        rightBar.minWidthProperty().bind(sideMaxWidth);
         
-        // StackPane permite que o título fique centralizado absolutamente
-        StackPane topBar = new StackPane();
-        topBar.getChildren().addAll(leftSection, title, rightSection);
-        
-        // Define alinhamento: logo à esquerda, título no centro, botões à direita
-        StackPane.setAlignment(leftSection, Pos.CENTER_LEFT);
-        StackPane.setAlignment(title, Pos.CENTER);
-        StackPane.setAlignment(rightSection, Pos.CENTER_RIGHT);
-        
-        // Garante que leftSection e rightSection não ocupem todo o espaço
-        leftSection.setMaxWidth(Double.MAX_VALUE);
-        rightSection.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(leftSection, Priority.ALWAYS);
-        HBox.setHgrow(rightSection, Priority.ALWAYS);
-        
+        BorderPane topBar = new BorderPane();
+        topBar.setLeft(leftBar);
+        topBar.setCenter(title);
+        topBar.setRight(rightBar);
+        BorderPane.setAlignment(title, Pos.CENTER);
         topBar.setPadding(new Insets(30, 60, 0, 60));
+
+        title.setMaxWidth(Region.USE_PREF_SIZE);
+        rightBar.setMaxWidth(Region.USE_PREF_SIZE);
+        leftBar.setMaxWidth(Region.USE_PREF_SIZE);
 
         // Área de estatísticas - três colunas
         VBox statisticsContainer = createStatisticsContainer();

@@ -333,12 +333,7 @@ public class MedicineView extends VBox {
             javafx.scene.Group wrapper = new javafx.scene.Group();
             wrapper.getChildren().add(svgGroup);
             
-            // Calcula o tamanho após a escala
-            double scaledWidth = viewBoxWidth * scale;
-            double scaledHeight = viewBoxHeight * scale;
-            
-            // Centraliza o SVG movendo para que seu canto superior esquerdo fique no centro
-            // Depois aplica a escala e ajusta para centralizar no espaço 18x18
+            // Centraliza
             svgGroup.setTranslateX(-viewBoxWidth / 2);
             svgGroup.setTranslateY(-viewBoxHeight / 2);
             
@@ -346,8 +341,7 @@ public class MedicineView extends VBox {
             wrapper.setScaleX(scale);
             wrapper.setScaleY(scale);
             
-            // Adiciona ao pane - o StackPane vai centralizar automaticamente
-            // já que o conteúdo está centralizado em relação a (0,0) após a escala
+            // Adiciona ao pane
             iconPane.getChildren().add(wrapper);
             
         } catch (Exception e) {
@@ -405,10 +399,17 @@ public class MedicineView extends VBox {
      * Configura o layout principal da view, incluindo logo, título e botões de ação.
      */
     private void setupLayout() {
-        // Logo no topo esquerdo
+        // Logo no topo esquerdo (clicável -> Menu)
         ImageView logo = new ImageView(new Image(getClass().getResourceAsStream("/assets/logo.png")));
         logo.setFitWidth(140);
         logo.setPreserveRatio(true);
+
+        Button logoBtn = new Button();
+        logoBtn.setGraphic(logo);
+        logoBtn.setOnAction(e -> returnToMainMenu());
+        logoBtn.setCursor(javafx.scene.Cursor.HAND);
+        logoBtn.setStyle("-fx-background-color: transparent; -fx-padding: 0; -fx-border-color: transparent;");
+        logoBtn.setFocusTraversable(false);
 
         // Título centralizado no topo
         Label title = new Label("Medicamentos");
@@ -417,14 +418,11 @@ public class MedicineView extends VBox {
         // Botões de ação no topo direito
         ImageView paw1 = new ImageView(new Image(getClass().getResourceAsStream("/assets/patas.png")));
         ImageView paw2 = new ImageView(new Image(getClass().getResourceAsStream("/assets/patas.png")));
-        ImageView paw3 = new ImageView(new Image(getClass().getResourceAsStream("/assets/patas.png")));
 
         paw1.setFitWidth(16);
         paw1.setPreserveRatio(true);
         paw2.setFitWidth(16);
         paw2.setPreserveRatio(true);
-        paw3.setFitWidth(16);
-        paw3.setPreserveRatio(true);
 
         Label addLabel = new Label("Cadastrar");
         HBox addContent = new HBox(6, addLabel, paw1);
@@ -440,44 +438,34 @@ public class MedicineView extends VBox {
         brandsButton.setGraphic(brandsContent);
         brandsButton.getStyleClass().add("top-btn");
 
-        Label menuLabel = new Label("Menu");
-        HBox menuContent = new HBox(6, menuLabel, paw3);
-        menuContent.setAlignment(Pos.CENTER);
-        Button menuButton = new Button();
-        menuButton.setGraphic(menuContent);
-        menuButton.getStyleClass().add("top-btn");
-
         addButton.setOnAction(e -> openAddForm());
         brandsButton.setOnAction(e -> openBrandView());
-        menuButton.setOnAction(e -> returnToMainMenu());
 
-        HBox buttonBar = new HBox(15, addButton, brandsButton, menuButton);
+        HBox buttonBar = new HBox(15, addButton, brandsButton);
         buttonBar.setAlignment(Pos.CENTER_RIGHT);
 
         // Layout usando StackPane para centralizar o título absolutamente sobre a tabela
         // O título fica centralizado ignorando logo e botões
-        HBox leftSection = new HBox(logo);
-        leftSection.setAlignment(Pos.CENTER_LEFT);
+        HBox leftBar = new HBox(logoBtn);
+        leftBar.setAlignment(Pos.CENTER_LEFT);
         
-        HBox rightSection = new HBox(buttonBar);
-        rightSection.setAlignment(Pos.CENTER_RIGHT);
+        HBox rightBar = new HBox(buttonBar);
+        rightBar.setAlignment(Pos.CENTER_RIGHT);
+
+        var sideMaxWidth = javafx.beans.binding.Bindings.max(leftBar.widthProperty(), rightBar.widthProperty());
+        leftBar.minWidthProperty().bind(sideMaxWidth);
+        rightBar.minWidthProperty().bind(sideMaxWidth);
         
-        // StackPane permite que o título fique centralizado absolutamente
-        StackPane topBar = new StackPane();
-        topBar.getChildren().addAll(leftSection, title, rightSection);
-        
-        // Define alinhamento: logo à esquerda, título no centro, botões à direita
-        StackPane.setAlignment(leftSection, Pos.CENTER_LEFT);
-        StackPane.setAlignment(title, Pos.CENTER);
-        StackPane.setAlignment(rightSection, Pos.CENTER_RIGHT);
-        
-        // Garante que leftSection e rightSection não ocupem todo o espaço
-        leftSection.setMaxWidth(Double.MAX_VALUE);
-        rightSection.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(leftSection, Priority.ALWAYS);
-        HBox.setHgrow(rightSection, Priority.ALWAYS);
-        
+        BorderPane topBar = new BorderPane();
+        topBar.setLeft(leftBar);
+        topBar.setCenter(title);
+        topBar.setRight(rightBar);
+        BorderPane.setAlignment(title, Pos.CENTER);
         topBar.setPadding(new Insets(30, 60, 0, 60));
+
+        title.setMaxWidth(Region.USE_PREF_SIZE);
+        rightBar.setMaxWidth(Region.USE_PREF_SIZE);
+        leftBar.setMaxWidth(Region.USE_PREF_SIZE);
 
         VBox content = new VBox(30, table);
         content.setAlignment(Pos.CENTER);

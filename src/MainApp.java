@@ -28,7 +28,7 @@ public class MainApp extends Application {
         this.mainLayout.setCenter(login);
 
         // A cena da aplicação agora é o mainLayout, que gerencia todas as views
-        Scene scene = new Scene(this.mainLayout, 1280, 720);
+        Scene scene = new Scene(this.mainLayout, 1440, 900);
         stage.setScene(scene);
         stage.show();
     }

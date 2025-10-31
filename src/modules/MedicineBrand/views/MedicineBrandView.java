@@ -202,7 +202,6 @@ public class MedicineBrandView extends VBox {
             javafx.scene.Group wrapper = new javafx.scene.Group();
             
             // Primeiro, centraliza o conteúdo SVG em relação ao viewBox
-            // Move o grupo para que seu centro fique em (0,0)
             svgGroup.setTranslateX(-viewBoxWidth / 2);
             svgGroup.setTranslateY(-viewBoxHeight / 2);
             
@@ -274,6 +273,13 @@ public class MedicineBrandView extends VBox {
         logo.setFitWidth(140);
         logo.setPreserveRatio(true);
 
+        Button logoBtn = new Button();
+        logoBtn.setGraphic(logo);
+        logoBtn.setOnAction(e -> mainLayout.setCenter(new MenuView(mainLayout, null)));
+        logoBtn.setCursor(javafx.scene.Cursor.HAND);
+        logoBtn.setStyle("-fx-background-color: transparent; -fx-padding: 0; -fx-border-color: transparent;");
+        logoBtn.setFocusTraversable(false);
+
         // Título centralizado no topo
         Label title = new Label("Marcas");
         title.getStyleClass().add("title");
@@ -281,14 +287,11 @@ public class MedicineBrandView extends VBox {
         // Botões de ação no topo direito
         ImageView paw1 = new ImageView(new Image(getClass().getResourceAsStream("/assets/patas.png")));
         ImageView paw2 = new ImageView(new Image(getClass().getResourceAsStream("/assets/patas.png")));
-        ImageView paw3 = new ImageView(new Image(getClass().getResourceAsStream("/assets/patas.png")));
 
         paw1.setFitWidth(16);
         paw1.setPreserveRatio(true);
         paw2.setFitWidth(16);
         paw2.setPreserveRatio(true);
-        paw3.setFitWidth(16);
-        paw3.setPreserveRatio(true);
 
         Label addLabel = new Label("Cadastrar");
         HBox addContent = new HBox(6, addLabel, paw1);
@@ -304,44 +307,34 @@ public class MedicineBrandView extends VBox {
         productsButton.setGraphic(productsContent);
         productsButton.getStyleClass().add("top-btn");
 
-        Label menuLabel = new Label("Menu");
-        HBox menuContent = new HBox(6, menuLabel, paw3);
-        menuContent.setAlignment(Pos.CENTER);
-        Button menuButton = new Button();
-        menuButton.setGraphic(menuContent);
-        menuButton.getStyleClass().add("top-btn");
-
         addButton.setOnAction(e -> openAddForm());
         productsButton.setOnAction(e -> openMedicineView());
-        menuButton.setOnAction(e -> returnToMainMenu());
 
-        HBox buttonBar = new HBox(15, addButton, productsButton, menuButton);
+        HBox buttonBar = new HBox(15, addButton, productsButton);
         buttonBar.setAlignment(Pos.CENTER_RIGHT);
 
         // Layout usando StackPane para centralizar o título absolutamente sobre a tabela
         // O título fica centralizado ignorando logo e botões
-        HBox leftSection = new HBox(logo);
-        leftSection.setAlignment(Pos.CENTER_LEFT);
+        HBox leftBar = new HBox(logoBtn);
+        leftBar.setAlignment(Pos.CENTER_LEFT);
+
+        HBox rightBar = new HBox(buttonBar);
+        rightBar.setAlignment(Pos.CENTER_RIGHT);
+
+        var sideMaxWidth = javafx.beans.binding.Bindings.max(leftBar.widthProperty(), rightBar.widthProperty());
+        leftBar.minWidthProperty().bind(sideMaxWidth);
+        rightBar.minWidthProperty().bind(sideMaxWidth);
         
-        HBox rightSection = new HBox(buttonBar);
-        rightSection.setAlignment(Pos.CENTER_RIGHT);
-        
-        // StackPane permite que o título fique centralizado absolutamente
-        StackPane topBar = new StackPane();
-        topBar.getChildren().addAll(leftSection, title, rightSection);
-        
-        // Define alinhamento: logo à esquerda, título no centro, botões à direita
-        StackPane.setAlignment(leftSection, Pos.CENTER_LEFT);
-        StackPane.setAlignment(title, Pos.CENTER);
-        StackPane.setAlignment(rightSection, Pos.CENTER_RIGHT);
-        
-        // Garante que leftSection e rightSection não ocupem todo o espaço
-        leftSection.setMaxWidth(Double.MAX_VALUE);
-        rightSection.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(leftSection, Priority.ALWAYS);
-        HBox.setHgrow(rightSection, Priority.ALWAYS);
-        
+        BorderPane topBar = new BorderPane();
+        topBar.setLeft(leftBar);
+        topBar.setCenter(title);
+        topBar.setRight(rightBar);
+        BorderPane.setAlignment(title, Pos.CENTER);
         topBar.setPadding(new Insets(30, 60, 0, 60));
+
+        title.setMaxWidth(Region.USE_PREF_SIZE);
+        rightBar.setMaxWidth(Region.USE_PREF_SIZE);
+        leftBar.setMaxWidth(Region.USE_PREF_SIZE);
 
         VBox content = new VBox(30, table);
         content.setAlignment(Pos.CENTER);
