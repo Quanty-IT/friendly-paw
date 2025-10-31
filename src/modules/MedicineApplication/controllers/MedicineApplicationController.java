@@ -3,6 +3,7 @@ package modules.MedicineApplication.controllers;
 import config.Database;
 import modules.MedicineApplication.models.MedicineApplication;
 import modules.MedicineApplication.models.MedicineApplication.Frequency;
+import modules.MedicineApplication.services.GoogleCalendarService;
 
 import java.sql.*;
 import java.time.ZoneId;
@@ -15,25 +16,26 @@ import java.util.UUID;
  * Controller para CRUD de aplicações de medicamento.
  *
  * Convenções assumidas na tabela public.medicine_applications:
- *  - application_uuid (PK, UUID, default gen_random_uuid())  [opcional]
- *  - medicine_uuid (UUID)    NOT NULL
- *  - user_uuid (UUID)        NOT NULL
- *  - animal_uuid (UUID)      NOT NULL
- *  - applied_at (timestamptz) NOT NULL
- *  - quantity (numeric)      NOT NULL
+ *  - application_uuid (PK, UUID, default gen_random_uuid())
+ *  - medicine_uuid (UUID)          NOT NULL
+ *  - user_uuid (UUID)              NOT NULL
+ *  - animal_uuid (UUID)            NOT NULL
+ *  - applied_at (timestamptz)      NOT NULL
+ *  - quantity (numeric)            NOT NULL
  *  - next_application_at (timestamptz) NULL
- *  - frequency (text)        NOT NULL (valores do enum Frequency.name())
- *  - ends_at (timestamptz)   NULL
- *  - created_at (timestamptz) DEFAULT now()
+ *  - frequency (varchar)           NOT NULL (valores do enum Frequency.name())
+ *  - ends_at (timestamptz)         NULL
+ *  - google_calendar_id (text)               NULL   ← id do evento no Google Calendar
+ *  - created_at (timestamptz)      DEFAULT now()
  */
 public class MedicineApplicationController {
 
-    /** Cria uma nova aplicação */
+    /** Cria uma nova aplicação (salva google_calendar_id se existir) */
     public void create(MedicineApplication application) throws SQLException {
         String sql = """
             INSERT INTO public.medicine_applications
-            (medicine_uuid, user_uuid, animal_uuid, applied_at, quantity, next_application_at, frequency, ends_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            (medicine_uuid, user_uuid, animal_uuid, applied_at, quantity, next_application_at, frequency, ends_at, google_calendar_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """;
 
         try (Connection conn = Database.getConnection();
@@ -61,6 +63,13 @@ public class MedicineApplicationController {
                 pstmt.setNull(8, Types.TIMESTAMP_WITH_TIMEZONE);
             }
 
+            // google_calendar_id do Google Calendar (pode ser null)
+            if (application.getGoogleCalendarGoogleCalendarId() != null && !application.getGoogleCalendarGoogleCalendarId().isBlank()) {
+                pstmt.setString(9, application.getGoogleCalendarGoogleCalendarId());
+            } else {
+                pstmt.setNull(9, Types.VARCHAR);
+            }
+
             pstmt.executeUpdate();
         }
     }
@@ -69,7 +78,7 @@ public class MedicineApplicationController {
     public static List<MedicineApplication> getApplicationsForAnimal(Connection conn, UUID animalUuid) throws SQLException {
         String sql = """
             SELECT application_uuid, medicine_uuid, user_uuid, animal_uuid,
-                   applied_at, quantity, next_application_at, frequency, ends_at, created_at
+                   applied_at, quantity, next_application_at, frequency, ends_at, created_at, google_calendar_id
               FROM public.medicine_applications
              WHERE animal_uuid = ?
              ORDER BY applied_at DESC, created_at DESC
@@ -89,7 +98,7 @@ public class MedicineApplicationController {
     public static MedicineApplication getByUuid(Connection conn, UUID applicationUuid) throws SQLException {
         String sql = """
             SELECT application_uuid, medicine_uuid, user_uuid, animal_uuid,
-                   applied_at, quantity, next_application_at, frequency, ends_at, created_at
+                   applied_at, quantity, next_application_at, frequency, ends_at, created_at, google_calendar_id
               FROM public.medicine_applications
              WHERE application_uuid = ?
              LIMIT 1
@@ -102,10 +111,34 @@ public class MedicineApplicationController {
         }
     }
 
-    /** Deleta uma aplicação pelo UUID */
+    /**
+     * Deleta uma aplicação pelo UUID.
+     * - Se houver google_calendar_id, tenta apagar o evento do Google Calendar (best-effort).
+     * - Em qualquer caso, remove o registro do banco.
+     */
     public static void delete(Connection conn, UUID applicationUuid) throws SQLException {
-        String sql = "DELETE FROM public.medicine_applications WHERE application_uuid = ?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        // 1) Buscar google_calendar_id
+        String googleCalendarId = null;
+        try (PreparedStatement ps = conn.prepareStatement(
+                "SELECT google_calendar_id FROM public.medicine_applications WHERE application_uuid = ?")) {
+            ps.setObject(1, applicationUuid);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) googleCalendarId = rs.getString("google_calendar_id");
+            }
+        }
+
+        // 2) Tentar deletar no Google Calendar (não bloqueia se falhar)
+        if (googleCalendarId != null && !googleCalendarId.isBlank()) {
+            try {
+                GoogleCalendarService.deleteEvent(googleCalendarId);
+            } catch (Exception e) {
+                System.err.println("Falha ao deletar evento no Google Calendar (googleCalendarId=" + googleCalendarId + "): " + e.getMessage());
+            }
+        }
+
+        // 3) Remover do banco
+        try (PreparedStatement ps = conn.prepareStatement(
+                "DELETE FROM public.medicine_applications WHERE application_uuid = ?")) {
             ps.setObject(1, applicationUuid);
             ps.executeUpdate();
         }
@@ -156,6 +189,10 @@ public class MedicineApplicationController {
         if (createdTs != null) {
             m.setCreatedAt(ZonedDateTime.ofInstant(createdTs.toInstant(), ZoneId.systemDefault()));
         }
+
+        // google_calendar_id do Google Calendar
+        String evId = rs.getString("google_calendar_id");
+        if (evId != null) m.setGoogleCalendarGoogleCalendarId(evId);
 
         return m;
     }

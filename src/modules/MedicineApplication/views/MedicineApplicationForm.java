@@ -185,7 +185,6 @@ public class MedicineApplicationForm extends VBox {
         box.setPrefWidth(width);
         box.setMaxWidth(width);
 
-        // Checkbox alinhado à esquerda se aparecer em full
         if (field instanceof CheckBox cb) {
             wrapper.setAlignment(Pos.CENTER_LEFT);
             cb.setMinWidth(24);
@@ -210,7 +209,6 @@ public class MedicineApplicationForm extends VBox {
         wrapper.setPrefWidth(width);
         wrapper.setMaxWidth(width);
 
-        // larguras padrão para consistência
         if (!(field instanceof DatePicker) && !(field instanceof ComboBox) && !(field instanceof CheckBox)) {
             field.setPrefWidth(width);
         }
@@ -261,7 +259,6 @@ public class MedicineApplicationForm extends VBox {
         frequencyComboBox.setOnAction(e -> {
             boolean useGC = "Sim".equals(googleCalendarCombo.getValue());
             if (!useGC) {
-                // se não for para usar o GC, mantém tudo travado
                 nextDatePicker.setDisable(true);
                 endsDatePicker.setDisable(true);
                 return;
@@ -289,7 +286,10 @@ public class MedicineApplicationForm extends VBox {
             }
         });
 
-        backButton.setOnAction(e -> this.mainLayout.setCenter(new AnimalView(this.mainLayout)));
+        backButton.setOnAction(e ->
+            // volta para a listagem (novo fluxo)
+            this.mainLayout.setCenter(new MedicineApplicationView(this.mainLayout, selectedAnimal))
+        );
 
         saveButton.setOnAction(event -> {
             try {
@@ -324,19 +324,23 @@ public class MedicineApplicationForm extends VBox {
                     newApp.setEndsAt(ZonedDateTime.of(endsDatePicker.getValue(), LocalTime.MIDNIGHT, ZoneId.systemDefault()));
                 }
 
+                // ➕ Cria evento no Google Calendar e salva o ID no model
                 if ("Sim".equals(googleCalendarCombo.getValue())) {
                     try {
                         ZonedDateTime startDateTime =
                                 newApp.getNextApplicationAt() != null ? newApp.getNextApplicationAt() : newApp.getAppliedAt();
 
-                        modules.MedicineApplication.services.GoogleCalendarService.createMedicineApplicationEvent(
+                        String googleCalendarId = modules.MedicineApplication.services.GoogleCalendarService.createMedicineApplicationEvent(
                                 selectedAnimal.getName(),
                                 selectedMedicine.getName(),
                                 newApp.getQuantity().toString(),
                                 startDateTime,
-                                frequency,
+                                newApp.getFrequency(),
                                 newApp.getEndsAt()
                         );
+
+                        newApp.setGoogleCalendarGoogleCalendarId(googleCalendarId);
+
                     } catch (Exception calendarException) {
                         showErrorAlert("Erro no Google Calendar",
                                 "Não foi possível criar o evento no Google Calendar: " + calendarException.getMessage());
@@ -350,7 +354,8 @@ public class MedicineApplicationForm extends VBox {
                 alert.setHeaderText("Sucesso");
                 alert.showAndWait();
 
-                this.mainLayout.setCenter(new AnimalView(this.mainLayout));
+                // ➕ volta para a listagem das aplicações do animal
+                this.mainLayout.setCenter(new MedicineApplicationView(this.mainLayout, selectedAnimal));
 
             } catch (NumberFormatException e) {
                 showErrorAlert("Formato Inválido", "A quantidade deve ser um número válido (ex: 1.5).");

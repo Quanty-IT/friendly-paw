@@ -25,6 +25,7 @@ public class M20251010104951CreateMedicineApplicationsTable implements Migration
                     next_application_at TIMESTAMP,
                     frequency VARCHAR(10) CHECK (frequency IN ('DAILY', 'WEEKLY', 'MONTHLY', 'ANNUALLY', 'EVERY_WEEKDAY')),
                     ends_at TIMESTAMP,
+                    google_calendar_id TEXT,
                     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
                 );
             """);

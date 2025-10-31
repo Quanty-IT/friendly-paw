@@ -19,6 +19,7 @@ public class MedicineApplication {
         public String getDisplayName() { return displayName; }
         @Override public String toString() { return displayName; }
 
+        /** Converte para RRULE do Google Calendar */
         public String toRRULE(ZonedDateTime endDate) {
             if (this == DOES_NOT_REPEAT) return null;
 
@@ -31,9 +32,10 @@ public class MedicineApplication {
                 case EVERY_WEEKDAY -> rule.append("FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR");
             }
 
+            // Inclui o dia final (convenção amigável)
             if (endDate != null) {
-                // inclui o dia final (convenção mais amigável para o usuário)
-                String until = endDate.plusDays(1).format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"));
+                String until = endDate.plusDays(1)
+                        .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"));
                 rule.append(";UNTIL=").append(until);
             }
             return rule.toString();
@@ -46,12 +48,16 @@ public class MedicineApplication {
     private UUID medicineUuid;
     private UUID userUuid;
     private UUID animalUuid;
-    private ZonedDateTime appliedAt;
-    private BigDecimal quantity;
-    private ZonedDateTime nextApplicationAt;
-    private Frequency frequency;
-    private ZonedDateTime endsAt;
-    private ZonedDateTime createdAt;
+
+    private ZonedDateTime appliedAt;          // TIMESTAMPTZ
+    private BigDecimal   quantity;            // NUMERIC
+    private ZonedDateTime nextApplicationAt;  // TIMESTAMPTZ
+    private Frequency     frequency;          // VARCHAR(20) (enum.name())
+    private ZonedDateTime endsAt;             // TIMESTAMPTZ
+    private ZonedDateTime createdAt;          // TIMESTAMPTZ (DEFAULT now())
+
+    /** ➕ ID do evento no Google Calendar (coluna google_calendar_id) */
+    private String googleCalendarGoogleCalendarId;
 
     public MedicineApplication() {}
 
@@ -89,8 +95,12 @@ public class MedicineApplication {
     public ZonedDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(ZonedDateTime createdAt) { this.createdAt = createdAt; }
 
+    /** ➕ getters/setters do googleCalendarId do Google Calendar */
+    public String getGoogleCalendarGoogleCalendarId() { return googleCalendarGoogleCalendarId; }
+    public void setGoogleCalendarGoogleCalendarId(String googleCalendarGoogleCalendarId) { this.googleCalendarGoogleCalendarId = googleCalendarGoogleCalendarId; }
+
     @Override public String toString() {
-        return "MedicineApplication{uuid=%s, animal=%s, med=%s, qty=%s}"
-                .formatted(applicationUuid, animalUuid, medicineUuid, quantity);
+        return "MedicineApplication{uuid=%s, animal=%s, med=%s, qty=%s, googleCalendarId=%s}"
+                .formatted(applicationUuid, animalUuid, medicineUuid, quantity, googleCalendarGoogleCalendarId);
     }
 }
