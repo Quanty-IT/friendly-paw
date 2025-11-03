@@ -9,7 +9,7 @@ import javafx.scene.layout.*;
 import modules.MedicineApplication.controllers.MedicineApplicationController;
 import modules.Medicine.controllers.MedicineController;
 import modules.Animal.models.Animal;
-import modules.Animal.views.AnimalView;
+import modules.MedicineApplication.views.MedicineApplicationView;
 import modules.Medicine.models.Medicine;
 import modules.MedicineApplication.models.MedicineApplication;
 import modules.User.models.User;
@@ -52,7 +52,7 @@ public class MedicineApplicationForm extends VBox {
     private static final Locale PT_BR = new Locale("pt", "BR");
     private static final DateTimeFormatter BR_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    /**
+     /**
      * Construtor do formulário de aplicação de medicamento.
      * 
      * @param mainLayout Layout principal para navegação
@@ -80,17 +80,16 @@ public class MedicineApplicationForm extends VBox {
         localizeDatePicker(appliedDatePicker);
         localizeDatePicker(nextDatePicker);
         localizeDatePicker(endsDatePicker);
-        // >>> Regras de datas
         setupDateConstraints();
         loadData();
         setupActions();
+        refreshScheduleFields();
     }
 
     /**
      * Configura a interface do formulário.
      */
     private void setupUI() {
-        // estilo base (igual AnimalForm/MedicineForm)
         getStyleClass().add("form-bg");
         setPadding(new Insets(30, 40, 30, 40));
         setSpacing(18);
@@ -120,7 +119,7 @@ public class MedicineApplicationForm extends VBox {
         // Data de aplicação
         appliedDatePicker.setPrefWidth(HALF);
         appliedDatePicker.getStyleClass().add("date-picker");
-        appliedDatePicker.setEditable(false); // opcional: evitar digitação livre
+        appliedDatePicker.setEditable(false);
 
         // Quantidade
         quantityField.setPromptText("Digite a quantidade");
@@ -160,8 +159,8 @@ public class MedicineApplicationForm extends VBox {
         endsDatePicker.setPrefWidth(HALF);
         nextDatePicker.getStyleClass().add("date-picker");
         endsDatePicker.getStyleClass().add("date-picker");
-        nextDatePicker.setEditable(false); // opcional
-        endsDatePicker.setEditable(false); // opcional
+        nextDatePicker.setEditable(false);
+        endsDatePicker.setEditable(false);
 
         // Botões
         backButton.getStyleClass().add("form-btn-cancel");
@@ -169,7 +168,7 @@ public class MedicineApplicationForm extends VBox {
         saveButton.getStyleClass().add("form-btn-save");
         saveButton.setPrefWidth(150);
 
-        // Layout (helpers iguais ao AnimalForm: blocos com label acima + wrapper centralizado)
+        // Layout
         VBox form = new VBox(20);
         form.setAlignment(Pos.CENTER);
 
@@ -178,7 +177,6 @@ public class MedicineApplicationForm extends VBox {
                 rowFull("Animal:", animalField, FULL),
                 rowHalf("Medicamento:", medicineComboBox, "Data da aplicação:", appliedDatePicker, HALF),
 
-                // 👇 NOVA LINHA COM 3 COLUNAS
                 rowThird(
                         "Quantidade:",        quantityField,
                         "Agendar no Google Calendar:", googleCalendarCombo,
@@ -186,7 +184,6 @@ public class MedicineApplicationForm extends VBox {
                         THIRD
                 ),
 
-                // 👇 LINHA ABAIXO COM 2 COLUNAS
                 rowHalf("Próxima aplicação (opcional):", nextDatePicker, "Fim do tratamento (opcional):", endsDatePicker, HALF)
         );
 
@@ -216,13 +213,13 @@ public class MedicineApplicationForm extends VBox {
     private void setupDateConstraints() {
         final LocalDate today = LocalDate.now();
 
-        // 1) Data da aplicação: só hoje e passadas (de hoje pra trás)
+        // 1) Data da aplicação: só hoje e passadas
         appliedDatePicker.setDayCellFactory(dp -> new DateCell() {
             @Override
             public void updateItem(LocalDate date, boolean empty) {
                 super.updateItem(date, empty);
                 if (empty || date == null) return;
-                setDisable(date.isAfter(today)); // desabilita futuro
+                setDisable(date.isAfter(today));
             }
         });
 
@@ -232,29 +229,26 @@ public class MedicineApplicationForm extends VBox {
             public void updateItem(LocalDate date, boolean empty) {
                 super.updateItem(date, empty);
                 if (empty || date == null) return;
-                setDisable(!date.isAfter(today)); // precisa ser > hoje
+                setDisable(!date.isAfter(today));
             }
         });
 
-        // 3) Fim do tratamento: apenas datas após a "próxima aplicação"
-        //    (se próxima não estiver setada, considere hoje como base)
+        // 3) Fim do tratamento: apenas datas após a "próxima aplicação" (ou hoje)
         endsDatePicker.setDayCellFactory(dp -> new DateCell() {
             @Override
             public void updateItem(LocalDate date, boolean empty) {
                 super.updateItem(date, empty);
                 if (empty || date == null) return;
                 LocalDate base = nextDatePicker.getValue() != null ? nextDatePicker.getValue() : today;
-                setDisable(!date.isAfter(base)); // precisa ser > próxima aplicação
+                setDisable(!date.isAfter(base));
             }
         });
 
-        // Quando mudar a "próxima aplicação", refaça o filtro do "fim"
+        // Recalcula as restrições quando "próxima" mudar
         nextDatePicker.valueProperty().addListener((obs, oldV, newV) -> {
-            // se já havia um fim escolhido inválido com a nova base, limpe
             if (endsDatePicker.getValue() != null && newV != null && !endsDatePicker.getValue().isAfter(newV)) {
                 endsDatePicker.setValue(null);
             }
-            // reconstroi a fábrica para refletir a nova base
             endsDatePicker.setDayCellFactory(dp -> new DateCell() {
                 @Override
                 public void updateItem(LocalDate date, boolean empty) {
@@ -265,6 +259,37 @@ public class MedicineApplicationForm extends VBox {
                 }
             });
         });
+    }
+
+    /**
+     * Atualiza os campos de próxima aplicação e fim do tratamento
+     * baseado na seleção de Google Calendar e frequência.
+     */
+    private void refreshScheduleFields() {
+        boolean useGC = "Sim".equals(googleCalendarCombo.getValue());
+        MedicineApplication.Frequency f = frequencyComboBox.getValue();
+
+        if (!useGC) {
+            nextDatePicker.setDisable(true);
+            endsDatePicker.setDisable(true);
+            return;
+        }
+
+        if (f == MedicineApplication.Frequency.DOES_NOT_REPEAT) {
+            // GC = Sim e não repete -> habilita "Próxima aplicação", desabilita "Fim"
+            nextDatePicker.setDisable(false);
+            endsDatePicker.setDisable(true);
+            if (endsDatePicker.getValue() != null) endsDatePicker.setValue(null);
+            return;
+        }
+
+        // Frequências recorrentes -> habilita ambos
+        boolean isRecurring = (f != null) && f.isRecurring();
+        nextDatePicker.setDisable(false);                 // com GC, sempre habilita
+        endsDatePicker.setDisable(!isRecurring);
+        if (!isRecurring && endsDatePicker.getValue() != null) {
+            endsDatePicker.setValue(null);
+        }
     }
 
     /**
@@ -371,7 +396,12 @@ public class MedicineApplicationForm extends VBox {
      */
     private void loadData() {
         try {
-            medicineComboBox.setItems(FXCollections.observableArrayList(medicineController.listAll()));
+            var onlyActiveAndInStock = medicineController.listAll().stream()
+                    .filter(Medicine::getIsActive)
+                    .filter(medicine -> medicine.getQuantity() != 0)
+                    .toList();
+
+            medicineComboBox.setItems(FXCollections.observableArrayList(onlyActiveAndInStock));
             medicineComboBox.setCellFactory(param -> new ListCell<>() {
                 @Override protected void updateItem(Medicine item, boolean empty) {
                     super.updateItem(item, empty);
@@ -384,49 +414,42 @@ public class MedicineApplicationForm extends VBox {
                     setText(empty || item == null ? null : item.getName());
                 }
             });
+
+            if (onlyActiveAndInStock.isEmpty()) {
+                medicineComboBox.getItems().clear();
+                medicineComboBox.setDisable(true);
+                medicineComboBox.setPromptText("Nenhum medicamento disponível");
+                saveButton.setDisable(true);
+            } else {
+                medicineComboBox.setDisable(false);
+                medicineComboBox.setPromptText("Selecione um medicamento");
+                saveButton.setDisable(false);
+            }
         } catch (SQLException e) {
             showErrorAlert("Falha ao Carregar Dados", "Não foi possível carregar a lista de medicamentos.");
         }
     }
 
     /**
-     * Configura os event handlers dos botões e campos do formulário.
-     * Inclui lógica para habilitar/desabilitar campos baseado na seleção de Google Calendar e frequência.
+     * Configura os listeners e handlers dos botões/campos.
+     * Versão robusta: ouvindo valueProperty() para reagir também a setValue().
      */
     private void setupActions() {
-        // toggle de recorrência conforme Google Calendar
-        frequencyComboBox.setOnAction(e -> {
-            boolean useGC = "Sim".equals(googleCalendarCombo.getValue());
-            if (!useGC) {
-                nextDatePicker.setDisable(true);
-                endsDatePicker.setDisable(true);
-                return;
-            }
-            var f = frequencyComboBox.getValue();
-            boolean isRecurring = f != null && f.isRecurring();
-            nextDatePicker.setDisable(!isRecurring);
-            endsDatePicker.setDisable(!isRecurring);
-        });
+        // Reagir a QUALQUER mudança de valor (inclusive via setValue)
+        frequencyComboBox.valueProperty().addListener((obs, oldV, newV) -> refreshScheduleFields());
 
-        googleCalendarCombo.setOnAction(e -> {
-            boolean useGC = "Sim".equals(googleCalendarCombo.getValue());
+        googleCalendarCombo.valueProperty().addListener((obs, oldV, newV) -> {
+            boolean useGC = "Sim".equals(newV);
             frequencyComboBox.setDisable(!useGC);
-
             if (!useGC) {
                 frequencyComboBox.setValue(MedicineApplication.Frequency.DOES_NOT_REPEAT);
                 nextDatePicker.setValue(null);
                 endsDatePicker.setValue(null);
-                nextDatePicker.setDisable(true);
-                endsDatePicker.setDisable(true);
-            } else {
-                boolean isRecurring = frequencyComboBox.getValue() != null && frequencyComboBox.getValue().isRecurring();
-                nextDatePicker.setDisable(!isRecurring);
-                endsDatePicker.setDisable(!isRecurring);
             }
+            refreshScheduleFields();
         });
 
         backButton.setOnAction(e ->
-            // volta para a listagem (novo fluxo)
             this.mainLayout.setCenter(new MedicineApplicationView(this.mainLayout, selectedAnimal))
         );
 
@@ -438,11 +461,11 @@ public class MedicineApplicationForm extends VBox {
                     return;
                 }
 
-                // >>> Validações de datas (reforço das regras)
-                LocalDate today = LocalDate.now();
+                // --- Datas
+                LocalDate today   = LocalDate.now();
                 LocalDate applied = appliedDatePicker.getValue();
-                LocalDate next = nextDatePicker.getValue();
-                LocalDate ends = endsDatePicker.getValue();
+                LocalDate next    = nextDatePicker.getValue();
+                LocalDate ends    = endsDatePicker.getValue();
 
                 if (applied == null || applied.isAfter(today)) {
                     showErrorAlert("Data inválida", "A data da aplicação deve ser hoje ou anterior.");
@@ -460,48 +483,72 @@ public class MedicineApplicationForm extends VBox {
                     }
                 }
 
-                MedicineApplication newApp = new MedicineApplication();
-                newApp.setAnimalUuid(selectedAnimal.getUuid());
-                newApp.setMedicineUuid(selectedMedicine.getUuid());
-                newApp.setUserUuid(currentUser.getUuid());
-
-                LocalDate localDate = applied;
-                newApp.setAppliedAt(ZonedDateTime.of(localDate, LocalTime.now(), ZoneId.systemDefault()));
-
+                // --- Quantidade aplicada
                 String qtyText = quantityField.getText() == null ? "" : quantityField.getText().trim();
                 if (qtyText.isEmpty()) {
                     showErrorAlert("Dados Incompletos", "Informe a quantidade.");
                     return;
                 }
-                newApp.setQuantity(Integer.parseInt(qtyText));
+
+                int usedQty = Integer.parseInt(qtyText);
+                if (usedQty <= 0) {
+                    showErrorAlert("Formato Inválido", "A quantidade deve ser um número inteiro positivo.");
+                    return;
+                }
+
+                // Regra: se o estoque do medicamento for finito, não pode ultrapassar
+                Integer medicineStock = selectedMedicine.getQuantity(); // pode ser null, -1 (ilimitado) ou >=0
+                boolean finiteStock = medicineStock != null && medicineStock != -1;
+
+                if (finiteStock && usedQty > medicineStock) {
+                    showErrorAlert(
+                        "Quantidade indisponível",
+                        "A quantidade informada (" + usedQty + ") excede o estoque disponível (" + medicineStock + ")."
+                    );
+                    return;
+                }
+
+                // --- Monta a aplicação
+                MedicineApplication newApp = new MedicineApplication();
+                newApp.setAnimalUuid(selectedAnimal.getUuid());
+                newApp.setMedicineUuid(selectedMedicine.getUuid());
+                newApp.setUserUuid(currentUser.getUuid());
+
+                newApp.setAppliedAt(ZonedDateTime.of(applied, LocalTime.now(), ZoneId.systemDefault()));
+                newApp.setQuantity(usedQty);
 
                 MedicineApplication.Frequency frequency = frequencyComboBox.getValue();
-                newApp.setFrequency(frequency != null ? frequency : MedicineApplication.Frequency.DOES_NOT_REPEAT);
+                if (frequency == null) frequency = MedicineApplication.Frequency.DOES_NOT_REPEAT;
+                newApp.setFrequency(frequency);
 
-                if (nextDatePicker.getValue() != null) {
-                    newApp.setNextApplicationAt(ZonedDateTime.of(nextDatePicker.getValue(), LocalTime.MIDNIGHT, ZoneId.systemDefault()));
-                }
-                if (endsDatePicker.getValue() != null) {
-                    newApp.setEndsAt(ZonedDateTime.of(endsDatePicker.getValue(), LocalTime.MIDNIGHT, ZoneId.systemDefault()));
+                if (next != null) {
+                    newApp.setNextApplicationAt(ZonedDateTime.of(next, LocalTime.MIDNIGHT, ZoneId.systemDefault()));
                 }
 
-                // ➕ Cria evento no Google Calendar e salva o ID no model
+                // >>> Ajuste: só persiste fim do tratamento se for recorrente
+                if (frequency != MedicineApplication.Frequency.DOES_NOT_REPEAT && ends != null) {
+                    newApp.setEndsAt(ZonedDateTime.of(ends, LocalTime.MIDNIGHT, ZoneId.systemDefault()));
+                } else {
+                    newApp.setEndsAt(null);
+                }
+
+                // --- Google Calendar (opcional)
                 if ("Sim".equals(googleCalendarCombo.getValue())) {
                     try {
                         ZonedDateTime startDateTime =
                                 newApp.getNextApplicationAt() != null ? newApp.getNextApplicationAt() : newApp.getAppliedAt();
 
-                        String googleCalendarId = modules.MedicineApplication.services.GoogleCalendarService.createMedicineApplicationEvent(
-                                selectedAnimal.getName(),
-                                selectedMedicine.getName(),
-                                newApp.getQuantity().toString(),
-                                startDateTime,
-                                newApp.getFrequency(),
-                                newApp.getEndsAt()
-                        );
+                        String googleCalendarId =
+                                modules.MedicineApplication.services.GoogleCalendarService.createMedicineApplicationEvent(
+                                        selectedAnimal.getName(),
+                                        selectedMedicine.getName(),
+                                        String.valueOf(newApp.getQuantity()),
+                                        startDateTime,
+                                        newApp.getFrequency(),
+                                        newApp.getEndsAt()
+                                );
 
                         newApp.setGoogleCalendarGoogleCalendarId(googleCalendarId);
-
                     } catch (Exception calendarException) {
                         showErrorAlert("Erro no Google Calendar",
                                 "Não foi possível criar o evento no Google Calendar: " + calendarException.getMessage());
@@ -509,13 +556,34 @@ public class MedicineApplicationForm extends VBox {
                     }
                 }
 
+                // --- Persiste a aplicação
                 appController.create(newApp);
 
+                // --- Baixa de estoque (apenas se quantidade finita)
+                Integer stock = selectedMedicine.getQuantity();
+                if (stock != null && stock != -1) {
+                    int newStock = stock - usedQty;
+                    if (newStock < 0) newStock = 0; // evita negativo
+                    try {
+                        medicineController.update(
+                                selectedMedicine.getUuid(),
+                                selectedMedicine.getName(),
+                                selectedMedicine.getBrandUuid(),
+                                newStock,
+                                selectedMedicine.getDescription(),
+                                selectedMedicine.getIsActive()
+                        );
+                    } catch (SQLException se) {
+                        showErrorAlert("Erro ao atualizar estoque",
+                                "A aplicação foi registrada, mas não foi possível atualizar a quantidade do medicamento: " + se.getMessage());
+                    }
+                }
+
+                // --- Sucesso e retorno à listagem
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "Aplicação registrada com sucesso!", ButtonType.OK);
                 alert.setHeaderText("Sucesso");
                 alert.showAndWait();
 
-                // ➕ volta para a listagem das aplicações do animal
                 this.mainLayout.setCenter(new MedicineApplicationView(this.mainLayout, selectedAnimal));
 
             } catch (NumberFormatException e) {

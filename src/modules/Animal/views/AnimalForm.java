@@ -130,6 +130,14 @@ public class AnimalForm extends GridPane {
         birthdateField.setMinWidth(280);
         birthdateField.setPrefWidth(280);
         birthdateField.setMaxWidth(Double.MAX_VALUE);
+        birthdateField.setDayCellFactory(dp -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                if (empty || date == null) return;
+                setDisable(date.isAfter(LocalDate.now())); // desabilita futuro
+            }
+        });
 
         microchipField = new TextField();
         microchipField.setPromptText("Microchip (opcional)");

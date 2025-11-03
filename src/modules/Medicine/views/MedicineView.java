@@ -153,8 +153,7 @@ public class MedicineView extends VBox {
                     setText(null);
                 } else {
                     setAlignment(Pos.CENTER);
-                    // Mostra "∞" para inativos, quantidade para ativos
-                    if (!medicine.getIsActive() || item == null || item == -1) {
+                    if (item == null || item == -1) {
                         setText("∞");
                     } else {
                         setText(item.toString());

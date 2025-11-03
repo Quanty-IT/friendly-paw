@@ -182,7 +182,7 @@ public class MedicineApplicationView extends VBox {
         // Aplicado em
         TableColumn<MedicineApplication, ZonedDateTime> appliedCol = new TableColumn<>("aplicado em");
         appliedCol.setCellValueFactory(new PropertyValueFactory<>("appliedAt"));
-        DateTimeFormatter dt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        DateTimeFormatter dt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         appliedCol.setCellFactory(col -> new TableCell<>() {
             { setAlignment(Pos.CENTER); }
             @Override protected void updateItem(ZonedDateTime item, boolean empty) {

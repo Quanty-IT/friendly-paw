@@ -21,9 +21,9 @@ public class M20251010104951CreateMedicineApplicationsTable implements Migration
                     user_uuid UUID NOT NULL REFERENCES public.users(uuid),
                     animal_uuid UUID NOT NULL REFERENCES public.animals(uuid),
                     applied_at TIMESTAMP NOT NULL,
-                    quantity INTEGER,
+                    quantity INTEGER NOT NULL,
                     next_application_at TIMESTAMP,
-                    frequency VARCHAR(10) CHECK (frequency IN ('DAILY', 'WEEKLY', 'MONTHLY', 'ANNUALLY', 'EVERY_WEEKDAY')),
+                    frequency VARCHAR(15),
                     ends_at TIMESTAMP,
                     google_calendar_id TEXT,
                     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
