@@ -88,6 +88,7 @@ public class MedicineApplicationForm extends VBox {
 
     /**
      * Configura a interface do formulário.
+     * Não retorna valor e não lança exceções.
      */
     private void setupUI() {
         getStyleClass().add("form-bg");
@@ -193,7 +194,11 @@ public class MedicineApplicationForm extends VBox {
         getChildren().setAll(form, buttons);
     }
 
-    // Converte/mostra datas no formato BR e define placeholder
+    /**
+     * Converte e exibe datas no formato brasileiro (dd/MM/yyyy) e define o placeholder.
+     * 
+     * @param dp DatePicker a ser localizado
+     */
     private void localizeDatePicker(DatePicker dp) {
         dp.setConverter(new StringConverter<LocalDate>() {
             @Override
@@ -209,7 +214,11 @@ public class MedicineApplicationForm extends VBox {
         dp.setPromptText("dd/MM/aaaa");
     }
 
-    // >>> Regras de data para os DatePickers
+    /**
+     * Configura as regras de validação de datas para os DatePickers do formulário.
+     * Define restrições para data de aplicação, próxima aplicação e fim do tratamento.
+     * Não retorna valor e não lança exceções.
+     */
     private void setupDateConstraints() {
         final LocalDate today = LocalDate.now();
 
@@ -264,6 +273,7 @@ public class MedicineApplicationForm extends VBox {
     /**
      * Atualiza os campos de próxima aplicação e fim do tratamento
      * baseado na seleção de Google Calendar e frequência.
+     * Não retorna valor e não lança exceções.
      */
     private void refreshScheduleFields() {
         boolean useGC = "Sim".equals(googleCalendarCombo.getValue());
@@ -433,6 +443,7 @@ public class MedicineApplicationForm extends VBox {
     /**
      * Configura os listeners e handlers dos botões/campos.
      * Versão robusta: ouvindo valueProperty() para reagir também a setValue().
+     * Não retorna valor e não lança exceções.
      */
     private void setupActions() {
         // Reagir a QUALQUER mudança de valor (inclusive via setValue)

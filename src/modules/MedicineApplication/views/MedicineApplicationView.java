@@ -153,6 +153,9 @@ public class MedicineApplicationView extends VBox {
         return btn;
     }
 
+    /**
+     * Inicializa os componentes da interface, incluindo a tabela e suas colunas.
+     */
     private void initializeComponents() {
         tableView.setItems(appList);
 
@@ -277,6 +280,9 @@ public class MedicineApplicationView extends VBox {
         tableView.setPlaceholder(new Label("Nenhuma aplicação cadastrada"));
     }
 
+    /**
+     * Configura o layout principal da view, incluindo logo, título e botões de ação.
+     */
     private void setupLayout() {
         // Logo topo esquerdo
         ImageView logo = new ImageView(new Image(getClass().getResourceAsStream("/assets/logo.png")));

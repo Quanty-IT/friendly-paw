@@ -11,6 +11,11 @@ public class MedicineBrandController {
 
     private final Connection conn;
 
+    /**
+     * Construtor do MedicineBrandController.
+     * 
+     * @param conn Conexão com o banco de dados
+     */
     public MedicineBrandController(Connection conn) {
         this.conn = conn;
     }

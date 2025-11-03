@@ -44,6 +44,10 @@ public class UserAuthForm extends VBox {
         setupStyles();
     }
 
+    /**
+     * Configura o layout do formulário de autenticação, incluindo campos e botões.
+     * Não retorna valor e não lança exceções.
+     */
     private void setupLayout() {
         setAlignment(Pos.CENTER);
 
@@ -145,6 +149,10 @@ public class UserAuthForm extends VBox {
         loginButton.setDefaultButton(true);
     }
 
+    /**
+     * Configura os estilos CSS do formulário de autenticação.
+     * Não retorna valor e não lança exceções.
+     */
     private void setupStyles() {
         getStylesheets().add(getClass().getResource("/modules/User/styles/UserAuthForm.css").toExternalForm());
     }
@@ -152,6 +160,8 @@ public class UserAuthForm extends VBox {
     /**
      * Realiza a autenticação do usuário com email e senha.
      * Valida os campos antes de tentar autenticar e chama o callback onSuccess em caso de sucesso.
+     * 
+     * @throws SQLException Se ocorrer erro na operação do banco de dados (tratado internamente com Alert)
      */
     private void doLogin() {
         if (conn == null) {

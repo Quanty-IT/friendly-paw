@@ -11,6 +11,11 @@ public class MedicineController {
 
     private final Connection conn;
 
+    /**
+     * Construtor do MedicineController.
+     * 
+     * @param conn Conexão com o banco de dados
+     */
     public MedicineController(Connection conn) {
         this.conn = conn;
     }

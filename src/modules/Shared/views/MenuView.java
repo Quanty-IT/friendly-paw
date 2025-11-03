@@ -47,6 +47,7 @@ public class MenuView extends VBox {
 
     /**
      * Configura o layout principal da view do menu.
+     * Não retorna valor e não lança exceções.
      */
     private void setupLayout() {
         // Logo no topo esquerdo
@@ -250,6 +251,8 @@ public class MenuView extends VBox {
 
     /**
      * Carrega as estatísticas dos animais e atualiza os boxes.
+     * 
+     * @throws SQLException Se ocorrer erro na operação do banco de dados (tratado internamente com Alert)
      */
     private void loadStatistics() {
         try {

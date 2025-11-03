@@ -153,6 +153,9 @@ public class AnimalView extends VBox {
         return btn;
     }
 
+    /**
+     * Inicializa os componentes da interface, incluindo a tabela e suas colunas.
+     */
     private void initializeComponents() {
         tableView = new TableView<>();
         animalList = FXCollections.observableArrayList();
@@ -335,6 +338,9 @@ public class AnimalView extends VBox {
         tableView.setPlaceholder(new Label("Nenhum animal cadastrado"));
     }
 
+    /**
+     * Configura o layout principal da view, incluindo logo, título e botões de ação.
+     */
     private void setupLayout() {
         // Logo topo esquerdo
         ImageView logo = new ImageView(new Image(getClass().getResourceAsStream("/assets/logo.png")));

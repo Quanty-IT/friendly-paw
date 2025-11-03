@@ -52,6 +52,7 @@ public class MedicineForm extends VBox {
 
     /**
      * Configura todos os componentes do formulário, incluindo campos e botões.
+     * Não retorna valor e não lança exceções.
      */
     private void setupComponents() {
         // Título
@@ -181,6 +182,8 @@ public class MedicineForm extends VBox {
 
     /**
      * Carrega a lista de marcas de medicamentos do banco de dados e popula o ComboBox.
+     * 
+     * @throws SQLException Se ocorrer erro na operação do banco de dados (tratado internamente com Alert)
      */
     private void loadBrands() {
         try {
@@ -224,6 +227,9 @@ public class MedicineForm extends VBox {
     /**
      * Salva um novo medicamento no banco de dados.
      * Valida os campos antes de prosseguir.
+     * 
+     * @throws SQLException Se ocorrer erro na operação do banco de dados (tratado internamente com Alert)
+     * @throws NumberFormatException Se a quantidade não for um número válido (tratado internamente com Alert)
      */
     private void saveMedicine() {
         String name = nameField.getText().trim();
@@ -277,6 +283,7 @@ public class MedicineForm extends VBox {
 
     /**
      * Volta para a view de lista de medicamentos.
+     * Não retorna valor e não lança exceções.
      */
     private void goBack() {
         if (mainLayout != null && medicineView != null) {
