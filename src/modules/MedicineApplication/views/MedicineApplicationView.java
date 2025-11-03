@@ -301,11 +301,11 @@ public class MedicineApplicationView extends VBox {
                 mainLayout.setCenter(new MedicineApplicationForm(mainLayout, animal))
         );
 
-        Button backButton = new Button("Animais");
+        Button backButton = new Button("Voltar");
         backButton.getStyleClass().add("top-btn");
         backButton.setOnAction(e -> mainLayout.setCenter(new AnimalView(mainLayout)));
 
-        HBox rightBar = new HBox(15, addButton);
+        HBox rightBar = new HBox(15, addButton, backButton);
         rightBar.setAlignment(Pos.CENTER_RIGHT);
 
         HBox leftBar = new HBox(logoBtn);
