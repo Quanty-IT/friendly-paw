@@ -34,7 +34,7 @@ public class MedicineApplicationController {
             pstmt.setObject(2, application.getUserUuid());
             pstmt.setObject(3, application.getAnimalUuid());
             pstmt.setTimestamp(4, Timestamp.from(application.getAppliedAt().toInstant()));
-            pstmt.setBigDecimal(5, application.getQuantity());
+            pstmt.setInt(5, application.getQuantity());
 
             if (application.getNextApplicationAt() != null) {
                 pstmt.setTimestamp(6, Timestamp.from(application.getNextApplicationAt().toInstant()));
@@ -178,7 +178,7 @@ public class MedicineApplicationController {
             m.setAppliedAt(ZonedDateTime.ofInstant(appliedTs.toInstant(), ZoneId.systemDefault()));
         }
 
-        m.setQuantity(rs.getBigDecimal("quantity"));
+        m.setQuantity(rs.getInt("quantity"));
 
         Timestamp nextTs = rs.getTimestamp("next_application_at");
         if (nextTs != null) {

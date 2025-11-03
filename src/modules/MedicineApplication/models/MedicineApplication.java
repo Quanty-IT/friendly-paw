@@ -1,6 +1,5 @@
 package modules.MedicineApplication.models;
 
-import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
@@ -54,12 +53,12 @@ public class MedicineApplication {
     private UUID userUuid;
     private UUID animalUuid;
 
-    private ZonedDateTime appliedAt;          // TIMESTAMPTZ
-    private BigDecimal   quantity;            // NUMERIC
-    private ZonedDateTime nextApplicationAt;  // TIMESTAMPTZ
-    private Frequency     frequency;          // VARCHAR(20) (enum.name())
-    private ZonedDateTime endsAt;             // TIMESTAMPTZ
-    private ZonedDateTime createdAt;          // TIMESTAMPTZ (DEFAULT now())
+    private ZonedDateTime appliedAt;
+    private Integer   quantity;
+    private ZonedDateTime nextApplicationAt;
+    private Frequency     frequency;
+    private ZonedDateTime endsAt;
+    private ZonedDateTime createdAt;
 
     private String googleCalendarGoogleCalendarId;
 
@@ -84,8 +83,8 @@ public class MedicineApplication {
     public ZonedDateTime getAppliedAt() { return appliedAt; }
     public void setAppliedAt(ZonedDateTime appliedAt) { this.appliedAt = appliedAt; }
 
-    public BigDecimal getQuantity() { return quantity; }
-    public void setQuantity(BigDecimal quantity) { this.quantity = quantity; }
+    public Integer getQuantity() { return quantity; }
+    public void setQuantity(Integer quantity) { this.quantity = quantity; }
 
     public ZonedDateTime getNextApplicationAt() { return nextApplicationAt; }
     public void setNextApplicationAt(ZonedDateTime nextApplicationAt) { this.nextApplicationAt = nextApplicationAt; }

@@ -21,6 +21,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
+import javafx.util.StringConverter;
 
 public class MedicineApplicationForm extends VBox {
 
@@ -44,10 +48,25 @@ public class MedicineApplicationForm extends VBox {
     private final Button saveButton = new Button("Salvar");
     private final Button backButton = new Button("Voltar");
 
+    // Locale/formatter pt-BR
+    private static final Locale PT_BR = new Locale("pt", "BR");
+    private static final DateTimeFormatter BR_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+    /**
+     * Construtor do formulário de aplicação de medicamento.
+     * 
+     * @param mainLayout Layout principal para navegação
+     * @param selectedAnimal Animal selecionado
+     * @throws SQLException Se ocorrer erro na operação do banco de dados
+     * @throws IOException Se ocorrer erro na operação do Google Calendar
+     */
     public MedicineApplicationForm(BorderPane mainLayout, Animal selectedAnimal) {
         this.mainLayout = mainLayout;
         this.selectedAnimal = selectedAnimal;
         this.currentUser = Session.get();
+
+        // Garante datas e nomes em pt-BR (mês/dia no popup do calendário)
+        Locale.setDefault(PT_BR);
 
         try {
             this.conn = Database.getConnection();
@@ -58,13 +77,18 @@ public class MedicineApplicationForm extends VBox {
         this.medicineController = new MedicineController(this.conn);
 
         setupUI();
+        localizeDatePicker(appliedDatePicker);
+        localizeDatePicker(nextDatePicker);
+        localizeDatePicker(endsDatePicker);
+        // >>> Regras de datas
+        setupDateConstraints();
         loadData();
         setupActions();
     }
 
-    // =========================
-    // UI
-    // =========================
+    /**
+     * Configura a interface do formulário.
+     */
     private void setupUI() {
         // estilo base (igual AnimalForm/MedicineForm)
         getStyleClass().add("form-bg");
@@ -96,8 +120,10 @@ public class MedicineApplicationForm extends VBox {
         // Data de aplicação
         appliedDatePicker.setPrefWidth(HALF);
         appliedDatePicker.getStyleClass().add("date-picker");
+        appliedDatePicker.setEditable(false); // opcional: evitar digitação livre
 
         // Quantidade
+        quantityField.setPromptText("Digite a quantidade");
         quantityField.setPrefWidth(THIRD);
         quantityField.getStyleClass().add("form-input");
 
@@ -134,6 +160,8 @@ public class MedicineApplicationForm extends VBox {
         endsDatePicker.setPrefWidth(HALF);
         nextDatePicker.getStyleClass().add("date-picker");
         endsDatePicker.getStyleClass().add("date-picker");
+        nextDatePicker.setEditable(false); // opcional
+        endsDatePicker.setEditable(false); // opcional
 
         // Botões
         backButton.getStyleClass().add("form-btn-cancel");
@@ -168,9 +196,80 @@ public class MedicineApplicationForm extends VBox {
         getChildren().setAll(form, buttons);
     }
 
+    // Converte/mostra datas no formato BR e define placeholder
+    private void localizeDatePicker(DatePicker dp) {
+        dp.setConverter(new StringConverter<LocalDate>() {
+            @Override
+            public String toString(LocalDate date) {
+                return date != null ? BR_DATE.format(date) : "";
+            }
+            @Override
+            public LocalDate fromString(String str) {
+                if (str == null || str.trim().isEmpty()) return null;
+                return LocalDate.parse(str, BR_DATE);
+            }
+        });
+        dp.setPromptText("dd/MM/aaaa");
+    }
+
+    // >>> Regras de data para os DatePickers
+    private void setupDateConstraints() {
+        final LocalDate today = LocalDate.now();
+
+        // 1) Data da aplicação: só hoje e passadas (de hoje pra trás)
+        appliedDatePicker.setDayCellFactory(dp -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                if (empty || date == null) return;
+                setDisable(date.isAfter(today)); // desabilita futuro
+            }
+        });
+
+        // 2) Próxima aplicação: apenas datas após o dia atual
+        nextDatePicker.setDayCellFactory(dp -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                if (empty || date == null) return;
+                setDisable(!date.isAfter(today)); // precisa ser > hoje
+            }
+        });
+
+        // 3) Fim do tratamento: apenas datas após a "próxima aplicação"
+        //    (se próxima não estiver setada, considere hoje como base)
+        endsDatePicker.setDayCellFactory(dp -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                if (empty || date == null) return;
+                LocalDate base = nextDatePicker.getValue() != null ? nextDatePicker.getValue() : today;
+                setDisable(!date.isAfter(base)); // precisa ser > próxima aplicação
+            }
+        });
+
+        // Quando mudar a "próxima aplicação", refaça o filtro do "fim"
+        nextDatePicker.valueProperty().addListener((obs, oldV, newV) -> {
+            // se já havia um fim escolhido inválido com a nova base, limpe
+            if (endsDatePicker.getValue() != null && newV != null && !endsDatePicker.getValue().isAfter(newV)) {
+                endsDatePicker.setValue(null);
+            }
+            // reconstroi a fábrica para refletir a nova base
+            endsDatePicker.setDayCellFactory(dp -> new DateCell() {
+                @Override
+                public void updateItem(LocalDate date, boolean empty) {
+                    super.updateItem(date, empty);
+                    if (empty || date == null) return;
+                    LocalDate base = newV != null ? newV : today;
+                    setDisable(!date.isAfter(base));
+                }
+            });
+        });
+    }
+
     /**
      * Cria uma linha completa no formulário com label e campo de largura total.
-     * 
+     *
      * @param labelText Texto do label
      * @param field Campo de controle
      * @param width Largura total do campo
@@ -199,7 +298,7 @@ public class MedicineApplicationForm extends VBox {
 
     /**
      * Cria uma linha no formulário com dois campos lado a lado.
-     * 
+     *
      * @param l1 Texto do label do primeiro campo
      * @param f1 Primeiro campo de controle
      * @param l2 Texto do label do segundo campo
@@ -217,7 +316,7 @@ public class MedicineApplicationForm extends VBox {
 
     /**
      * Cria um VBox com label e campo de controle para uso em layouts de formulário.
-     * 
+     *
      * @param labelText Texto do label
      * @param field Campo de controle
      * @param width Largura do campo
@@ -245,7 +344,7 @@ public class MedicineApplicationForm extends VBox {
 
     /**
      * Cria uma linha no formulário com três campos lado a lado.
-     * 
+     *
      * @param l1 Texto do label do primeiro campo
      * @param f1 Primeiro campo de controle
      * @param l2 Texto do label do segundo campo
@@ -265,10 +364,9 @@ public class MedicineApplicationForm extends VBox {
         return row;
     }
 
-
     /**
      * Carrega a lista de medicamentos do banco de dados e popula o ComboBox.
-     * 
+     *
      * @throws SQLException Se ocorrer erro na operação do banco de dados (tratado internamente com Alert)
      */
     private void loadData() {
@@ -340,12 +438,34 @@ public class MedicineApplicationForm extends VBox {
                     return;
                 }
 
+                // >>> Validações de datas (reforço das regras)
+                LocalDate today = LocalDate.now();
+                LocalDate applied = appliedDatePicker.getValue();
+                LocalDate next = nextDatePicker.getValue();
+                LocalDate ends = endsDatePicker.getValue();
+
+                if (applied == null || applied.isAfter(today)) {
+                    showErrorAlert("Data inválida", "A data da aplicação deve ser hoje ou anterior.");
+                    return;
+                }
+                if (next != null && !next.isAfter(today)) {
+                    showErrorAlert("Data inválida", "A próxima aplicação deve ser após o dia de hoje.");
+                    return;
+                }
+                if (ends != null) {
+                    LocalDate base = (next != null) ? next : today;
+                    if (!ends.isAfter(base)) {
+                        showErrorAlert("Data inválida", "O fim do tratamento deve ser após a data da próxima aplicação.");
+                        return;
+                    }
+                }
+
                 MedicineApplication newApp = new MedicineApplication();
                 newApp.setAnimalUuid(selectedAnimal.getUuid());
                 newApp.setMedicineUuid(selectedMedicine.getUuid());
                 newApp.setUserUuid(currentUser.getUuid());
 
-                LocalDate localDate = appliedDatePicker.getValue();
+                LocalDate localDate = applied;
                 newApp.setAppliedAt(ZonedDateTime.of(localDate, LocalTime.now(), ZoneId.systemDefault()));
 
                 String qtyText = quantityField.getText() == null ? "" : quantityField.getText().trim();
@@ -399,7 +519,7 @@ public class MedicineApplicationForm extends VBox {
                 this.mainLayout.setCenter(new MedicineApplicationView(this.mainLayout, selectedAnimal));
 
             } catch (NumberFormatException e) {
-                showErrorAlert("Formato Inválido", "A quantidade deve ser um número válido.");
+                showErrorAlert("Formato Inválido", "A quantidade deve ser um número inteiro válido.");
             } catch (Exception e) {
                 showErrorAlert("Erro ao Salvar", "Ocorreu um erro ao registrar a aplicação: " + e.getMessage());
                 e.printStackTrace();
@@ -409,7 +529,7 @@ public class MedicineApplicationForm extends VBox {
 
     /**
      * Exibe um Alert de erro com título e mensagem personalizados.
-     * 
+     *
      * @param title Título do alerta (exibido no header)
      * @param message Mensagem de erro a ser exibida
      */
