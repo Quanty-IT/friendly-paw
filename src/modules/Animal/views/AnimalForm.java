@@ -13,6 +13,10 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+import javafx.util.StringConverter;
+
 public class AnimalForm extends GridPane {
 
     private TextField nameField;
@@ -34,13 +38,25 @@ public class AnimalForm extends GridPane {
     private final BorderPane mainLayout;
     private final Animal animalToEdit;
 
-    public AnimalForm(BorderPane mainLayout) {
-        this(mainLayout, null);
-    }
+    // >>> Locale/formatter pt-BR
+    private static final Locale PT_BR = new Locale("pt", "BR");
+    private static final DateTimeFormatter BR_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
+    /**
+     * Construtor do formulário de animal.
+     * 
+     * @param mainLayout Layout principal para navegação
+     * @param animal Animal a ser editado
+     * @throws SQLException Se ocorrer erro na operação do banco de dados
+     * @throws IOException Se ocorrer erro na operação do Google Calendar
+     * @throws GeneralSecurityException Se ocorrer erro na operação do Google Calendar
+     */
     public AnimalForm(BorderPane mainLayout, Animal animal) {
         this.mainLayout = mainLayout;
         this.animalToEdit = animal;
+
+        // Garante datas e nomes em pt-BR (mês/dia no popup do calendário)
+        Locale.setDefault(PT_BR);
 
         try {
             this.conn = Database.getConnection();

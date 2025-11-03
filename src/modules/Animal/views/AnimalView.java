@@ -354,7 +354,7 @@ public class AnimalView extends VBox {
 
         Button addButton = new Button("Cadastrar");
         addButton.getStyleClass().add("top-btn");
-        addButton.setOnAction(e -> mainLayout.setCenter(new AnimalForm(mainLayout)));
+        addButton.setOnAction(e -> mainLayout.setCenter(new AnimalForm(mainLayout, null)));
 
         HBox rightBar = new HBox(15, addButton);
         rightBar.setAlignment(Pos.CENTER_RIGHT);
