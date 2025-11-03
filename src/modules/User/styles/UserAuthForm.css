@@ -1,0 +1,80 @@
+/* Fundo da tela de login */
+.login-bg {
+  -fx-background-color: linear-gradient(to bottom, #f5e6d3, #e8d4b8);
+  -fx-min-width: 100%;
+  -fx-min-height: 100%;
+}
+
+/* Labels dos campos */
+.login-label {
+  -fx-font-size: 20px;
+  -fx-font-weight: bold;
+  -fx-text-fill: #5c3317;
+  -fx-min-width: 120px;
+  -fx-alignment: CENTER_RIGHT;
+}
+
+/* Campos de entrada */
+.login-input,
+.login-input .text-input {
+  -fx-background-color: #ffffff;
+  -fx-background-radius: 6;
+  -fx-border-color: #d4b896;
+  -fx-border-width: 2;
+  -fx-border-radius: 6;
+  -fx-padding: 10 15 10 15;
+  -fx-font-size: 13px;
+  -fx-text-fill: #4a2c10;
+}
+
+.login-input:focused,
+.login-input:focused .text-input {
+  -fx-border-color: #8b5a2b;
+  -fx-effect: dropshadow(gaussian, rgba(139, 90, 43, 0.3), 6, 0, 0, 0);
+}
+
+.login-input .prompt-text {
+  -fx-text-fill: #8b6f47;
+  -fx-font-style: italic;
+}
+
+/* Botão de Login */
+.login-btn {
+  -fx-background-color: linear-gradient(to bottom, #8b5a2b, #6b3a18);
+  -fx-text-fill: #ffffff;
+  -fx-font-size: 14px;
+  -fx-font-weight: bold;
+  -fx-background-radius: 8;
+  -fx-padding: 10 20 10 20;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 6, 0, 0, 3);
+  -fx-cursor: hand;
+  -fx-border-color: transparent;
+}
+
+.login-btn .label {
+  -fx-text-fill: #ffffff;
+}
+
+.login-btn:hover {
+  -fx-background-color: linear-gradient(to bottom, #a0672f, #7d4520);
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 8, 0, 0, 4);
+  -fx-scale-x: 1.02;
+  -fx-scale-y: 1.02;
+}
+
+.login-btn:pressed {
+  -fx-background-color: linear-gradient(to bottom, #6b3a18, #5c3317);
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0, 0, 1);
+}
+
+.login-btn:focused {
+  -fx-background-insets: 0;
+  -fx-border-color: transparent;
+}
+
+.login-btn:disabled {
+  -fx-background-color: #9e9e9e;
+  -fx-text-fill: #ffffff;
+  -fx-opacity: 0.6;
+}
+

@@ -1,9 +1,13 @@
 package modules.User.views;
 
 import config.Database;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 import modules.User.controllers.UserAuthController;
 import modules.User.models.User;
 import utils.Session;
@@ -12,16 +16,16 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.function.Consumer;
 
-public class UserAuthForm extends GridPane {
+public class UserAuthForm extends VBox {
 
     private final TextField emailField = new TextField();
     private final PasswordField passwordField = new PasswordField();
-    private final Button loginButton = new Button("Entrar");
+    private final Button loginButton = new Button("Login");
     private Connection conn;
 
     private final Consumer<User> onSuccess;
 
-    /**
+     /**
      * Construtor do formulário de autenticação de usuário.
      * 
      * @param onSuccess Callback executado após login bem-sucedido
@@ -36,26 +40,113 @@ public class UserAuthForm extends GridPane {
             loginButton.setDisable(true);
         }
 
-        setVgap(10);
-        setHgap(10);
-        setPadding(new Insets(20));
+        setupLayout();
+        setupStyles();
+    }
 
-        add(new Label("E-mail:"), 0, 0);
-        add(emailField, 1, 0);
+    private void setupLayout() {
+        setAlignment(Pos.CENTER);
 
-        add(new Label("Senha:"), 0, 1);
-        add(passwordField, 1, 1);
+        // espaço entre logo e formulário
+        setSpacing(12);
 
-        add(loginButton, 1, 2);
+        setPadding(new Insets(60, 40, 60, 40));
+        getStyleClass().add("login-bg");
 
-        emailField.setPromptText("email");
-        passwordField.setPromptText("senha");
+        final double INPUT_W = 220;
+        final double TRANSLATE_X = -65;
 
+        // Logo
+        ImageView logoView = new ImageView(new Image(getClass().getResourceAsStream("/assets/logo.png")));
+        logoView.setFitWidth(220);
+        logoView.setPreserveRatio(true);
+
+        VBox logoContainer = new VBox(6, logoView);
+        logoContainer.setAlignment(Pos.CENTER);
+
+        // Form
+        VBox formContainer = new VBox(20);
+        formContainer.setAlignment(Pos.CENTER);
+        formContainer.setPadding(new Insets(0));
+
+        Label emailLabel = new Label("Email:");
+        emailLabel.getStyleClass().add("login-label");
+        emailLabel.setTranslateX(TRANSLATE_X);
+
+        Label passwordLabel = new Label("Senha:");
+        passwordLabel.getStyleClass().add("login-label");
+        passwordLabel.setTranslateX(TRANSLATE_X);
+
+        emailField.setPromptText("exemplo@email.com");
+        emailField.setTranslateX(TRANSLATE_X);
+        passwordField.setPromptText("*************");
+        passwordField.setTranslateX(TRANSLATE_X);
+        emailField.getStyleClass().add("login-input");
+        passwordField.getStyleClass().add("login-input");
+
+        emailField.setPrefWidth(INPUT_W);
+        passwordField.setPrefWidth(INPUT_W);
+        emailField.setMinWidth(Region.USE_PREF_SIZE);
+        emailField.setMaxWidth(Region.USE_PREF_SIZE);
+        passwordField.setMinWidth(Region.USE_PREF_SIZE);
+        passwordField.setMaxWidth(Region.USE_PREF_SIZE);
+
+        // Grid alinhando label (direita) e campo (esquerda)
+        GridPane grid = new GridPane();
+        grid.setHgap(16);
+        grid.setVgap(18);
+        grid.setAlignment(Pos.CENTER);
+
+        ColumnConstraints c1 = new ColumnConstraints();
+        c1.setMinWidth(120);
+        c1.setHalignment(HPos.RIGHT);
+
+        ColumnConstraints c2 = new ColumnConstraints();
+        c2.setHgrow(Priority.NEVER);
+        c2.setFillWidth(false);
+        c2.setMaxWidth(INPUT_W);
+
+        grid.getColumnConstraints().setAll(c1, c2);
+
+        GridPane.setHgrow(emailField, Priority.NEVER);
+        GridPane.setHgrow(passwordField, Priority.NEVER);
+
+        grid.add(emailLabel, 0, 0);
+        grid.add(emailField, 1, 0);
+        grid.add(passwordLabel, 0, 1);
+        grid.add(passwordField, 1, 1);
+
+        // Botão
+        loginButton.getStyleClass().add("login-btn");
+        loginButton.setPrefWidth(160);
+        loginButton.setPrefHeight(42);
         loginButton.setOnAction(e -> doLogin());
         passwordField.setOnAction(e -> doLogin());
 
-        emailField.setPrefWidth(260);
-        passwordField.setPrefWidth(260);
+        grid.add(loginButton, 0, 2, 2, 1);
+        GridPane.setHalignment(loginButton, HPos.CENTER);
+
+        formContainer.getChildren().add(grid);
+
+        getChildren().addAll(logoContainer, formContainer);
+
+        this.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.windowProperty().addListener((obsWin, oldWin, newWin) -> {
+                    if (newWin != null) {
+                        emailField.requestFocus();
+                    }
+                });
+            }
+        });
+
+        emailField.setOnAction(e -> passwordField.requestFocus());
+        passwordField.setOnAction(e -> loginButton.fire());
+        loginButton.setDefaultButton(true);
+    }
+
+    private void setupStyles() {
+        getStylesheets().add(getClass().getResource("/modules/User/styles/UserAuthForm.css").toExternalForm());
     }
 
     /**
