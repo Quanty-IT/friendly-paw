@@ -12,6 +12,8 @@ import modules.Animal.views.AnimalView;
 import config.Database;
 
 import java.io.File;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -100,7 +102,14 @@ public class AttachmentForm extends GridPane {
         setPrefSize(520, 600);
     }
 
-    // ===== helpers de layout iguais aos do AnimalForm =====
+    /**
+     * Adiciona uma linha completa no formulário com label e campo de largura total.
+     * 
+     * @param labelText Texto do label
+     * @param field Campo de controle a ser adicionado
+     * @param row Número da linha no GridPane
+     * @param width Largura total do campo
+     */
     private void addRowFull(String labelText, Control field, int row, double width) {
         Label label = new Label(labelText);
         label.getStyleClass().add("form-label");
@@ -118,6 +127,16 @@ public class AttachmentForm extends GridPane {
         add(box, 0, row, 4, 1);
     }
 
+    /**
+     * Adiciona uma linha no formulário com dois campos lado a lado.
+     * 
+     * @param l1 Texto do label do primeiro campo
+     * @param f1 Primeiro campo de controle
+     * @param l2 Texto do label do segundo campo
+     * @param f2 Segundo campo de controle
+     * @param row Número da linha no GridPane
+     * @param width Largura de cada campo (metade da largura total)
+     */
     private void addRowHalf(String l1, Control f1, String l2, Control f2, int row, double width) {
         VBox left = buildLabeledBox(l1, f1, width);
         VBox right = buildLabeledBox(l2, f2, width);
@@ -128,6 +147,14 @@ public class AttachmentForm extends GridPane {
         add(rowBox, 0, row, 4, 1);
     }
 
+    /**
+     * Cria um VBox com label e campo de controle para uso em layouts de formulário.
+     * 
+     * @param labelText Texto do label
+     * @param field Campo de controle
+     * @param width Largura do campo
+     * @return VBox configurado com label e campo
+     */
     private VBox buildLabeledBox(String labelText, Control field, double width) {
         if (labelText == null || labelText.isBlank()) labelText = " ";
 
@@ -146,7 +173,10 @@ public class AttachmentForm extends GridPane {
         return box;
     }
 
-    // ===== lógica =====
+    /**
+     * Abre um diálogo de seleção de arquivo e armazena o arquivo selecionado.
+     * O nome do arquivo é exibido no campo urlField após a seleção.
+     */
     private void selectFile() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Selecionar arquivo");
@@ -163,6 +193,14 @@ public class AttachmentForm extends GridPane {
         }
     }
 
+    /**
+     * Salva um novo anexo no banco de dados e faz upload para o Google Drive.
+     * Valida se um arquivo foi selecionado antes de prosseguir.
+     * 
+     * @throws IOException Se ocorrer erro ao fazer upload do arquivo para o Google Drive (tratado internamente com Alert)
+     * @throws GeneralSecurityException Se ocorrer erro na autenticação com Google Drive (tratado internamente com Alert)
+     * @throws SQLException Se ocorrer erro na operação do banco de dados (tratado internamente com Alert)
+     */
     private void saveAttachment() {
         if (selectedFile == null) {
             new Alert(Alert.AlertType.WARNING, "Por favor, selecione um arquivo para fazer upload.").showAndWait();

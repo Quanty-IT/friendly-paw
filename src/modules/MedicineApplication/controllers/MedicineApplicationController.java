@@ -12,25 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Controller para CRUD de aplicações de medicamento.
- *
- * Convenções assumidas na tabela public.medicine_applications:
- *  - application_uuid (PK, UUID, default gen_random_uuid())
- *  - medicine_uuid (UUID)          NOT NULL
- *  - user_uuid (UUID)              NOT NULL
- *  - animal_uuid (UUID)            NOT NULL
- *  - applied_at (timestamptz)      NOT NULL
- *  - quantity (numeric)            NOT NULL
- *  - next_application_at (timestamptz) NULL
- *  - frequency (varchar)           NOT NULL (valores do enum Frequency.name())
- *  - ends_at (timestamptz)         NULL
- *  - google_calendar_id (text)               NULL   ← id do evento no Google Calendar
- *  - created_at (timestamptz)      DEFAULT now()
- */
 public class MedicineApplicationController {
 
-    /** Cria uma nova aplicação (salva google_calendar_id se existir) */
+    /**
+     * Cria uma nova aplicação (salva google_calendar_id se existir).
+     * 
+     * @param application Objeto MedicineApplication a ser criado
+     * @throws SQLException Se ocorrer erro na operação do banco de dados
+     */
     public void create(MedicineApplication application) throws SQLException {
         String sql = """
             INSERT INTO public.medicine_applications
@@ -74,7 +63,14 @@ public class MedicineApplicationController {
         }
     }
 
-    /** Lista todas as aplicações de um animal (para a listagem) */
+    /**
+     * Lista todas as aplicações de um animal (para a listagem).
+     * 
+     * @param conn Conexão com o banco de dados
+     * @param animalUuid UUID do animal a ser buscado
+     * @return Lista de objetos MedicineApplication
+     * @throws SQLException Se ocorrer erro na operação do banco de dados
+     */
     public static List<MedicineApplication> getApplicationsForAnimal(Connection conn, UUID animalUuid) throws SQLException {
         String sql = """
             SELECT application_uuid, medicine_uuid, user_uuid, animal_uuid,
@@ -94,7 +90,14 @@ public class MedicineApplicationController {
         }
     }
 
-    /** (Opcional) Buscar uma aplicação específica por UUID */
+    /**
+     * Busca uma aplicação específica por UUID.
+     * 
+     * @param conn Conexão com o banco de dados
+     * @param applicationUuid UUID da aplicação a ser buscada
+     * @return Objeto MedicineApplication se encontrado, null caso contrário
+     * @throws SQLException Se ocorrer erro na operação do banco de dados
+     */
     public static MedicineApplication getByUuid(Connection conn, UUID applicationUuid) throws SQLException {
         String sql = """
             SELECT application_uuid, medicine_uuid, user_uuid, animal_uuid,
@@ -115,6 +118,10 @@ public class MedicineApplicationController {
      * Deleta uma aplicação pelo UUID.
      * - Se houver google_calendar_id, tenta apagar o evento do Google Calendar (best-effort).
      * - Em qualquer caso, remove o registro do banco.
+     * 
+     * @param conn Conexão com o banco de dados
+     * @param applicationUuid UUID da aplicação a ser deletada
+     * @throws SQLException Se ocorrer erro na operação do banco de dados
      */
     public static void delete(Connection conn, UUID applicationUuid) throws SQLException {
         // 1) Buscar google_calendar_id
@@ -144,7 +151,13 @@ public class MedicineApplicationController {
         }
     }
 
-    /** Mapper centralizado ResultSet -> Model */
+    /**
+     * Mapper centralizado ResultSet -> Model.
+     * 
+     * @param rs ResultSet a ser mapeado
+     * @return Objeto MedicineApplication
+     * @throws SQLException Se ocorrer erro na operação do banco de dados
+     */
     private static MedicineApplication mapRow(ResultSet rs) throws SQLException {
         MedicineApplication m = new MedicineApplication();
 

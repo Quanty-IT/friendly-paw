@@ -19,7 +19,12 @@ public class MedicineApplication {
         public String getDisplayName() { return displayName; }
         @Override public String toString() { return displayName; }
 
-        /** Converte para RRULE do Google Calendar */
+        /**
+         * Converte para RRULE do Google Calendar.
+         * 
+         * @param endDate Data final da recorrência
+         * @return String representando a RRULE
+         */
         public String toRRULE(ZonedDateTime endDate) {
             if (this == DOES_NOT_REPEAT) return null;
 
@@ -56,7 +61,6 @@ public class MedicineApplication {
     private ZonedDateTime endsAt;             // TIMESTAMPTZ
     private ZonedDateTime createdAt;          // TIMESTAMPTZ (DEFAULT now())
 
-    /** ➕ ID do evento no Google Calendar (coluna google_calendar_id) */
     private String googleCalendarGoogleCalendarId;
 
     public MedicineApplication() {}
@@ -95,7 +99,6 @@ public class MedicineApplication {
     public ZonedDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(ZonedDateTime createdAt) { this.createdAt = createdAt; }
 
-    /** ➕ getters/setters do googleCalendarId do Google Calendar */
     public String getGoogleCalendarGoogleCalendarId() { return googleCalendarGoogleCalendarId; }
     public void setGoogleCalendarGoogleCalendarId(String googleCalendarGoogleCalendarId) { this.googleCalendarGoogleCalendarId = googleCalendarGoogleCalendarId; }
 

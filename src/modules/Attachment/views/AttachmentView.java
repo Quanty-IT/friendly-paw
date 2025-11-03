@@ -52,12 +52,14 @@ public class AttachmentView extends VBox {
         loadAttachments();
     }
 
-    /* =========================
-       UI helpers (SVG + Buttons)
-       ========================= */
-
+    /**
+     * Cria um ícone SVG a partir de um arquivo SVG do classpath.
+     * 
+     * @param svgPath Caminho do arquivo SVG no classpath
+     * @param color Cor a ser aplicada ao ícone (formato hexadecimal, ex: "#FFFFFF")
+     * @return StackPane contendo o ícone renderizado, ou um StackPane vazio em caso de erro
+     */
     private StackPane createSvgIcon(String svgPath, String color) {
-        // container fixo 18x18, centraliza automaticamente
         StackPane box = new StackPane();
         box.setMinSize(18, 18);
         box.setPrefSize(18, 18);
@@ -115,6 +117,13 @@ public class AttachmentView extends VBox {
         return box;
     }
 
+    /**
+     * Cria um botão circular com um ícone SVG centralizado.
+     * 
+     * @param svgPath Caminho do SVG no classpath
+     * @param extraStyleClasses Classes extras para estilização
+     * @return Button configurado com o ícone SVG e estilos aplicados
+     */
     private Button createIconButton(String svgPath, String... extraStyleClasses) {
         Button btn = new Button();
         StackPane icon = createSvgIcon(svgPath, "#FFFFFF");
@@ -133,9 +142,6 @@ public class AttachmentView extends VBox {
         return btn;
     }
 
-    /* ==============
-       Build the view
-       ============== */
     private void initializeComponents() {
         tableView = new TableView<>();
         attachmentList = FXCollections.observableArrayList();
@@ -308,9 +314,11 @@ public class AttachmentView extends VBox {
         );
     }
 
-    /* =========================
-       Load data
-       ========================= */
+    /**
+     * Carrega todos os anexos do animal do banco de dados e atualiza a tabela.
+     * 
+     * @throws SQLException Se ocorrer erro na operação do banco de dados (tratado internamente com Alert)
+     */
     private void loadAttachments() {
         try {
             List<Attachment> attachments = AttachmentController.getAttachmentsForAnimal(conn, animalUuid);

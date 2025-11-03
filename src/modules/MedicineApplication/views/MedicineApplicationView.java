@@ -22,7 +22,6 @@ import modules.Shared.views.MenuView;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -31,10 +30,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Listagem de Aplicações de Medicamento de um animal.
- * Estilo e UX seguem o mesmo padrão de AttachmentView.
- */
 public class MedicineApplicationView extends VBox {
 
     private final BorderPane mainLayout;
@@ -68,10 +63,13 @@ public class MedicineApplicationView extends VBox {
         loadApplications();
     }
 
-    /* =========================
-       UI helpers (SVG + Buttons)
-       ========================= */
-
+    /**
+     * Cria um ícone SVG a partir de um arquivo SVG do classpath.
+     * 
+     * @param svgPath Caminho do arquivo SVG no classpath
+     * @param color Cor a ser aplicada ao ícone (formato hexadecimal, ex: "#FFFFFF")
+     * @return StackPane contendo o ícone renderizado, ou um StackPane vazio em caso de erro
+     */
     private StackPane createSvgIcon(String svgPath, String color) {
         StackPane box = new StackPane();
         box.setMinSize(18, 18);
@@ -130,6 +128,13 @@ public class MedicineApplicationView extends VBox {
         return box;
     }
 
+    /**
+     * Cria um botão circular com um ícone SVG centralizado.
+     * 
+     * @param svgPath Caminho do SVG no classpath
+     * @param extraStyleClasses Classes extras para estilização
+     * @return Button configurado com o ícone SVG e estilos aplicados
+     */
     private Button createIconButton(String svgPath, String... extraStyleClasses) {
         Button btn = new Button();
         StackPane icon = createSvgIcon(svgPath, "#FFFFFF");
@@ -148,10 +153,6 @@ public class MedicineApplicationView extends VBox {
         return btn;
     }
 
-    /* ==============
-       Build the view
-       ============== */
-
     private void initializeComponents() {
         tableView.setItems(appList);
 
@@ -166,14 +167,14 @@ public class MedicineApplicationView extends VBox {
             }
         });
 
-        // Quantidade (mg)
-        TableColumn<MedicineApplication, BigDecimal> qtyCol = new TableColumn<>("quantidade (mg)");
+        // Quantidade
+        TableColumn<MedicineApplication, Integer> qtyCol = new TableColumn<>("quantidade");
         qtyCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         qtyCol.setCellFactory(col -> new TableCell<>() {
             { setAlignment(Pos.CENTER); }
-            @Override protected void updateItem(BigDecimal item, boolean empty) {
+            @Override protected void updateItem(Integer item, boolean empty) {
                 super.updateItem(item, empty);
-                setText(empty || item == null ? null : item.stripTrailingZeros().toPlainString());
+                setText(empty || item == null ? null : item.toString());
             }
         });
         qtyCol.setPrefWidth(140);
@@ -338,10 +339,12 @@ public class MedicineApplicationView extends VBox {
         );
     }
 
-    /* =========================
-       Load data
-       ========================= */
-
+    /**
+     * Carrega os medicamentos do banco de dados e cria um mapa de UUID para nome.
+     * Utilizado para exibir o nome do medicamento na tabela a partir do UUID.
+     * 
+     * @throws SQLException Se ocorrer erro na operação do banco de dados (erro logado mas não interrompe a execução)
+     */
     private void loadMedicinesLookup() {
         try {
             MedicineController medCtrl = new MedicineController(conn);
@@ -353,6 +356,11 @@ public class MedicineApplicationView extends VBox {
         }
     }
 
+    /**
+     * Carrega todas as aplicações de medicamento do animal do banco de dados e atualiza a tabela.
+     * 
+     * @throws SQLException Se ocorrer erro na operação do banco de dados (tratado internamente com Alert)
+     */
     private void loadApplications() {
         try {
             List<MedicineApplication> apps =

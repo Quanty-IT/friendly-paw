@@ -15,7 +15,6 @@ import modules.MedicineApplication.models.MedicineApplication;
 import modules.User.models.User;
 import utils.Session;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -99,7 +98,6 @@ public class MedicineApplicationForm extends VBox {
         appliedDatePicker.getStyleClass().add("date-picker");
 
         // Quantidade
-        quantityField.setPromptText("Ex: 1.5");
         quantityField.setPrefWidth(THIRD);
         quantityField.getStyleClass().add("form-input");
 
@@ -154,7 +152,7 @@ public class MedicineApplicationForm extends VBox {
 
                 // 👇 NOVA LINHA COM 3 COLUNAS
                 rowThird(
-                        "Quantidade (em mg):",        quantityField,
+                        "Quantidade:",        quantityField,
                         "Agendar no Google Calendar:", googleCalendarCombo,
                         "Frequência:",                 frequencyComboBox,
                         THIRD
@@ -170,7 +168,14 @@ public class MedicineApplicationForm extends VBox {
         getChildren().setAll(form, buttons);
     }
 
-    // Helpers visuais
+    /**
+     * Cria uma linha completa no formulário com label e campo de largura total.
+     * 
+     * @param labelText Texto do label
+     * @param field Campo de controle
+     * @param width Largura total do campo
+     * @return VBox configurado com label e campo
+     */
     private VBox rowFull(String labelText, Control field, double width) {
         Label label = new Label(labelText);
         label.getStyleClass().add("form-label");
@@ -192,6 +197,16 @@ public class MedicineApplicationForm extends VBox {
         return box;
     }
 
+    /**
+     * Cria uma linha no formulário com dois campos lado a lado.
+     * 
+     * @param l1 Texto do label do primeiro campo
+     * @param f1 Primeiro campo de controle
+     * @param l2 Texto do label do segundo campo
+     * @param f2 Segundo campo de controle
+     * @param width Largura de cada campo (metade da largura total)
+     * @return HBox configurado com os dois campos lado a lado
+     */
     private HBox rowHalf(String l1, Control f1, String l2, Control f2, double width) {
         VBox left = labeledBox(l1, f1, width);
         VBox right = labeledBox(l2, f2, width);
@@ -200,6 +215,14 @@ public class MedicineApplicationForm extends VBox {
         return row;
     }
 
+    /**
+     * Cria um VBox com label e campo de controle para uso em layouts de formulário.
+     * 
+     * @param labelText Texto do label
+     * @param field Campo de controle
+     * @param width Largura do campo
+     * @return VBox configurado com label e campo
+     */
     private VBox labeledBox(String labelText, Control field, double width) {
         Label label = new Label(labelText);
         label.getStyleClass().add("form-label");
@@ -220,6 +243,18 @@ public class MedicineApplicationForm extends VBox {
         return box;
     }
 
+    /**
+     * Cria uma linha no formulário com três campos lado a lado.
+     * 
+     * @param l1 Texto do label do primeiro campo
+     * @param f1 Primeiro campo de controle
+     * @param l2 Texto do label do segundo campo
+     * @param f2 Segundo campo de controle
+     * @param l3 Texto do label do terceiro campo
+     * @param f3 Terceiro campo de controle
+     * @param widthEach Largura de cada campo
+     * @return HBox configurado com os três campos lado a lado
+     */
     private HBox rowThird(String l1, Control f1, String l2, Control f2, String l3, Control f3, double widthEach) {
         VBox c1 = labeledBox(l1, f1, widthEach);
         VBox c2 = labeledBox(l2, f2, widthEach);
@@ -231,9 +266,11 @@ public class MedicineApplicationForm extends VBox {
     }
 
 
-    // =========================
-    // Dados e ações
-    // =========================
+    /**
+     * Carrega a lista de medicamentos do banco de dados e popula o ComboBox.
+     * 
+     * @throws SQLException Se ocorrer erro na operação do banco de dados (tratado internamente com Alert)
+     */
     private void loadData() {
         try {
             medicineComboBox.setItems(FXCollections.observableArrayList(medicineController.listAll()));
@@ -254,6 +291,10 @@ public class MedicineApplicationForm extends VBox {
         }
     }
 
+    /**
+     * Configura os event handlers dos botões e campos do formulário.
+     * Inclui lógica para habilitar/desabilitar campos baseado na seleção de Google Calendar e frequência.
+     */
     private void setupActions() {
         // toggle de recorrência conforme Google Calendar
         frequencyComboBox.setOnAction(e -> {
@@ -309,10 +350,10 @@ public class MedicineApplicationForm extends VBox {
 
                 String qtyText = quantityField.getText() == null ? "" : quantityField.getText().trim();
                 if (qtyText.isEmpty()) {
-                    showErrorAlert("Dados Incompletos", "Informe a quantidade (ex: 1.5).");
+                    showErrorAlert("Dados Incompletos", "Informe a quantidade.");
                     return;
                 }
-                newApp.setQuantity(new BigDecimal(qtyText.replace(',', '.')));
+                newApp.setQuantity(Integer.parseInt(qtyText));
 
                 MedicineApplication.Frequency frequency = frequencyComboBox.getValue();
                 newApp.setFrequency(frequency != null ? frequency : MedicineApplication.Frequency.DOES_NOT_REPEAT);
@@ -358,7 +399,7 @@ public class MedicineApplicationForm extends VBox {
                 this.mainLayout.setCenter(new MedicineApplicationView(this.mainLayout, selectedAnimal));
 
             } catch (NumberFormatException e) {
-                showErrorAlert("Formato Inválido", "A quantidade deve ser um número válido (ex: 1.5).");
+                showErrorAlert("Formato Inválido", "A quantidade deve ser um número válido.");
             } catch (Exception e) {
                 showErrorAlert("Erro ao Salvar", "Ocorreu um erro ao registrar a aplicação: " + e.getMessage());
                 e.printStackTrace();
@@ -366,9 +407,12 @@ public class MedicineApplicationForm extends VBox {
         });
     }
 
-    // =========================
-    // Alerts
-    // =========================
+    /**
+     * Exibe um Alert de erro com título e mensagem personalizados.
+     * 
+     * @param title Título do alerta (exibido no header)
+     * @param message Mensagem de erro a ser exibida
+     */
     private void showErrorAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Erro");

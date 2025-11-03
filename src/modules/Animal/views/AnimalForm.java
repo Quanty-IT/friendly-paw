@@ -211,7 +211,14 @@ public class AnimalForm extends GridPane {
         }
     }
 
-    // Helpers de layout (mantendo seu padrão)
+    /**
+     * Adiciona uma linha completa no formulário com label e campo de largura total.
+     * 
+     * @param labelText Texto do label
+     * @param field Campo de controle a ser adicionado
+     * @param row Número da linha no GridPane
+     * @param width Largura total do campo
+     */
     private void addRowFull(String labelText, Control field, int row, double width) {
         Label label = new Label(labelText);
         label.getStyleClass().add("form-label");
@@ -229,6 +236,16 @@ public class AnimalForm extends GridPane {
         add(box, 0, row, 4, 1);
     }
 
+    /**
+     * Adiciona uma linha no formulário com dois campos lado a lado.
+     * 
+     * @param l1 Texto do label do primeiro campo
+     * @param f1 Primeiro campo de controle
+     * @param l2 Texto do label do segundo campo
+     * @param f2 Segundo campo de controle
+     * @param row Número da linha no GridPane
+     * @param width Largura de cada campo (metade da largura total)
+     */
     private void addRowHalf(String l1, Control f1, String l2, Control f2, int row, double width) {
         VBox left = buildLabeledBox(l1, f1, width);
         VBox right = buildLabeledBox(l2, f2, width);
@@ -239,6 +256,14 @@ public class AnimalForm extends GridPane {
         add(rowBox, 0, row, 4, 1);
     }
 
+    /**
+     * Cria um VBox com label e campo de controle para uso em layouts de formulário.
+     * 
+     * @param labelText Texto do label
+     * @param field Campo de controle
+     * @param width Largura do campo
+     * @return VBox configurado com label e campo
+     */
     private VBox buildLabeledBox(String labelText, Control field, double width) {
         if (labelText == null || labelText.isBlank()) {
             labelText = " ";
@@ -260,11 +285,22 @@ public class AnimalForm extends GridPane {
         return box;
     }
 
+    /**
+     * Adiciona uma classe CSS a um controle.
+     * 
+     * @param c Controle ao qual adicionar a classe
+     * @param cls Nome da classe CSS
+     */
     private void addClass(Control c, String cls) {
         c.getStyleClass().add(cls);
     }
 
-    // salvar
+    /**
+     * Salva ou atualiza um animal no banco de dados.
+     * Valida os dados do formulário e cria ou atualiza o animal conforme o modo (criação/edição).
+     * 
+     * @throws SQLException Se ocorrer erro na operação do banco de dados (tratado internamente com Alert)
+     */
     private void saveAnimal() {
         String name = nameField.getText();
 
@@ -319,25 +355,42 @@ public class AnimalForm extends GridPane {
         }
     }
 
-    // Converters (mantidos)
-    private String convertSex(String v) {
-        return switch (v) {
+    /**
+     * Converte o valor de sexo do português para inglês.
+     * 
+     * @param value Valor em português ("Macho" ou "Fêmea")
+     * @return Valor em inglês ("male" ou "female"), ou null se o valor não for reconhecido
+     */
+    private String convertSex(String value) {
+        return switch (value) {
             case "Macho" -> "male";
             case "Fêmea" -> "female";
             default -> null;
         };
     }
 
-    private String convertSpecies(String v) {
-        return switch (v) {
+    /**
+     * Converte o valor de espécie do português para inglês.
+     * 
+     * @param value Valor em português ("Cachorro" ou "Gato")
+     * @return Valor em inglês ("dog" ou "cat"), ou null se o valor não for reconhecido
+     */
+    private String convertSpecies(String value) {
+        return switch (value) {
             case "Cachorro" -> "dog";
             case "Gato" -> "cat";
             default -> null;
         };
     }
 
-    private String convertBreed(String v) {
-        return switch (v) {
+    /**
+     * Converte o valor de raça do português para inglês.
+     * 
+     * @param value Valor em português (nome da raça)
+     * @return Valor em inglês (identificador da raça), ou null se o valor não for reconhecido
+     */
+    private String convertBreed(String value) {
+        return switch (value) {
             case "S.R.D" -> "mixed-breed";
             case "Shih-tzu" -> "shih-tzu";
             case "Yorkshire Terrier" -> "yorkshire-terrier";
@@ -358,8 +411,14 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertSize(String v) {
-        return switch (v) {
+    /**
+     * Converte o valor de porte do português para inglês.
+     * 
+     * @param value Valor em português ("Pequeno", "Médio" ou "Grande")
+     * @return Valor em inglês ("small", "medium" ou "large"), ou null se o valor não for reconhecido
+     */
+    private String convertSize(String value) {
+        return switch (value) {
             case "Pequeno" -> "small";
             case "Médio" -> "medium";
             case "Grande" -> "large";
@@ -367,8 +426,14 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertColor(String v) {
-        return switch (v) {
+    /**
+     * Converte o valor de cor do português para inglês.
+     * 
+     * @param value Valor em português (nome da cor)
+     * @return Valor em inglês (identificador da cor), ou null se o valor não for reconhecido
+     */
+    private String convertColor(String value) {
+        return switch (value) {
             case "Preto" -> "black";
             case "Branco" -> "white";
             case "Cinza" -> "gray";
@@ -381,8 +446,14 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertYesNoNotTested(String v) {
-        return switch (v) {
+    /**
+     * Converte o valor de teste do português para inglês.
+     * 
+     * @param value Valor em português ("Sim", "Não" ou "Não testado")
+     * @return Valor em inglês ("yes", "no" ou "not-tested"), ou null se o valor não for reconhecido
+     */
+    private String convertYesNoNotTested(String value) {
+        return switch (value) {
             case "Sim" -> "yes";
             case "Não" -> "no";
             case "Não testado" -> "not-tested";
@@ -390,8 +461,14 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertStatus(String v) {
-        return switch (v) {
+    /**
+     * Converte o valor de status do português para inglês.
+     * 
+     * @param value Valor em português ("Quarentena", "Abrigado", "Adotado" ou "Perdido")
+     * @return Valor em inglês ("quarantine", "sheltered", "adopted" ou "lost"), ou null se o valor não for reconhecido
+     */
+    private String convertStatus(String value) {
+        return switch (value) {
             case "Quarentena" -> "quarantine";
             case "Abrigado" -> "sheltered";
             case "Adotado" -> "adopted";
@@ -400,24 +477,42 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertSexToPt(String v) {
-        return switch (v) {
+    /**
+     * Converte o valor de sexo do inglês para português.
+     * 
+     * @param value Valor em inglês ("male" ou "female")
+     * @return Valor em português ("Macho" ou "Fêmea"), ou null se o valor não for reconhecido
+     */
+    private String convertSexToPt(String value) {
+        return switch (value) {
             case "male" -> "Macho";
             case "female" -> "Fêmea";
             default -> null;
         };
     }
 
-    private String convertSpeciesToPt(String v) {
-        return switch (v) {
+    /**
+     * Converte o valor de espécie do inglês para português.
+     * 
+     * @param value Valor em inglês ("dog" ou "cat")
+     * @return Valor em português ("Cachorro" ou "Gato"), ou null se o valor não for reconhecido
+     */
+    private String convertSpeciesToPt(String value) {
+        return switch (value) {
             case "dog" -> "Cachorro";
             case "cat" -> "Gato";
             default -> null;
         };
     }
 
-    private String convertBreedToPt(String v) {
-        return switch (v) {
+    /**
+     * Converte o valor de raça do inglês para português.
+     * 
+     * @param value Valor em inglês (identificador da raça)
+     * @return Valor em português (nome da raça), ou null se o valor não for reconhecido
+     */
+    private String convertBreedToPt(String value) {
+        return switch (value) {
             case "mixed-breed" -> "S.R.D";
             case "shih-tzu" -> "Shih-tzu";
             case "yorkshire-terrier" -> "Yorkshire Terrier";
@@ -438,8 +533,14 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertSizeToPt(String v) {
-        return switch (v) {
+    /**
+     * Converte o valor de porte do inglês para português.
+     * 
+     * @param value Valor em inglês ("small", "medium" ou "large")
+     * @return Valor em português ("Pequeno", "Médio" ou "Grande"), ou null se o valor não for reconhecido
+     */
+    private String convertSizeToPt(String value) {
+        return switch (value) {
             case "small" -> "Pequeno";
             case "medium" -> "Médio";
             case "large" -> "Grande";
@@ -447,8 +548,14 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertColorToPt(String v) {
-        return switch (v) {
+    /**
+     * Converte o valor de cor do inglês para português.
+     * 
+     * @param value Valor em inglês (identificador da cor)
+     * @return Valor em português (nome da cor), ou null se o valor não for reconhecido
+     */
+    private String convertColorToPt(String value) {
+        return switch (value) {
             case "black" -> "Preto";
             case "white" -> "Branco";
             case "gray" -> "Cinza";
@@ -461,8 +568,14 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertYesNoNotTestedToPt(String v) {
-        return switch (v) {
+    /**
+     * Converte o valor de teste do inglês para português.
+     * 
+     * @param value Valor em inglês ("yes", "no" ou "not-tested")
+     * @return Valor em português ("Sim", "Não" ou "Não testado"), ou null se o valor não for reconhecido
+     */
+    private String convertYesNoNotTestedToPt(String value) {
+        return switch (value) {
             case "yes" -> "Sim";
             case "no" -> "Não";
             case "not-tested" -> "Não testado";
@@ -470,8 +583,14 @@ public class AnimalForm extends GridPane {
         };
     }
 
-    private String convertStatusToPt(String v) {
-        return switch (v) {
+    /**
+     * Converte o valor de status do inglês para português.
+     * 
+     * @param value Valor em inglês ("quarantine", "sheltered", "adopted" ou "lost")
+     * @return Valor em português ("Quarentena", "Abrigado", "Adotado" ou "Perdido"), ou null se o valor não for reconhecido
+     */
+    private String convertStatusToPt(String value) {
+        return switch (value) {
             case "quarantine" -> "Quarentena";
             case "sheltered" -> "Abrigado";
             case "adopted" -> "Adotado";

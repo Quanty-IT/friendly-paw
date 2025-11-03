@@ -52,17 +52,14 @@ public class AnimalView extends VBox {
         loadAnimals();
     }
 
-    /* =========================
-       UI helpers (SVG + Buttons)
-       ========================= */
-
     /**
-     * Cria um ícone SVG usando SVGPath com escala correta baseada no viewBox.
-     * @param svgPath Caminho do arquivo SVG (no classpath, ex: "/assets/icons/attachment.svg")
-     * @param color Cor do preenchimento do ícone (ex: "#FFFFFF")
+     * Cria um ícone SVG a partir de um arquivo SVG do classpath.
+     * 
+     * @param svgPath Caminho do arquivo SVG no classpath
+     * @param color Cor a ser aplicada ao ícone (formato hexadecimal, ex: "#FFFFFF")
+     * @return StackPane contendo o ícone renderizado, ou um StackPane vazio em caso de erro
      */
     private StackPane createSvgIcon(String svgPath, String color) {
-        // container fixo 18x18, centraliza automaticamente
         StackPane box = new StackPane();
         box.setMinSize(18, 18);
         box.setPrefSize(18, 18);
@@ -132,8 +129,10 @@ public class AnimalView extends VBox {
 
     /**
      * Cria um botão circular com um ícone SVG centralizado.
-     * @param svgPath caminho do SVG no classpath.
-     * @param extraStyleClasses classes extras para estilização (ex: "icon-btn-edit").
+     * 
+     * @param svgPath Caminho do SVG no classpath
+     * @param extraStyleClasses Classes extras para estilização (ex: "icon-btn-edit")
+     * @return Button configurado com o ícone SVG e estilos aplicados
      */
     private Button createIconButton(String svgPath, String... extraStyleClasses) {
         Button btn = new Button();
@@ -143,12 +142,9 @@ public class AnimalView extends VBox {
         btn.getStyleClass().addAll("icon-btn");
         if (extraStyleClasses != null) btn.getStyleClass().addAll(extraStyleClasses);
 
-        // tamanho fixo do botão
         btn.setMinSize(35, 35);
         btn.setPrefSize(35, 35);
         btn.setMaxSize(35, 35);
-
-        // 👉 só responde a cliques dentro da área do botão, não por “bounds” invisíveis
         btn.setPickOnBounds(false);
 
         btn.setGraphicTextGap(0);
@@ -156,10 +152,6 @@ public class AnimalView extends VBox {
         btn.setAlignment(javafx.geometry.Pos.CENTER);
         return btn;
     }
-
-    /* ==============
-       Build the view
-       ============== */
 
     private void initializeComponents() {
         tableView = new TableView<>();
@@ -398,9 +390,11 @@ public class AnimalView extends VBox {
         );
     }
 
-    /* =========================
-       Load data
-       ========================= */
+    /**
+     * Carrega todos os animais do banco de dados e atualiza a tabela.
+     * 
+     * @throws SQLException Se ocorrer erro na operação do banco de dados (tratado internamente com Alert)
+     */
     private void loadAnimals() {
         try {
             List<Animal> animals = AnimalController.getAllAnimals(conn);
@@ -413,9 +407,12 @@ public class AnimalView extends VBox {
         }
     }
 
-    /* =========================
-       Converters (mesmos seus)
-       ========================= */
+    /**
+     * Converte o valor de sexo do inglês para português.
+     * 
+     * @param value Valor em inglês ("male" ou "female")
+     * @return Valor em português ("Macho" ou "Fêmea"), ou null se o valor não for reconhecido
+     */
     private String convertSexToPt(String value) {
         return switch (value) {
             case "male" -> "Macho";
@@ -423,6 +420,12 @@ public class AnimalView extends VBox {
             default -> null;
         };
     }
+    /**
+     * Converte o valor de espécie do inglês para português.
+     * 
+     * @param value Valor em inglês ("dog" ou "cat")
+     * @return Valor em português ("Cachorro" ou "Gato"), ou null se o valor não for reconhecido
+     */
     private String convertSpeciesToPt(String value) {
         return switch (value) {
             case "dog" -> "Cachorro";
@@ -430,6 +433,12 @@ public class AnimalView extends VBox {
             default -> null;
         };
     }
+    /**
+     * Converte o valor de raça do inglês para português.
+     * 
+     * @param value Valor em inglês (identificador da raça)
+     * @return Valor em português (nome da raça), ou null se o valor não for reconhecido
+     */
     private String convertBreedToPt(String value) {
         return switch (value) {
             case "mixed-breed" -> "S.R.D";
@@ -451,6 +460,12 @@ public class AnimalView extends VBox {
             default -> null;
         };
     }
+    /**
+     * Converte o valor de porte do inglês para português.
+     * 
+     * @param value Valor em inglês ("small", "medium" ou "large")
+     * @return Valor em português ("Pequeno", "Médio" ou "Grande"), ou null se o valor não for reconhecido
+     */
     private String convertSizeToPt(String value) {
         return switch (value) {
             case "small" -> "Pequeno";
@@ -459,6 +474,12 @@ public class AnimalView extends VBox {
             default -> null;
         };
     }
+    /**
+     * Converte o valor de cor do inglês para português.
+     * 
+     * @param value Valor em inglês (identificador da cor)
+     * @return Valor em português (nome da cor), ou null se o valor não for reconhecido
+     */
     private String convertColorToPt(String value) {
         return switch (value) {
             case "black" -> "Preto";
@@ -472,6 +493,12 @@ public class AnimalView extends VBox {
             default -> null;
         };
     }
+    /**
+     * Converte o valor de teste (yes/no/not-tested) do inglês para português.
+     * 
+     * @param value Valor em inglês ("yes", "no" ou "not-tested")
+     * @return Valor em português ("Sim", "Não" ou "Não testado"), ou null se o valor não for reconhecido
+     */
     private String convertYesNoNotTestedToPt(String value) {
         return switch (value) {
             case "yes" -> "Sim";
@@ -480,6 +507,12 @@ public class AnimalView extends VBox {
             default -> null;
         };
     }
+    /**
+     * Converte o valor de status do inglês para português.
+     * 
+     * @param value Valor em inglês ("quarantine", "sheltered", "adopted" ou "lost")
+     * @return Valor em português ("Quarentena", "Abrigado", "Adotado" ou "Perdido"), ou null se o valor não for reconhecido
+     */
     private String convertStatusToPt(String value) {
         return switch (value) {
             case "quarantine" -> "Quarentena";

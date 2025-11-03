@@ -44,6 +44,10 @@ public class GoogleDriveOAuthService {
     
     /**
      * Captura o código de autorização do servidor local.
+     * Inicia um servidor HTTP local na porta 3000 e aguarda o callback do OAuth.
+     * 
+     * @return Código de autorização recebido via OAuth callback
+     * @throws IOException Se ocorrer erro ao iniciar o servidor ou capturar o código
      */
     private static String captureAuthorizationCode() throws IOException {
         CompletableFuture<String> codeFuture = new CompletableFuture<>();
@@ -88,6 +92,12 @@ public class GoogleDriveOAuthService {
 
     /**
      * Obtém ou cria credenciais autorizadas usando OAuth 2.0.
+     * Verifica se já existem credenciais armazenadas, caso contrário inicia o fluxo de autenticação.
+     * 
+     * @return Credencial autorizada do Google Drive
+     * @throws IOException Se ocorrer erro ao acessar ou armazenar credenciais
+     * @throws GeneralSecurityException Se ocorrer erro na autenticação
+     * @throws IllegalStateException Se as variáveis de ambiente GOOGLE_DRIVE_CLIENT_ID ou GOOGLE_DRIVE_CLIENT_SECRET não estiverem configuradas
      */
     private static Credential getCredentials() throws IOException, GeneralSecurityException {
         if (credential != null && credential.getRefreshToken() != null) return credential;
@@ -129,6 +139,11 @@ public class GoogleDriveOAuthService {
 
     /**
      * Cria ou obtém uma instância do serviço Drive (singleton).
+     * Se o serviço já foi inicializado, retorna a instância existente.
+     * 
+     * @return Instância do serviço Drive do Google
+     * @throws IOException Se ocorrer erro ao obter credenciais
+     * @throws GeneralSecurityException Se ocorrer erro na autenticação
      */
     private static Drive getDriveServiceInstance() throws IOException, GeneralSecurityException {
         if (driveService == null) {
@@ -141,6 +156,11 @@ public class GoogleDriveOAuthService {
 
     /**
      * Busca ou cria a pasta "friendly-paw" no Google Drive.
+     * Se a pasta já existir, retorna seu ID. Caso contrário, cria uma nova pasta e a torna pública (read-only).
+     * 
+     * @return UUID da pasta "friendly-paw" no Google Drive
+     * @throws IOException Se ocorrer erro na operação do Google Drive
+     * @throws GeneralSecurityException Se ocorrer erro na autenticação
      */
     private static String getOrCreateFriendlyPawFolder() throws IOException, GeneralSecurityException {
         if (friendlyPawFolderUuid != null) return friendlyPawFolderUuid;
@@ -165,6 +185,12 @@ public class GoogleDriveOAuthService {
 
     /**
      * Busca ou cria a pasta do animal dentro de friendly-paw.
+     * A pasta é nomeada com o UUID do animal e criada dentro da pasta "friendly-paw".
+     * 
+     * @param animalId UUID do animal para criar/buscar a pasta
+     * @return UUID da pasta do animal no Google Drive
+     * @throws IOException Se ocorrer erro na operação do Google Drive
+     * @throws GeneralSecurityException Se ocorrer erro na autenticação
      */
     private static String getOrCreateAnimalFolder(UUID animalId) throws IOException, GeneralSecurityException {
         Drive service = getDriveServiceInstance();
@@ -191,6 +217,14 @@ public class GoogleDriveOAuthService {
     /**
      * Upload de arquivo para Google Drive organizado por animal.
      * Estrutura: friendly-paw/{animalId}/arquivo.png
+     * O arquivo é renomeado com um UUID para evitar conflitos de nome.
+     * 
+     * @param file Arquivo a ser enviado para o Google Drive
+     * @param animalId UUID do animal ao qual o arquivo pertence
+     * @return URL de visualização do arquivo no Google Drive
+     * @throws IOException Se o arquivo não existir, formato não for suportado ou ocorrer erro no upload
+     * @throws GeneralSecurityException Se ocorrer erro na autenticação
+     * @throws IllegalArgumentException Se o formato do arquivo não for suportado (aceito apenas: PNG, JPEG, JPG, PDF)
      */
     public static String uploadFile(java.io.File file, UUID animalId) throws IOException, GeneralSecurityException {
         if (file == null || !file.exists()) {
@@ -223,7 +257,11 @@ public class GoogleDriveOAuthService {
     }
 
     /**
-     * Deleta um arquivo do Google Drive.
+     * Deleta um arquivo do Google Drive pelo seu UUID.
+     * Este método trata exceções internamente e não as propaga.
+     * 
+     * @param fileUuid UUID do arquivo a ser deletado do Google Drive
+     * @return true se o arquivo foi deletado com sucesso, false caso contrário
      */
     public static boolean deleteFile(String fileUuid) {
         try {
@@ -237,6 +275,10 @@ public class GoogleDriveOAuthService {
 
     /**
      * Extrai o ID do arquivo a partir de uma URL do Google Drive.
+     * Funciona com URLs no formato: https://drive.google.com/file/d/{FILE_ID}/view
+     * 
+     * @param driveUrl URL do arquivo no Google Drive
+     * @return ID do arquivo extraído da URL, ou null se a URL for inválida ou não contiver o ID
      */
     public static String extractFileIdFromUrl(String driveUrl) {
         if (driveUrl == null || !driveUrl.contains("/d/")) return null;
@@ -249,6 +291,10 @@ public class GoogleDriveOAuthService {
     /**
      * Determina o tipo MIME do arquivo baseado na extensão.
      * Aceita apenas: PNG, JPEG, JPG e PDF.
+     * 
+     * @param fileName Nome do arquivo (com ou sem caminho completo)
+     * @return String representando o tipo MIME do arquivo
+     * @throws IllegalArgumentException Se o formato do arquivo não for suportado
      */
     private static String getMimeType(String fileName) {
         String ext = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
