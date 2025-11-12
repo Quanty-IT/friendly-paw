@@ -17,7 +17,7 @@ Thumbs.db
 temp/
 
 # Google Calendar credentials
-friendly-paw-calendar.json
+google-service-account.json
 
 # Google OAuth2 tokens (criado automaticamente)
 tokens/

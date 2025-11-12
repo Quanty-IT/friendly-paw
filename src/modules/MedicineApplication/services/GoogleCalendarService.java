@@ -22,18 +22,12 @@ import java.util.List;
 
 public class GoogleCalendarService {
 
-    private static final String APPLICATION_NAME =
-        System.getenv("GOOGLE_CALENDAR_APPLICATION_NAME") != null
-            ? System.getenv("GOOGLE_CALENDAR_APPLICATION_NAME")
-            : "Pata Amiga";
+    private static final String APPLICATION_NAME = "Focinho Amigo";
 
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private static final List<String> SCOPES = Collections.singletonList(CalendarScopes.CALENDAR);
 
-    private static final String SERVICE_ACCOUNT_FILE_PATH =
-        System.getenv("GOOGLE_SERVICE_ACCOUNT_FILE") != null
-            ? System.getenv("GOOGLE_SERVICE_ACCOUNT_FILE")
-            : "friendly-paw-calendar.json";
+    private static final String SERVICE_ACCOUNT_FILE_PATH = "google-service-account.json";
 
     // Fallback padrão: "primary"
     private static final String CALENDAR_ID_FALLBACK =

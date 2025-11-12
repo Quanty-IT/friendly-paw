@@ -25,7 +25,7 @@ public class GoogleDriveOAuthService {
     private static final String APPLICATION_NAME = "Friendly Paw";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
-    private static final String FOLDER_NAME = "friendly-paw";
+    private static final String FOLDER_NAME = "anexos-dos-animais";
     
     // OAuth 2.0 credentials
     private static final String GOOGLE_CLIENT_ID = System.getenv("GOOGLE_DRIVE_CLIENT_ID");
@@ -155,10 +155,10 @@ public class GoogleDriveOAuthService {
     }
 
     /**
-     * Busca ou cria a pasta "friendly-paw" no Google Drive.
+     * Busca ou cria a pasta "anexos-dos-animais" no Google Drive.
      * Se a pasta já existir, retorna seu ID. Caso contrário, cria uma nova pasta e a torna pública (read-only).
      * 
-     * @return UUID da pasta "friendly-paw" no Google Drive
+     * @return UUID da pasta "anexos-dos-animais" no Google Drive
      * @throws IOException Se ocorrer erro na operação do Google Drive
      * @throws GeneralSecurityException Se ocorrer erro na autenticação
      */
@@ -184,8 +184,8 @@ public class GoogleDriveOAuthService {
     }
 
     /**
-     * Busca ou cria a pasta do animal dentro de friendly-paw.
-     * A pasta é nomeada com o UUID do animal e criada dentro da pasta "friendly-paw".
+     * Busca ou cria a pasta do animal dentro de anexos-dos-animais.
+     * A pasta é nomeada com o UUID do animal e criada dentro da pasta "anexos-dos-animais".
      * 
      * @param animalId UUID do animal para criar/buscar a pasta
      * @return UUID da pasta do animal no Google Drive
@@ -216,7 +216,7 @@ public class GoogleDriveOAuthService {
 
     /**
      * Upload de arquivo para Google Drive organizado por animal.
-     * Estrutura: friendly-paw/{animalId}/arquivo.png
+     * Estrutura: anexos-dos-animais/{animalId}/arquivo.png
      * O arquivo é renomeado com um UUID para evitar conflitos de nome.
      * 
      * @param file Arquivo a ser enviado para o Google Drive
