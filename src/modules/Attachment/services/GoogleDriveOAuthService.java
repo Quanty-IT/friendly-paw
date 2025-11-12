@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 public class GoogleDriveOAuthService {
     
@@ -42,6 +43,71 @@ public class GoogleDriveOAuthService {
     private static Credential credential;
     private static HttpServer localServer;
     
+    /**
+     * Abre a URL no navegador padrão do sistema de forma multiplataforma.
+     * Tenta primeiro usar java.awt.Desktop, depois comandos do sistema operacional.
+     * 
+     * @param url URL para abrir no navegador
+     */
+    private static void openBrowser(String url) {
+        // Tenta usar java.awt.Desktop (funciona bem no macOS e Windows com GUI)
+        try {
+            if (java.awt.Desktop.isDesktopSupported()) {
+                java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+                if (desktop.isSupported(java.awt.Desktop.Action.BROWSE)) {
+                    desktop.browse(new java.net.URI(url));
+                    return;
+                }
+            }
+        } catch (Exception e) {
+            // Continua para tentar métodos alternativos
+        }
+        
+        // Métodos alternativos usando comandos do sistema operacional
+        String os = System.getProperty("os.name").toLowerCase();
+        Runtime runtime = Runtime.getRuntime();
+        
+        try {
+            if (os.contains("linux")) {
+                // Linux: tenta xdg-open, depois outros comandos
+                String[] commands = {"xdg-open", "gnome-open", "kde-open", "firefox", "google-chrome", "chromium-browser"};
+                for (String cmd : commands) {
+                    try {
+                        Process process = runtime.exec(new String[]{cmd, url});
+                        // Aguarda um pouco para ver se o comando funcionou
+                        // Se o processo não terminar em 1 segundo, assumimos sucesso (navegador está rodando)
+                        boolean finished = process.waitFor(1, TimeUnit.SECONDS);
+                        if (!finished) {
+                            // Processo ainda está rodando, provavelmente o navegador foi aberto
+                            return;
+                        }
+                        // Se terminou rapidamente, verifica se foi com sucesso (exit code 0)
+                        if (process.exitValue() == 0) {
+                            return;
+                        }
+                    } catch (Exception e) {
+                        // Tenta próximo comando
+                        continue;
+                    }
+                }
+            } else if (os.contains("mac")) {
+                // macOS: usa comando 'open'
+                runtime.exec(new String[]{"open", url});
+                return;
+            } else if (os.contains("win")) {
+                // Windows: usa comando 'start' ou 'rundll32'
+                runtime.exec(new String[]{"rundll32", "url.dll,FileProtocolHandler", url});
+                return;
+            }
+        } catch (Exception e) {
+            // Se todos os métodos falharem, apenas imprime a URL
+        }
+        
+        // Fallback: apenas imprime a URL
+        System.out.println("Não foi possível abrir o navegador automaticamente.");
+        System.out.println("Por favor, abra este URL no navegador:\n" + url);
+    }
+
     /**
      * Captura o código de autorização do servidor local.
      * Inicia um servidor HTTP local na porta 3000 e aguarda o callback do OAuth.
@@ -124,11 +190,7 @@ public class GoogleDriveOAuthService {
 
         String authorizationUrl = flow.newAuthorizationUrl().setRedirectUri(REDIRECT_URI).build();
         
-        try {
-            java.awt.Desktop.getDesktop().browse(new java.net.URI(authorizationUrl));
-        } catch (Exception e) {
-            System.out.println("Abra este URL no navegador:\n" + authorizationUrl);
-        }
+        openBrowser(authorizationUrl);
         
         String code = captureAuthorizationCode();
         TokenResponse tokenResponse = flow.newTokenRequest(code).setRedirectUri(REDIRECT_URI).execute();
