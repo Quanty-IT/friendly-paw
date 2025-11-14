@@ -16,7 +16,11 @@ public class AnimalController {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now())
         """;
 
-    private static final String SELECT_SQL = "SELECT * FROM public.animals";
+    private static final String SELECT_SQL = """
+        SELECT *
+        FROM public.animals
+        ORDER BY name ASC
+    """;
 
     private static final String UPDATE_SQL = """
         UPDATE public.animals
