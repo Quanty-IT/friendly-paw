@@ -47,9 +47,6 @@ public class AnimalForm extends GridPane {
      * 
      * @param mainLayout Layout principal para navegação
      * @param animal Animal a ser editado
-     * @throws SQLException Se ocorrer erro na operação do banco de dados
-     * @throws IOException Se ocorrer erro na operação do Google Calendar
-     * @throws GeneralSecurityException Se ocorrer erro na operação do Google Calendar
      */
     public AnimalForm(BorderPane mainLayout, Animal animal) {
         this.mainLayout = mainLayout;
@@ -322,8 +319,6 @@ public class AnimalForm extends GridPane {
     /**
      * Salva ou atualiza um animal no banco de dados.
      * Valida os dados do formulário e cria ou atualiza o animal conforme o modo (criação/edição).
-     * 
-     * @throws SQLException Se ocorrer erro na operação do banco de dados (tratado internamente com Alert)
      */
     private void saveAnimal() {
         String name = nameField.getText();

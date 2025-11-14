@@ -57,8 +57,6 @@ public class MedicineApplicationForm extends VBox {
      * 
      * @param mainLayout Layout principal para navegação
      * @param selectedAnimal Animal selecionado
-     * @throws SQLException Se ocorrer erro na operação do banco de dados
-     * @throws IOException Se ocorrer erro na operação do Google Calendar
      */
     public MedicineApplicationForm(BorderPane mainLayout, Animal selectedAnimal) {
         this.mainLayout = mainLayout;
